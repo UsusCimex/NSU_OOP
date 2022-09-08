@@ -23,7 +23,6 @@ public:
             int* tmp = (int*)realloc(arr, capacity);
 
             if (tmp == NULL) {
-                free(arr);
                 cout << "Realloc error!.." << endl;
                 return;
             }
