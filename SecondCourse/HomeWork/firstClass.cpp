@@ -16,6 +16,12 @@ public:
         free(arr);
     }
 
+    //Конструктор копирования
+    Array(const Array & oldArr) : Array(oldArr.sizeArray) {
+        memcpy(arr, oldArr.arr, oldArr.sizeArray * sizeof(*oldArr.arr));
+        sizeArray = oldArr.sizeArray;
+    }
+
     //Методы
     void push_back(int X) {
         if (sizeArray == capacity) {
@@ -140,7 +146,7 @@ int main() {
     PrintArray(myArr); //Sorted array
 
     cout << myArr.at(4) << endl; //Error
-    cout << myArr.at(3) << endl; //32
+    cout << myArr.at(3) << endl; //21
 
     PrintArray(myArr);
     return 0;
