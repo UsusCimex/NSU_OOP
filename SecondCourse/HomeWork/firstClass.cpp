@@ -26,7 +26,7 @@ public:
     void push_back(int X) {
         if (sizeArray == capacity) {
             capacity *= 2;
-            int* tmp = (int*)realloc(arr, capacity);
+            int* tmp = (int*)realloc(arr, capacity * sizeof(*arr));
 
             if (tmp == NULL) {
                 cout << "Realloc error!.." << endl;
@@ -64,13 +64,13 @@ public:
                 return &arr[i];
             }
         }
-        return nullptr;
+        return NULL;
     }
 
     bool pop(int val) {
         auto temp = find(val);
-        if (temp == nullptr) return 0;
-        while (temp + 1 != nullptr) {
+        if (temp == NULL) return 0;
+        while (*temp != NULL) {
             *temp = *(temp + 1);
             temp++;
         }
@@ -79,8 +79,8 @@ public:
     }
 
     bool pop(int* val) {
-        if (val == nullptr) return 0;
-        while (val + 1 != nullptr) {
+        if (val == NULL) return 0;
+        while (*val != NULL) {
             *val = *(val + 1);
             val++;
         }
@@ -91,7 +91,7 @@ public:
     void sort(bool reverse = 0) { //Bad sort, I know)
         for (int i = 0; i < sizeArray; ++i) {
             for (int j = i + 1; j < sizeArray; ++j) {
-                if ((arr[i] <= arr[j] && !reverse) || (arr[i] >= arr[j] && reverse)) {
+                if ((arr[i] >= arr[j] && !reverse) || (arr[i] <= arr[j] && reverse)) {
                     swap(&arr[i], &arr[j]);
                 }
             }
@@ -132,21 +132,25 @@ int main() {
     myArr.push_back(21);
     myArr.push_back(40);
 
-    cout << myArr.at(4) << endl;
-    PrintArray(myArr);
-    cout << myArr.at(4) << endl;
-
-    cout << myArr.size() << endl; //5
-    cout << myArr.pop_back() << endl; //40
-
+    myArr.sort();
+    myArr.push_back(25);
     myArr.sort();
 
-    cout << myArr.size() << endl; //4
+    cout << myArr.pop_back() << endl;
+    cout << myArr.pop_back() << endl;
 
-    PrintArray(myArr); //Sorted array
+    myArr.push_back(39);
+    myArr.sort();
 
-    cout << myArr.at(4) << endl; //Error
-    cout << myArr.at(3) << endl; //21
+    PrintArray(myArr);
+    auto el = myArr.find(21);
+    myArr.pop(el);
+    PrintArray(myArr);
+    myArr.pop(22);
+    PrintArray(myArr);
+
+    myArr.push_back(204);
+    myArr.sort();
 
     PrintArray(myArr);
     return 0;
