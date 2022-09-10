@@ -35,7 +35,7 @@ public:
     int at(int index) {
         if (index >= sizeArray) {
             cout << "index > size array. Error code: ";
-            return 1;
+            return 0;
         }
         return arr[index];
     }
@@ -46,10 +46,50 @@ public:
 
     int pop_back() {
         if (sizeArray == 0) {
-            cout << "File is empty" << endl;
+            cout << "Array is empty" << endl;
             return 0;
         }
         return arr[--sizeArray];
+    }
+
+    int* find(int val) {
+        for (int i = 0; i < sizeArray; ++i) {
+            if (arr[i] == val) {
+                return &arr[i];
+            }
+        }
+        return nullptr;
+    }
+
+    bool pop(int val) {
+        auto temp = find(val);
+        if (temp == nullptr) return 0;
+        while (temp + 1 != nullptr) {
+            *temp = *(temp + 1);
+            temp++;
+        }
+        sizeArray -= 1;
+        return 1;
+    }
+
+    bool pop(int* val) {
+        if (val == nullptr) return 0;
+        while (val + 1 != nullptr) {
+            *val = *(val + 1);
+            val++;
+        }
+        sizeArray -= 1;
+        return 1;
+    }
+
+    void sort(bool reverse = 0) { //Bad sort, I know)
+        for (int i = 0; i < sizeArray; ++i) {
+            for (int j = i + 1; j < sizeArray; ++j) {
+                if ((arr[i] <= arr[j] && !reverse) || (arr[i] >= arr[j] && reverse)) {
+                    swap(&arr[i], &arr[j]);
+                }
+            }
+        }
     }
 
     bool empty() {
@@ -62,20 +102,46 @@ private:
     int* arr = nullptr;
     size_t sizeArray = 0ull;
     size_t capacity = 0ull;
+
+    void swap(int* a, int* b) {
+        int c = *a;
+        *a = *b;
+        *b = c;
+    }
 };
+
+void PrintArray(Array arr) {
+    for (int i = 0; i < arr.size(); ++i) {
+        cout << arr.at(i) << " ";
+    }
+    cout << endl;
+}
 
 int main() {
     Array myArr(5);
 
-    myArr.push_back(21);
+    myArr.push_back(32);
     myArr.push_back(22);
+    myArr.push_back(22);
+    myArr.push_back(21);
     myArr.push_back(40);
 
-    cout << myArr.size() << endl; //3
-    cout << myArr.pop_back() << endl; //40
-    cout << myArr.size() << endl; //2
+    cout << myArr.at(4) << endl;
+    PrintArray(myArr);
+    cout << myArr.at(4) << endl;
 
-    cout << myArr.at(2) << endl; //Error
-    cout << myArr.at(1) << endl; //22
+    cout << myArr.size() << endl; //5
+    cout << myArr.pop_back() << endl; //40
+
+    myArr.sort();
+
+    cout << myArr.size() << endl; //4
+
+    PrintArray(myArr); //Sorted array
+
+    cout << myArr.at(4) << endl; //Error
+    cout << myArr.at(3) << endl; //32
+
+    PrintArray(myArr);
     return 0;
 }
