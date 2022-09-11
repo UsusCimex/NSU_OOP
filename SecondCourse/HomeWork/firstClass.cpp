@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -8,12 +8,12 @@ public:
     //Конструкторы
     Array(size_t initial_capacity = 1) {
         capacity = initial_capacity;
-        arr = (int*) malloc(capacity * sizeof(*arr));
+        arr = new int[capacity];
     }
 
     //Деструктор
     ~Array() {
-        free(arr);
+        delete[] arr;
     }
 
     //Конструктор копирования
