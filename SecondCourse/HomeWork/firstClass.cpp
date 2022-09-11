@@ -69,8 +69,8 @@ public:
 
     bool pop(int val) {
         auto temp = find(val);
-        if (temp == NULL) return 0;
-        while (*temp != NULL) {
+        if (temp == &arr[sizeArray-1]) return 0;
+        while (temp != &arr[sizeArray-1]) {
             *temp = *(temp + 1);
             temp++;
         }
@@ -79,8 +79,8 @@ public:
     }
 
     bool pop(int* val) {
-        if (val == NULL) return 0;
-        while (*val != NULL) {
+        if (val == &arr[sizeArray-1]) return 0;
+        while (val != &arr[sizeArray-1]) {
             *val = *(val + 1);
             val++;
         }
