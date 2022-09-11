@@ -7,9 +7,9 @@ namespace myCls {
         arr = new int[capacity];
     }
 
-    Array::Array(const Array & oldArray) : Array(oldArray.sizeArray) 
+    Array::Array(const Array & oldArray) : Array(oldArray.capacity) 
     {
-        memcpy(arr, oldArray.arr, oldArray.sizeArray * sizeof(*oldArray.arr));
+        memcpy(arr, oldArray.arr, oldArray.capacity * sizeof(*oldArray.arr));
         sizeArray = oldArray.sizeArray;
     }
 
@@ -18,10 +18,16 @@ namespace myCls {
         delete[] arr;
     }
 
-    // Array & Array::operator=(const Array & oldArray) 
-    // {
-    //     //
-    // }
+    Array & Array::operator=(const Array & oldArray)
+    {
+        sizeArray = oldArray.sizeArray;
+        capacity = oldArray.capacity;
+        arr = new int[capacity];
+        for (int i = 0; i < sizeArray; ++i) {
+            arr[i] = oldArray.arr[i];
+        }
+        return *this;
+    }
 
     void Array::push_back(int value) {
         if (sizeArray == capacity) {

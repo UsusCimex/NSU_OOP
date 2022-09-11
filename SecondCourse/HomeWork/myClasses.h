@@ -17,7 +17,7 @@ namespace myCls
         Array(const Array & oldArray); //Конструктор копирования
         ~Array(); //Деструктор
 
-        // Array & operator=(const Array & oldArray); //Оператор
+        Array & operator=(const Array & oldArray); //Оператор
         void push_back(int value); //Методы
         void sort(bool reverse = false);
         size_t size();
