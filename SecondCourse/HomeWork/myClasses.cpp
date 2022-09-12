@@ -29,6 +29,11 @@ namespace myCls {
         return *this;
     }
 
+    int Array::operator[](const size_t index)
+    {
+        return arr[index];
+    }
+
     void Array::push_back(int value) {
         if (sizeArray == capacity) {
             capacity *= 2;
@@ -42,6 +47,17 @@ namespace myCls {
             arr = tmp;
         }
         arr[sizeArray++] = value;
+    }
+
+    void Array::insert(size_t index, int value) {
+        if (index > sizeArray) return;
+
+        int temp = arr[index];
+        arr[index] = value;
+        for (size_t i = index + 1; i < sizeArray; i++) {
+            std::swap(temp, arr[i]);
+        }
+        push_back(temp);
     }
 
     int Array::at(size_t index) {
@@ -73,24 +89,45 @@ namespace myCls {
         return NULL;
     }
 
-    bool Array::pop(int value) {
-        auto temp = find(value);
-        if (temp == &arr[sizeArray-1]) return 0;
-        while (temp != &arr[sizeArray-1]) {
-            *temp = *(temp + 1);
-            temp++;
+    int Array::pop(size_t index) {
+        if (index >= sizeArray) return 0;
+        int temp = arr[index];
+        size_t beginner = index;
+        while (beginner != sizeArray) {
+            arr[beginner] = arr[beginner + 1];
+            beginner++;
         }
-        sizeArray -= 1;
-        return 1;
+        return temp;
     }
 
-    bool Array::pop(int* value) {
-        if (value == &arr[sizeArray-1]) return 0;
-        while (value != &arr[sizeArray-1]) {
-            *value = *(value + 1);
-            value++;
+    bool Array::pop_value(int value, size_t count) { //if count == 0 : pop all value
+        if (sizeArray == 0) return 0;
+        int* tempArr = new int[sizeArray];
+        memcpy(tempArr, arr, sizeArray * sizeof(*arr));
+        size_t counter = 0;
+        for (counter; (counter < count) || (count == 0); ++counter) {
+            size_t index;
+            bool flag = 0;
+            for (int i = 0; i < sizeArray; ++i) {
+                if (tempArr[i] == value) {
+                    index = i;
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag == 0 && count == 0) break;
+            if (flag == 0) {
+                delete[] tempArr;
+                return 0;
+            }
+
+            for (index; index < sizeArray; ++index) {
+                tempArr[index] = tempArr[index + 1];
+            }
         }
-        sizeArray -= 1;
+        sizeArray -= counter;
+        memcpy(arr, tempArr, sizeArray * sizeof(*arr));
+        delete[] tempArr;
         return 1;
     }
 
