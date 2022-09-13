@@ -41,8 +41,7 @@ namespace myArr {
             int* tmp = (int*)realloc(arr, capacity * sizeof(*arr));
 
             if (tmp == NULL) {
-                std::cout << "Realloc error!.." << std::endl;
-                return;
+                throw std::runtime_error("it's realloc...");
             }
 
             arr = tmp;
@@ -63,8 +62,7 @@ namespace myArr {
 
     int Array::at(size_t index) {
         if (index >= sizeArray) {
-            std::cout << "index > size array. Error code: ";
-            return 0;
+            throw std::invalid_argument("index out of bounds\n");
         }
         return arr[index];
     }
@@ -75,8 +73,7 @@ namespace myArr {
 
     int Array::pop_back() {
         if (sizeArray == 0) {
-            std::cout << "Array is empty" << std::endl;
-            return 0;
+            throw std::out_of_range("Array is empty!\n");
         }
         return arr[--sizeArray];
     }
