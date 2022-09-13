@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cstdlib>
-#include "myClasses.h"
+#include "Array.h"
 
 using namespace std;
-using namespace myCls;
+using namespace myArr;
 
 void PrintArray(Array arr) {
     for (int i = 0; i < arr.size(); ++i) {

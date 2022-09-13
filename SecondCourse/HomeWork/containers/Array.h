@@ -4,7 +4,7 @@
 #ifndef MYCLASS_H
 #define MYCLASS_H
 
-namespace myCls
+namespace myArr
 {
     class Array
     {

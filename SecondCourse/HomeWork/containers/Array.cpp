@@ -1,6 +1,6 @@
-#include "myClasses.h"
+#include "Array.h"
 
-namespace myCls {
+namespace myArr {
     Array::Array(size_t initial_capacity) 
     {
         capacity = initial_capacity;
