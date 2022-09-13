@@ -20,6 +20,7 @@ namespace myCls {
 
     Array & Array::operator=(const Array & oldArray)
     {
+        if (&oldArray == this) return *this;
         sizeArray = oldArray.sizeArray;
         capacity = oldArray.capacity;
         arr = new int[capacity];

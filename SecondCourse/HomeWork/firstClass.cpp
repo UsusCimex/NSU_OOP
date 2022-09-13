@@ -13,20 +13,18 @@ void PrintArray(Array arr) {
 }
 
 int main() {
-    Array myArr(5);
+    Array arr;
+    arr.push_back(2);
+    arr.push_back(5);
+    arr.push_back(3);
+    arr.push_back(14);
 
-    myArr.push_back(32);
-    myArr.push_back(22);
-    myArr.push_back(22);
-    myArr.push_back(21);
-    myArr.push_back(40);
+    PrintArray(arr);
 
-    myArr.sort();
-    PrintArray(myArr);
-    myArr.insert(2, 104);
-    PrintArray(myArr);
-    myArr.pop_value(22, 1);
-    PrintArray(myArr);
+    Array b = arr;
+    PrintArray(b);
+    b = b;
+    PrintArray(b);
 
     return 0;
 }
