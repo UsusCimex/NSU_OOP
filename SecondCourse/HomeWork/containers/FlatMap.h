@@ -58,7 +58,6 @@ public:
     friend bool operator!=(const FlatMap& a, const FlatMap& b);
 private:
     size_t capacity = 0ull;
-    size_t sizeArray = 0ull;
     Key* key = nullptr;
     Value* value = nullptr;
 };

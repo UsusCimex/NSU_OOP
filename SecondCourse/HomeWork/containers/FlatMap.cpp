@@ -6,12 +6,6 @@ FlatMap::FlatMap() : capacity(1), sizeArray(0)
     key[0] = 0;
     value = new Value[capacity];
 }
-FlatMap::FlatMap(size_t initial_capacity) : capacity(initial_capacity), sizeArray(0)
-{
-    key = new Key[capacity];
-    for (size_t i = 0; i < capacity; ++i) key[i] = 0;
-    value = new Value[capacity];
-}
 FlatMap::~FlatMap()
 {
     delete[] key;
@@ -168,7 +162,45 @@ Value& FlatMap::at(const Key& k)
     {
         while (index < capacity)
         {
-            if (key[index] == )
+            if (key[index] == 0)
+            {
+                throw std::runtime_error("Key is not available");
+            }
+            if (key[index] == k)
+            {
+                break;
+            }
+            else if (key[index] > k)
+            {
+                index = index * 2 + 1;
+            }
+            else
+            {
+                index = index * 2 + 2;
+            }
+        }
+        if (index >= capacity)
+        {
+            throw std::runtime_error("Key is not available");
+        }
+    }
+    return key[index];
+}
+const Value& FlatMap::at(const Key& k) const //Та же реализация, что без const //temp
+{
+    size_t index = 0;
+    if (sizeArray == 0)
+    {
+        key[sizeArray] = k;
+    }
+    else 
+    {
+        while (index < capacity)
+        {
+            if (key[index] == 0)
+            {
+                throw std::runtime_error("Key is not available");
+            }
             if (key[index] == k)
             {
                 break;
@@ -189,10 +221,6 @@ Value& FlatMap::at(const Key& k)
     }
 
     return key[index];
-}
-const Value& FlatMap::at(const Key& k) const 
-{
-
 }
 
 size_t FlatMap::size() const 
