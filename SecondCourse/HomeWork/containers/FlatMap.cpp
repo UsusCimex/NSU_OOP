@@ -1,6 +1,6 @@
 #include "FlatMap.h"
 
-FlatMap::FlatMap() : capacity(1), sizeArray(0)
+FlatMap::FlatMap() : capacity(1)
 {
     key = new Key[capacity];
     key[0] = 0;
@@ -12,18 +12,17 @@ FlatMap::~FlatMap()
     delete[] value; 
 }
 
-FlatMap::FlatMap(const FlatMap& b) : capacity(b.capacity), sizeArray(b.sizeArray)
+FlatMap::FlatMap(const FlatMap& b) : capacity(b.capacity)
 {
     key = new Key[capacity];
-    for (size_t i = 0; i < capacity; ++i) key[i] = 0;
     value = new Value[capacity];
-    for (size_t i = 0; i < sizeArray; i++)
+    for (size_t i = 0; i < capacity; i++)
     {
         key[i] = b.key[i];
         value[i] = b.value[i];
     }
 }
-FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity), sizeArray(b.sizeArray)
+FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
 {
     key = b.key;
     value = b.value;
@@ -31,13 +30,8 @@ FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity), sizeArray(b.sizeArray)
     b.value = nullptr;
 
     b.capacity = 0ull;
-    b.sizeArray = 0ull;
 }
 
-
-// Обменивает значения двух флетмап.
-// Подумайте, зачем нужен этот метод, при наличии стандартной функции
-// std::swap.
 void FlatMap::swap(FlatMap& b) {
     auto temp = move(b);
     b = move(*this);
@@ -48,11 +42,10 @@ FlatMap& FlatMap::operator=(const FlatMap& b)
 {
     if (b == *this) return *this;
     capacity = b.capacity;
-    sizeArray = b.sizeArray;
     key = new Key[capacity];
     value = new Value[capacity];
 
-    for (size_t i = 0; i < sizeArray; ++i)
+    for (size_t i = 0; i < capacity; ++i)
     {
         key[i] = b.key[i];
         value[i] = b.value[i];
@@ -66,8 +59,6 @@ FlatMap&& FlatMap::operator=(FlatMap&& b)
     
     capacity = b.capacity;
     b.capacity = 0ull;
-    sizeArray = b.sizeArray;
-    b.sizeArray = 0ull;
 
     key = b.key;
     b.key = nullptr;
@@ -77,40 +68,32 @@ FlatMap&& FlatMap::operator=(FlatMap&& b)
     return *this;
 }
 
-
-// Очищает контейнер.
 void FlatMap::clear() 
 {
-    if (sizeArray == 0) return;
+    if (key[0] == 0) return;
 
-    for (size_t i = 0; i < sizeArray; ++i) 
+    for (size_t i = 0; i < capacity; ++i) 
     {
         key[i] = 0;
         value[i] = 0;
     }
-    
-    sizeArray = 0ull;
 }
-// Удаляет элемент по заданному ключу.
+
 bool FlatMap::erase(const Key& k) 
 {
     
 }
-// Вставка в контейнер. Возвращаемое значение - успешность вставки.
+
 bool FlatMap::insert(const Key& k, const Value& v) 
 {
 
 }
 
-// Проверка наличия значения по заданному ключу.
 bool FlatMap::contains(const Key& k) const 
 {
 
 }
 
-// Возвращает значение по ключу. Небезопасный метод.
-// В случае отсутствия ключа в контейнере, следует вставить в контейнер
-// значение, созданное конструктором по умолчанию и вернуть ссылку на него. 
 Value& FlatMap::operator[](const Key& k) 
 {
     size_t index = 0;
@@ -150,15 +133,14 @@ Value& FlatMap::operator[](const Key& k)
     return value[index];
 }
 
-// Возвращает значение по ключу. Бросает исключение при неудаче.
 Value& FlatMap::at(const Key& k) 
 {
     size_t index = 0;
-    if (sizeArray == 0)
+    if (key[0] == 0)
     {
-        key[sizeArray] = k;
+        key[0] = k;
     }
-    else 
+    else
     {
         while (index < capacity)
         {
@@ -189,9 +171,9 @@ Value& FlatMap::at(const Key& k)
 const Value& FlatMap::at(const Key& k) const //Та же реализация, что без const //temp
 {
     size_t index = 0;
-    if (sizeArray == 0)
+    if (key[0] == 0)
     {
-        key[sizeArray] = k;
+        key[0] = k;
     }
     else 
     {
@@ -225,11 +207,11 @@ const Value& FlatMap::at(const Key& k) const //Та же реализация, �
 
 size_t FlatMap::size() const 
 {
-    return sizeArray;
+    //обход дерева, либо оставить переменную sizeArray
 }
 bool FlatMap::empty() const 
 {
-    if (sizeArray == 0) return 1;
+    if (key[0] == 0) return 1;
     return 0;
 }
 

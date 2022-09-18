@@ -24,8 +24,6 @@ public:
     FlatMap(FlatMap&& b);
 
     // Обменивает значения двух флетмап.
-    // Подумайте, зачем нужен этот метод, при наличии стандартной функции
-    // std::swap.
     void swap(FlatMap& b);
 
     FlatMap& operator=(const FlatMap& b);
