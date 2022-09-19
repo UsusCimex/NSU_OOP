@@ -80,6 +80,11 @@ void FlatMap::clear() //mb fix
 
 bool FlatMap::erase(const Key& k) 
 {
+    if (sizeArray == 0)
+    {
+        return 0;
+    }
+
     size_t r = sizeArray;
     size_t l = 0;
     indexSearch = (r + l) / 2;
@@ -152,7 +157,27 @@ bool FlatMap::insert(const Key& k, const Value& v)
 
 bool FlatMap::contains(const Key& k) const 
 {
-    //
+    if (sizeArray != 0)
+    {
+        size_t r = sizeArray;
+        size_t l = 0;
+        indexSearch = (r + l) / 2;
+        while (r - l > 0) {
+            if (key[indexSearch] == k)
+            {
+                return 1;
+            }
+            else if (key[indexSearch] > k)
+            {
+                r = indexSearch;
+            }
+            else
+            {
+                l = indexSearch;
+            }
+            indexSearch = (r + l) / 2;
+        }
+    }
     return 0;
 }
 
