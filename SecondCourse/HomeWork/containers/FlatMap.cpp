@@ -3,49 +3,50 @@
 FlatMap::FlatMap() : capacity(1)
 {
     key = new Key[capacity];
-    key[0] = 0;
     value = new Value[capacity];
 }
 FlatMap::~FlatMap()
 {
     delete[] key;
-    delete[] value; 
+    delete[] value;
 }
 
 FlatMap::FlatMap(const FlatMap& b) : capacity(b.capacity)
 {
     key = new Key[capacity];
     value = new Value[capacity];
-    for (size_t i = 0; i < capacity; i++)
+    for (size_t i = 0; i < b.sizeArray; i++)
     {
         key[i] = b.key[i];
         value[i] = b.value[i];
     }
 }
-FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
-{
-    key = b.key;
-    value = b.value;
-    b.key = nullptr;
-    b.value = nullptr;
+// FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
+// {
+//     key = b.key;
+//     value = b.value;
+//     b.key = nullptr;
+//     b.value = nullptr;
 
-    b.capacity = 0ull;
-}
+//     b.capacity = 0ull;
+//     b.sizeArray = 0ull;
+// }
 
-void FlatMap::swap(FlatMap& b) {
-    auto temp = move(b);
-    b = move(*this);
-    *this = move(temp);
+void FlatMap::swap(FlatMap& b) { //mb fix
+    auto temp = std::move(b);
+    b = std::move(*this);
+    *this = std::move(temp);
 }
 
 FlatMap& FlatMap::operator=(const FlatMap& b)
-{
+{    
     if (b == *this) return *this;
     capacity = b.capacity;
+    sizeArray = b.sizeArray;
     key = new Key[capacity];
     value = new Value[capacity];
-
-    for (size_t i = 0; i < capacity; ++i)
+     
+    for (size_t i = 0; i < sizeArray; ++i)
     {
         key[i] = b.key[i];
         value[i] = b.value[i];
@@ -53,167 +54,196 @@ FlatMap& FlatMap::operator=(const FlatMap& b)
 
     return *this;
 }
-FlatMap&& FlatMap::operator=(FlatMap&& b) 
-{
-    if (b == *this) return *this;
+// FlatMap&& FlatMap::operator=(FlatMap&& b) 
+// {
+//     if (b == this) return this;
     
-    capacity = b.capacity;
-    b.capacity = 0ull;
+//     capacity = b.capacity;
+//     sizeArray = b.sizeArray;
+//     b.capacity = 0ull;
+//     b.sizeArray = 0ull;
 
-    key = b.key;
-    b.key = nullptr;
-    value = b.value;
-    b.value = nullptr;
+//     key = b.key;
+//     b.key = nullptr;
+//     value = b.value;
+//     b.value = nullptr;
 
-    return *this;
-}
+//     return *this;
+// }
 
-void FlatMap::clear() 
+void FlatMap::clear() //mb fix
 {
-    if (key[0] == 0) return;
-
-    for (size_t i = 0; i < capacity; ++i) 
-    {
-        key[i] = 0;
-        value[i] = 0;
-    }
+    if (sizeArray == 0) return;
+    
+    sizeArray = 0;
 }
 
 bool FlatMap::erase(const Key& k) 
 {
-    
+    //
+    return 0;
 }
 
 bool FlatMap::insert(const Key& k, const Value& v) 
 {
-
+    //
+    return 0;
 }
 
 bool FlatMap::contains(const Key& k) const 
 {
-
+    //
+    return 0;
 }
 
 Value& FlatMap::operator[](const Key& k) 
 {
-    size_t index = 0;
-    while (index < capacity)
+    if (sizeArray == capacity)
     {
-        if (key[index] == 0) 
-        {
-            key[index] = k;
-            break;
-        }
-        if (key[index] == k)
-        {
-            break;
-        }
-        else if (key[index] > k)
-        {
-            index = index * 2 + 1;
-        }
-        else
-        {
-            index = index * 2 + 2;
-        }
+        ReallocArray(capacity*2);
     }
 
-    if (index >= capacity)
+    size_t indexSearch = 0;
+    
+    if (sizeArray == 0)
     {
-        capacity *= 2;
-        key = (Key*)realloc(key, capacity * sizeof(*key));
-        for (size_t i = capacity / 2; i < capacity; ++i)
-        {
-            key[i] = 0;
-        }
-        value = (Value*)realloc(value, capacity * sizeof(*value));
-        key[index] = k;
+        key[0] = k;
+        sizeArray += 1;
     }
-
-    return value[index];
+    else
+    {
+        size_t r = sizeArray;
+        size_t l = 0;
+        indexSearch = (r + l) / 2;
+        while (r - l > 0) {
+            if (key[indexSearch] == k)
+            {
+                return value[indexSearch];
+            }
+            else if (key[indexSearch] > k)
+            {
+                r = indexSearch;
+            }
+            else
+            {
+                l = indexSearch;
+            }
+            indexSearch = (r + l) / 2;
+        }
+        if (r == l)
+        {
+            Key tempKey = k;
+            Value tempValue = 0;
+            for (int i = indexSearch; i <= sizeArray; ++i)
+            {
+                std::swap(key[i], tempKey);
+                std::swap(value[i], tempValue);
+            }
+            sizeArray++;
+        }
+    }
+    return value[indexSearch];
 }
 
 Value& FlatMap::at(const Key& k) 
 {
-    size_t index = 0;
-    if (key[0] == 0)
-    {
-        key[0] = k;
-    }
-    else
-    {
-        while (index < capacity)
+    size_t r = sizeArray;
+    size_t l = 0;
+    size_t indexSearch = (r + l) / 2;
+    while (r - l > 0) {
+        if (key[indexSearch] == k)
         {
-            if (key[index] == 0)
-            {
-                throw std::runtime_error("Key is not available");
-            }
-            if (key[index] == k)
-            {
-                break;
-            }
-            else if (key[index] > k)
-            {
-                index = index * 2 + 1;
-            }
-            else
-            {
-                index = index * 2 + 2;
-            }
+            return value[indexSearch];
         }
-        if (index >= capacity)
+        else if (key[indexSearch] > k)
         {
-            throw std::runtime_error("Key is not available");
+            r = indexSearch;
         }
+        else
+        {
+            l = indexSearch;
+        }
+        indexSearch = (r + l) / 2;
     }
-    return key[index];
+    if (r == l)
+    {
+        throw std::out_of_range("Key isn't available");
+    }
+    return value[indexSearch];
 }
-const Value& FlatMap::at(const Key& k) const //Та же реализация, что без const //temp
+const Value& FlatMap::at(const Key& k) const //old realisation
 {
-    size_t index = 0;
-    if (key[0] == 0)
-    {
-        key[0] = k;
-    }
-    else 
-    {
-        while (index < capacity)
+    size_t r = sizeArray;
+    size_t l = 0;
+    size_t indexSearch = (r + l) / 2;
+    while (r - l > 0) {
+        if (key[indexSearch] == k)
         {
-            if (key[index] == 0)
-            {
-                throw std::runtime_error("Key is not available");
-            }
-            if (key[index] == k)
-            {
-                break;
-            }
-            else if (key[index] > k)
-            {
-                index = index * 2 + 1;
-            }
-            else
-            {
-                index = index * 2 + 2;
-            }
+            return value[indexSearch];
         }
-        if (index >= capacity)
+        else if (key[indexSearch] > k)
         {
-            throw std::runtime_error("Key is not available");
+            r = indexSearch;
         }
+        else
+        {
+            l = indexSearch;
+        }
+        indexSearch = (r + l) / 2;
     }
-
-    return key[index];
+    if (r == l)
+    {
+        throw std::out_of_range("Key isn't available");
+    }
+    return value[indexSearch];
 }
 
-size_t FlatMap::size() const 
+size_t FlatMap::size() const
 {
-    //обход дерева, либо оставить переменную sizeArray
+    return sizeArray;
 }
 bool FlatMap::empty() const 
 {
-    if (key[0] == 0) return 1;
+    if (sizeArray == 0) return 1;
     return 0;
 }
 
-friend bool FlatMap::operator==(const FlatMap& a, const FlatMap& b);
-friend bool FlatMap::operator!=(const FlatMap& a, const FlatMap& b);
+void FlatMap::ReallocArray(size_t newSize)
+{
+    if (newSize < capacity) return;
+    Key* tempKey = new Key[newSize];
+    Value* tempValue = new Value[newSize];
+
+    for (size_t i = 0; i < sizeArray; ++i)
+    {
+        tempKey[i] = key[i];
+        tempValue[i] = value[i];
+    }
+
+    delete[] key;
+    delete[] value;
+
+    key = tempKey;
+    value = tempValue;
+
+    capacity = newSize;
+}
+
+// bool FlatMap::operator==(const FlatMap& a, const FlatMap& b)
+// {
+//     if (a.sizeArray != b.sizeArray) 
+//     {
+//         return 0;
+//     }
+
+//     for (size_t i = 0; i < a.sizeArray; ++i)
+//     {
+//         if (a.key[i] != b.key[i] || a.value[i] != b.value[i])
+//         {
+//             return 0;
+//         }
+//     }
+
+//     return 1;
+// }
+// friend bool FlatMap::operator!=(const FlatMap& a, const FlatMap& b);

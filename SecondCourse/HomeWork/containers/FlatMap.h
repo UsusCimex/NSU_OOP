@@ -8,11 +8,6 @@
 typedef std::string Key;
 typedef int Value;
 
-struct Value {
-    unsigned age;
-    unsigned weight;
-};
-
 class FlatMap
 {
 public:
@@ -21,13 +16,13 @@ public:
     ~FlatMap();
 
     FlatMap(const FlatMap& b);
-    FlatMap(FlatMap&& b);
+    // FlatMap(FlatMap&& b);
 
     // Обменивает значения двух флетмап.
     void swap(FlatMap& b);
 
     FlatMap& operator=(const FlatMap& b);
-    FlatMap&& operator=(FlatMap&& b);
+    // FlatMap&& operator=(FlatMap&& b);
 
 
     // Очищает контейнер.
@@ -52,12 +47,31 @@ public:
     size_t size() const;
     bool empty() const;
 
-    friend bool operator==(const FlatMap& a, const FlatMap& b);
-    friend bool operator!=(const FlatMap& a, const FlatMap& b);
+    friend bool operator==(const FlatMap& a, const FlatMap& b)
+    {
+        if (a.sizeArray != b.sizeArray) 
+        {
+            return 0;
+        }
+
+        for (size_t i = 0; i < a.sizeArray; ++i)
+        {
+            if (a.key[i] != b.key[i] || a.value[i] != b.value[i])
+            {
+                return 0;
+            }
+        }
+
+        return 1;
+    }
+    // friend bool operator!=(const FlatMap& a, const FlatMap& b);
 private:
     size_t capacity = 0ull;
+    size_t sizeArray = 0ull;
     Key* key = nullptr;
     Value* value = nullptr;
+
+    void ReallocArray(size_t newSize);
 };
 
 #endif
