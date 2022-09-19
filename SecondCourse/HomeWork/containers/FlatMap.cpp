@@ -71,11 +71,11 @@ FlatMap& FlatMap::operator=(const FlatMap& b)
 //     return *this;
 // }
 
-void FlatMap::clear() //mb fix
+void FlatMap::clear()
 {
     if (sizeArray == 0) return;
     
-    sizeArray = 0;
+    ReallocArray(1);
 }
 
 bool FlatMap::erase(const Key& k) 
@@ -87,7 +87,7 @@ bool FlatMap::erase(const Key& k)
 
     size_t r = sizeArray;
     size_t l = 0;
-    indexSearch = (r + l) / 2;
+    size_t indexSearch = (r + l) / 2;
     while (r - l > 0) {
         if (key[indexSearch] == k)
         {
@@ -101,10 +101,12 @@ bool FlatMap::erase(const Key& k)
         }
         else if (key[indexSearch] > k)
         {
+            if (r == indexSearch) indexSearch--;
             r = indexSearch;
         }
         else
         {
+            if (l == indexSearch) indexSearch++;
             l = indexSearch;
         }
         indexSearch = (r + l) / 2;
@@ -124,7 +126,7 @@ bool FlatMap::insert(const Key& k, const Value& v)
     {
         size_t r = sizeArray;
         size_t l = 0;
-        indexSearch = (r + l) / 2;
+        size_t indexSearch = (r + l) / 2;
         while (r - l > 0) {
             if (key[indexSearch] == k)
             {
@@ -132,10 +134,12 @@ bool FlatMap::insert(const Key& k, const Value& v)
             }
             else if (key[indexSearch] > k)
             {
+                if (r == indexSearch) indexSearch--;
                 r = indexSearch;
             }
             else
             {
+                if (l == indexSearch) indexSearch++;
                 l = indexSearch;
             }
             indexSearch = (r + l) / 2;
@@ -161,7 +165,7 @@ bool FlatMap::contains(const Key& k) const
     {
         size_t r = sizeArray;
         size_t l = 0;
-        indexSearch = (r + l) / 2;
+        size_t indexSearch = (r + l) / 2;
         while (r - l > 0) {
             if (key[indexSearch] == k)
             {
@@ -169,10 +173,12 @@ bool FlatMap::contains(const Key& k) const
             }
             else if (key[indexSearch] > k)
             {
+                if (r == indexSearch) indexSearch--;
                 r = indexSearch;
             }
             else
             {
+                if (l == indexSearch) indexSearch++;
                 l = indexSearch;
             }
             indexSearch = (r + l) / 2;
@@ -207,10 +213,12 @@ Value& FlatMap::operator[](const Key& k)
             }
             else if (key[indexSearch] > k)
             {
+                if (r == indexSearch) indexSearch--;
                 r = indexSearch;
             }
             else
             {
+                if (l == indexSearch) indexSearch++;
                 l = indexSearch;
             }
             indexSearch = (r + l) / 2;
@@ -242,10 +250,12 @@ Value& FlatMap::at(const Key& k)
         }
         else if (key[indexSearch] > k)
         {
+            if (r == indexSearch) indexSearch--;
             r = indexSearch;
         }
         else
         {
+            if (l == indexSearch) indexSearch++;
             l = indexSearch;
         }
         indexSearch = (r + l) / 2;
@@ -268,10 +278,12 @@ const Value& FlatMap::at(const Key& k) const //old realisation
         }
         else if (key[indexSearch] > k)
         {
+            if (r == indexSearch) indexSearch--;
             r = indexSearch;
         }
         else
         {
+            if (l == indexSearch) indexSearch++;
             l = indexSearch;
         }
         indexSearch = (r + l) / 2;
@@ -295,14 +307,22 @@ bool FlatMap::empty() const
 
 void FlatMap::ReallocArray(size_t newSize)
 {
-    if (newSize < capacity) return;
+    if (newSize == capacity) return;
+
     Key* tempKey = new Key[newSize];
     Value* tempValue = new Value[newSize];
 
-    for (size_t i = 0; i < sizeArray; ++i)
+    if (newSize > capacity)
     {
-        tempKey[i] = key[i];
-        tempValue[i] = value[i];
+        for (size_t i = 0; i < sizeArray; ++i)
+        {
+            tempKey[i] = key[i];
+            tempValue[i] = value[i];
+        }
+    }
+    else //lose value
+    {
+        sizeArray = 0;
     }
 
     delete[] key;
