@@ -80,7 +80,30 @@ void FlatMap::clear() //mb fix
 
 bool FlatMap::erase(const Key& k) 
 {
-    //
+    size_t r = sizeArray;
+    size_t l = 0;
+    indexSearch = (r + l) / 2;
+    while (r - l > 0) {
+        if (key[indexSearch] == k)
+        {
+            for (int i = indexSearch; i < sizeArray; ++i)
+            {
+                std::swap(key[i], key[i+1]);
+                std::swap(value[i], value[i+1]);
+            }
+            sizeArray--;
+            return 1;
+        }
+        else if (key[indexSearch] > k)
+        {
+            r = indexSearch;
+        }
+        else
+        {
+            l = indexSearch;
+        }
+        indexSearch = (r + l) / 2;
+    }
     return 0;
 }
 
@@ -228,22 +251,3 @@ void FlatMap::ReallocArray(size_t newSize)
 
     capacity = newSize;
 }
-
-// bool FlatMap::operator==(const FlatMap& a, const FlatMap& b)
-// {
-//     if (a.sizeArray != b.sizeArray) 
-//     {
-//         return 0;
-//     }
-
-//     for (size_t i = 0; i < a.sizeArray; ++i)
-//     {
-//         if (a.key[i] != b.key[i] || a.value[i] != b.value[i])
-//         {
-//             return 0;
-//         }
-//     }
-
-//     return 1;
-// }
-// friend bool FlatMap::operator!=(const FlatMap& a, const FlatMap& b);
