@@ -109,8 +109,45 @@ bool FlatMap::erase(const Key& k)
 
 bool FlatMap::insert(const Key& k, const Value& v) 
 {
-    //
-    return 0;
+    if (sizeArray == 0)
+    {
+        key[0] = k;
+        value[0] = v;
+        sizeArray += 1;
+    }
+    else
+    {
+        size_t r = sizeArray;
+        size_t l = 0;
+        indexSearch = (r + l) / 2;
+        while (r - l > 0) {
+            if (key[indexSearch] == k)
+            {
+                return 0; //mb old value needs to be replaced with a new one
+            }
+            else if (key[indexSearch] > k)
+            {
+                r = indexSearch;
+            }
+            else
+            {
+                l = indexSearch;
+            }
+            indexSearch = (r + l) / 2;
+        }
+        if (r == l)
+        {
+            Key tempKey = k;
+            Value tempValue = v;
+            for (int i = indexSearch; i <= sizeArray; ++i)
+            {
+                std::swap(key[i], tempKey);
+                std::swap(value[i], tempValue);
+            }
+            sizeArray++;
+        }
+    }
+    return 1;
 }
 
 bool FlatMap::contains(const Key& k) const 
