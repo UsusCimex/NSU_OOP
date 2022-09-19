@@ -12,7 +12,6 @@ class FlatMap
 {
 public:
     FlatMap();
-    FlatMap(size_t initial_capacity);
     ~FlatMap();
 
     FlatMap(const FlatMap& b);
