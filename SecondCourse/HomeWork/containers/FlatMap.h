@@ -64,7 +64,10 @@ public:
 
         return 1;
     }
-    // friend bool operator!=(const FlatMap& a, const FlatMap& b);
+    friend bool operator!=(const FlatMap& a, const FlatMap& b)
+    {
+        return !(a == b);
+    }
 private:
     size_t capacity = 0ull;
     size_t sizeArray = 0ull;
