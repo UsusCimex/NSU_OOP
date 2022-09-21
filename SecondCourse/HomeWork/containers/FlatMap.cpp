@@ -21,18 +21,18 @@ FlatMap::FlatMap(const FlatMap& b) : capacity(b.capacity)
         value[i] = b.value[i];
     }
 }
-// FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
-// {
-//     key = b.key;
-//     value = b.value;
-//     b.key = nullptr;
-//     b.value = nullptr;
+FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
+{
+    key = b.key;
+    value = b.value;
+    b.key = nullptr;
+    b.value = nullptr;
 
-//     b.capacity = 0ull;
-//     b.sizeArray = 0ull;
-// }
+    b.capacity = 0ull;
+    b.sizeArray = 0ull;
+}
 
-void FlatMap::swap(FlatMap& b) { //mb fix
+void FlatMap::swap(FlatMap& b) {
     auto temp = std::move(b);
     b = std::move(*this);
     *this = std::move(temp);
@@ -54,28 +54,29 @@ FlatMap& FlatMap::operator=(const FlatMap& b)
 
     return *this;
 }
-// FlatMap&& FlatMap::operator=(FlatMap&& b) 
-// {
-//     if (b == this) return this;
+FlatMap& FlatMap::operator=(FlatMap&& b) 
+{
+    if (b == this) return this;
     
-//     capacity = b.capacity;
-//     sizeArray = b.sizeArray;
-//     b.capacity = 0ull;
-//     b.sizeArray = 0ull;
+    capacity = b.capacity;
+    sizeArray = b.sizeArray;
+    b.capacity = 0ull;
+    b.sizeArray = 0ull;
 
-//     key = b.key;
-//     b.key = nullptr;
-//     value = b.value;
-//     b.value = nullptr;
+    key = b.key;
+    b.key = nullptr;
+    value = b.value;
+    b.value = nullptr;
 
-//     return *this;
-// }
+    return *this;
+}
 
 void FlatMap::clear()
 {
     if (sizeArray == 0) return;
     
     ReallocArray(1);
+    sizeArray = 0;
 }
 
 bool FlatMap::erase(const Key& k) 
@@ -97,6 +98,12 @@ bool FlatMap::erase(const Key& k)
                 std::swap(value[i], value[i+1]);
             }
             sizeArray--;
+
+            if (sizeArray < capacity / 2) //optimise memory
+            {
+                ReallocArray(capacity / 2);
+            }
+
             return 1;
         }
         else if (key[indexSearch] > k)
@@ -146,6 +153,11 @@ bool FlatMap::insert(const Key& k, const Value& v)
         }
         if (r == l)
         {
+            if (sizeArray == capacity)
+            {
+                ReallocArray(capacity * 2);
+            }
+            
             Key tempKey = k;
             Value tempValue = v;
             for (int i = indexSearch; i <= sizeArray; ++i)
@@ -189,11 +201,6 @@ bool FlatMap::contains(const Key& k) const
 
 Value& FlatMap::operator[](const Key& k) 
 {
-    if (sizeArray == capacity)
-    {
-        ReallocArray(capacity*2);
-    }
-
     size_t indexSearch = 0;
     
     if (sizeArray == 0)
@@ -225,6 +232,11 @@ Value& FlatMap::operator[](const Key& k)
         }
         if (r == l)
         {
+            if (sizeArray == capacity)
+            {
+                ReallocArray(capacity*2);
+            }
+            
             Key tempKey = k;
             Value tempValue = 0;
             for (int i = indexSearch; i <= sizeArray; ++i)

@@ -15,13 +15,13 @@ public:
     ~FlatMap();
 
     FlatMap(const FlatMap& b);
-    // FlatMap(FlatMap&& b);
+    FlatMap(FlatMap&& b);
 
     // Обменивает значения двух флетмап.
     void swap(FlatMap& b);
 
     FlatMap& operator=(const FlatMap& b);
-    // FlatMap&& operator=(FlatMap&& b);
+    FlatMap& operator=(FlatMap&& b);
 
 
     // Очищает контейнер.
