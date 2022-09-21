@@ -27,7 +27,7 @@ FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
     value = b.value;
     b.key = nullptr;
     b.value = nullptr;
-
+    
     b.capacity = 0ull;
     b.sizeArray = 0ull;
 }
@@ -56,7 +56,7 @@ FlatMap& FlatMap::operator=(const FlatMap& b)
 }
 FlatMap& FlatMap::operator=(FlatMap&& b) 
 {
-    if (b == this) return this;
+    if (b == *this) return *this;
     
     capacity = b.capacity;
     sizeArray = b.sizeArray;

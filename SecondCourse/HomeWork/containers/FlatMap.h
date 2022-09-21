@@ -14,34 +14,34 @@ public:
     FlatMap();
     ~FlatMap();
 
-    FlatMap(const FlatMap& b);
-    FlatMap(FlatMap&& b);
+    FlatMap(const FlatMap&);
+    FlatMap(FlatMap&&);
 
     // Обменивает значения двух флетмап.
-    void swap(FlatMap& b);
+    void swap(FlatMap&);
 
-    FlatMap& operator=(const FlatMap& b);
-    FlatMap& operator=(FlatMap&& b);
+    FlatMap& operator=(const FlatMap&);
+    FlatMap& operator=(FlatMap&&);
 
 
     // Очищает контейнер.
     void clear();
     // Удаляет элемент по заданному ключу.
-    bool erase(const Key& k);
+    bool erase(const Key&);
     // Вставка в контейнер. Возвращаемое значение - успешность вставки.
-    bool insert(const Key& k, const Value& v);
+    bool insert(const Key&, const Value&);
 
     // Проверка наличия значения по заданному ключу.
-    bool contains(const Key& k) const;
+    bool contains(const Key&) const;
 
     // Возвращает значение по ключу. Небезопасный метод.
     // В случае отсутствия ключа в контейнере, следует вставить в контейнер
     // значение, созданное конструктором по умолчанию и вернуть ссылку на него. 
-    Value& operator[](const Key& k);
+    Value& operator[](const Key&);
 
     // Возвращает значение по ключу. Бросает исключение при неудаче.
-    Value& at(const Key& k);
-    const Value& at(const Key& k) const;
+    Value& at(const Key&);
+    const Value& at(const Key&) const;
 
     size_t size() const;
     bool empty() const;
@@ -73,7 +73,7 @@ private:
     Key* key = nullptr;
     Value* value = nullptr;
 
-    void ReallocArray(size_t newSize);
+    void ReallocArray(size_t);
 };
 
 #endif
