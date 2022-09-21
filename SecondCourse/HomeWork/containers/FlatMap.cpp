@@ -320,9 +320,13 @@ void FlatMap::ReallocArray(size_t newSize)
             tempValue[i] = value[i];
         }
     }
-    else //lose value
+    else //lose some value
     {
-        sizeArray = 0;
+        sizeArray = newSize;
+        for (int i = 0; i < newSize; ++i)
+        {
+            tempKey[i] = key[i];
+        }
     }
 
     delete[] key;
