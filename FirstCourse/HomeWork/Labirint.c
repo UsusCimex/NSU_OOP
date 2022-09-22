@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <locale.h>
+#include <windows.h>
 
 #define VISITED 0b10000000
 #define SEEKED 0b01000000
@@ -72,13 +73,13 @@ int PopRandCell(int* edges, int* count) {
     return res;
 }
 
-char* PrimMaze(int size) {
-    char* maze = calloc(size * size, sizeof(char));
+char* MakeMaze(int size) {
+    char* maze = (char*)calloc(size * size, sizeof(char));
     int rH = rand() % size;
     int rW = rand() % size;
     maze[rH * size + rW] |= VISITED;
     maze[rH * size + rW] |= SEEKED;
-    int* edges = calloc(size * size, sizeof(int));
+    int* edges = (int*)calloc(size * size, sizeof(int));
     
     int countConnected = 1;
     int countSeeked = 0;
@@ -96,7 +97,7 @@ char* PrimMaze(int size) {
 }
 
 void PrintMaze(char* maze, int size) {
-    char* printer = calloc((size + 1) * (size + 1), sizeof(char));
+    char* printer = (char*)calloc((size + 1) * (size + 1), sizeof(char));
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             if (!(maze[i * size + j] & LEFT)) {
@@ -121,70 +122,71 @@ void PrintMaze(char* maze, int size) {
     for (int i = 0; i < size + 1; i++) {
         for (int j = 0; j < size + 1; j++) {
             if ((i == 0 && j == 0) || (i == size && j == size)) {
-                wprintf(L" ");
+                printf(" ");
             }
             else {
                 int index = i * (size + 1) + j;
                 if ((printer[index] & LEFT) && (printer[index] & UP) && (printer[index] & RIGHT) && (printer[index] & DOWN)) {
-                    wprintf(L"%Lc", L'╋');
+                    printf("╋");
                 }
                 else if ((printer[index] & LEFT) && (printer[index] & UP) && (printer[index] & RIGHT)) {
-                    wprintf(L"%Lc", L'┻');
+                    printf("┻");
                 }
                 else if ((printer[index] & LEFT) && (printer[index] & UP) && (printer[index] & DOWN)) {
-                    wprintf(L"%Lc", L'┫');
+                    printf("┫");
                 }
                 else if ((printer[index] & LEFT) && (printer[index] & DOWN) && (printer[index] & RIGHT)) {
-                    wprintf(L"%Lc", L'┳');
+                    printf("┳");
                 }
                 else if ((printer[index] & UP) && (printer[index] & RIGHT) && (printer[index] & DOWN)) {
-                    wprintf(L"%Lc", L'┣');
+                    printf("┣");
                 }
                 else if ((printer[index] & LEFT) && (printer[index] & UP)) {
-                    wprintf(L"%Lc", L'┛');
+                    printf("┛");
                 }
                 else if ((printer[index] & LEFT) && (printer[index] & RIGHT)) {
-                    wprintf(L"%Lc", L'━');
+                    printf("━");
                 }
                 else if ((printer[index] & LEFT) && (printer[index] & DOWN)) {
-                    wprintf(L"%Lc", L'┓');
+                    printf("┓");
                 }
                 else if ((printer[index] & UP) && (printer[index] & RIGHT)) {
-                    wprintf(L"%Lc", L'┗');
+                    printf("┗");
                 }
                 else if ((printer[index] & UP) && (printer[index] & DOWN)) {
-                    wprintf(L"%Lc", L'┃');
+                    printf("┃");
                 }
                 else if ((printer[index] & RIGHT) && (printer[index] & DOWN)) {
-                    wprintf(L"%Lc", L'┏');
+                    printf("┏");
                 }
                 else if (printer[index] & UP) {
-                    wprintf(L"%Lc", L'╹');
+                    printf("╹");
                 }
                 else if (printer[index] & LEFT) {
-                    wprintf(L"%Lc", L'╸');
+                    printf("╸");
                 }
                 else if (printer[index] & RIGHT) {
-                    wprintf(L"%Lc", L'╺');
+                    printf("╺");
                 }
                 else if (printer[index] & DOWN) {
-                    wprintf(L"%Lc", L'╻');
+                    printf("╻");
                 }
             }
         }
-        wprintf(L"\n");
+        printf("\n");
     }
     free(printer);
 }
 
 int main() {
-    freopen("output.txt", "w", stdout);
+    // freopen("output.txt", "w", stdout);
+    SetConsoleOutputCP( 65001 );
     setlocale(LC_ALL, "en_US.UTF-8");
     srand(time(0));
     int N;
     if (scanf("%d", &N) != 1)
         return 0;
-    char* maze = PrimMaze(N);
+    char* maze = MakeMaze(N);
     PrintMaze(maze, N);
     free(maze);
     return 0;
