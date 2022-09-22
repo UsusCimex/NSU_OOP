@@ -1,30 +1,29 @@
 #include <iostream>
 #include <cstdlib>
-#include "Array.h"
+#include "FlatMap.h"
 
 using namespace std;
-using namespace myArr;
-
-void PrintArray(Array arr) {
-    for (int i = 0; i < arr.size(); ++i) {
-        cout << arr.at(i) << " ";
-    }
-    cout << endl;
-}
 
 int main() {
-    Array arr;
-    arr.push_back(2);
-    arr.push_back(5);
-    arr.push_back(3);
-    arr.push_back(14);
+    FlatMap<string, int> myFM;
+    myFM["help"] = 24;
+    myFM["hello"] = 12;
+    myFM["pirivet"] = 33;
 
-    PrintArray(arr);
+    cout << myFM.at("hello") << endl;
+    cout << myFM.at("pirivet") << endl;
+    // cout << myFM.at("pirivit") << endl; //throw
 
-    Array b = arr;
-    PrintArray(b);
-    b = b;
-    PrintArray(b);
+    myFM["hello"] = 22;
+    cout << myFM.at("hello") << endl;
+
+    if (myFM.erase("hello")) cout << "del" << endl;
+    else cout << "error erase" << endl;
+
+    // cout << myFM.at("hello") << endl; //throw
+
+    myFM.insert("foo", 100);
+    cout << myFM.at("foo") << endl;
 
     return 0;
 }
