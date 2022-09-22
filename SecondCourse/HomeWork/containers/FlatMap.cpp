@@ -1,17 +1,21 @@
 #include "FlatMap.h"
 
-FlatMap::FlatMap() : capacity(1)
+template <typename Key, typename Value>
+FlatMap<Key, Value>::FlatMap() : capacity(1)
 {
     key = new Key[capacity];
     value = new Value[capacity];
 }
-FlatMap::~FlatMap()
+
+template <typename Key, typename Value>
+FlatMap<Key, Value>::~FlatMap()
 {
     delete[] key;
     delete[] value;
 }
 
-FlatMap::FlatMap(const FlatMap& b) : capacity(b.capacity)
+template <typename Key, typename Value>
+FlatMap<Key, Value>::FlatMap(const FlatMap& b) : capacity(b.capacity)
 {
     key = new Key[capacity];
     value = new Value[capacity];
@@ -21,7 +25,9 @@ FlatMap::FlatMap(const FlatMap& b) : capacity(b.capacity)
         value[i] = b.value[i];
     }
 }
-FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
+
+template <typename Key, typename Value>
+FlatMap<Key, Value>::FlatMap(FlatMap&& b) : capacity(b.capacity)
 {
     key = b.key;
     value = b.value;
@@ -32,13 +38,15 @@ FlatMap::FlatMap(FlatMap&& b) : capacity(b.capacity)
     b.sizeArray = 0ull;
 }
 
-void FlatMap::swap(FlatMap& b) {
+template <typename Key, typename Value>
+void FlatMap<Key, Value>::swap(FlatMap& b) {
     auto temp = std::move(b);
     b = std::move(*this);
     *this = std::move(temp);
 }
 
-FlatMap& FlatMap::operator=(const FlatMap& b)
+template <typename Key, typename Value>
+FlatMap<Key, Value>& FlatMap<Key, Value>::operator=(const FlatMap& b)
 {    
     if (b == *this) return *this;
     capacity = b.capacity;
@@ -54,7 +62,9 @@ FlatMap& FlatMap::operator=(const FlatMap& b)
 
     return *this;
 }
-FlatMap& FlatMap::operator=(FlatMap&& b) 
+
+template <typename Key, typename Value>
+FlatMap<Key, Value>& FlatMap<Key, Value>::operator=(FlatMap&& b) 
 {
     if (b == *this) return *this;
     
@@ -71,7 +81,8 @@ FlatMap& FlatMap::operator=(FlatMap&& b)
     return *this;
 }
 
-void FlatMap::clear()
+template <typename Key, typename Value>
+void FlatMap<Key, Value>::clear()
 {
     if (sizeArray == 0) return;
     
@@ -79,7 +90,8 @@ void FlatMap::clear()
     sizeArray = 0;
 }
 
-bool FlatMap::erase(const Key& k) 
+template <typename Key, typename Value>
+bool FlatMap<Key, Value>::erase(const Key& k) 
 {
     if (sizeArray == 0)
     {
@@ -121,7 +133,8 @@ bool FlatMap::erase(const Key& k)
     return 0;
 }
 
-bool FlatMap::insert(const Key& k, const Value& v) 
+template <typename Key, typename Value>
+bool FlatMap<Key, Value>::insert(const Key& k, const Value& v) 
 {
     if (sizeArray == 0)
     {
@@ -171,7 +184,8 @@ bool FlatMap::insert(const Key& k, const Value& v)
     return 1;
 }
 
-bool FlatMap::contains(const Key& k) const 
+template <typename Key, typename Value>
+bool FlatMap<Key, Value>::contains(const Key& k) const 
 {
     if (sizeArray != 0)
     {
@@ -199,7 +213,8 @@ bool FlatMap::contains(const Key& k) const
     return 0;
 }
 
-Value& FlatMap::operator[](const Key& k) 
+template <typename Key, typename Value>
+Value& FlatMap<Key, Value>::operator[](const Key& k) 
 {
     size_t indexSearch = 0;
     
@@ -250,35 +265,8 @@ Value& FlatMap::operator[](const Key& k)
     return value[indexSearch];
 }
 
-Value& FlatMap::at(const Key& k) 
-{
-    size_t r = sizeArray;
-    size_t l = 0;
-    size_t indexSearch = (r + l) / 2;
-    while (r - l > 0) {
-        if (key[indexSearch] == k)
-        {
-            return value[indexSearch];
-        }
-        else if (key[indexSearch] > k)
-        {
-            if (r == indexSearch) indexSearch--;
-            r = indexSearch;
-        }
-        else
-        {
-            if (l == indexSearch) indexSearch++;
-            l = indexSearch;
-        }
-        indexSearch = (r + l) / 2;
-    }
-    if (r == l)
-    {
-        throw std::out_of_range("Key isn't available");
-    }
-    return value[indexSearch];
-}
-const Value& FlatMap::at(const Key& k) const //old realisation
+template <typename Key, typename Value>
+Value& FlatMap<Key, Value>::at(const Key& k) 
 {
     size_t r = sizeArray;
     size_t l = 0;
@@ -307,17 +295,51 @@ const Value& FlatMap::at(const Key& k) const //old realisation
     return value[indexSearch];
 }
 
-size_t FlatMap::size() const
+template <typename Key, typename Value>
+const Value& FlatMap<Key, Value>::at(const Key& k) const //old realisation
+{
+    size_t r = sizeArray;
+    size_t l = 0;
+    size_t indexSearch = (r + l) / 2;
+    while (r - l > 0) {
+        if (key[indexSearch] == k)
+        {
+            return value[indexSearch];
+        }
+        else if (key[indexSearch] > k)
+        {
+            if (r == indexSearch) indexSearch--;
+            r = indexSearch;
+        }
+        else
+        {
+            if (l == indexSearch) indexSearch++;
+            l = indexSearch;
+        }
+        indexSearch = (r + l) / 2;
+    }
+    if (r == l)
+    {
+        throw std::out_of_range("Key isn't available");
+    }
+    return value[indexSearch];
+}
+
+template <typename Key, typename Value>
+size_t FlatMap<Key, Value>::size() const
 {
     return sizeArray;
 }
-bool FlatMap::empty() const 
+
+template <typename Key, typename Value>
+bool FlatMap<Key, Value>::empty() const 
 {
     if (sizeArray == 0) return 1;
     return 0;
 }
 
-void FlatMap::ReallocArray(size_t newSize)
+template <typename Key, typename Value>
+void FlatMap<Key, Value>::ReallocArray(size_t newSize)
 {
     if (newSize == capacity) return;
 
@@ -348,4 +370,29 @@ void FlatMap::ReallocArray(size_t newSize)
     value = tempValue;
 
     capacity = newSize;
+}
+
+template <typename Key, typename Value>
+bool operator==(const FlatMap<Key, Value>& a, const FlatMap<Key, Value>& b)
+{
+    if (a.sizeArray != b.sizeArray) 
+    {
+        return 0;
+    }
+
+    for (size_t i = 0; i < a.sizeArray; ++i)
+    {
+        if (a.key[i] != b.key[i] || a.value[i] != b.value[i])
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+template <typename Key, typename Value>
+bool operator!=(const FlatMap<Key, Value>& a, const FlatMap<Key, Value>& b)
+{
+    return !(a == b);
 }
