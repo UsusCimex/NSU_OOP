@@ -52,6 +52,23 @@ TEST_F(FlatMapTest, checkInsertAndErase)
 	ASSERT_EQ(a.size(), 0);
 }
 
+TEST_F(FlatMapTest, EqualMaps)
+{
+	ASSERT_TRUE(a.insert("key1", 1));
+	ASSERT_TRUE(a.insert("key2", 2));
+	ASSERT_TRUE(a.insert("3key", 3));
+
+	b = a;
+	ASSERT_TRUE(a == b);
+	
+	ASSERT_TRUE(b.erase("key2"));
+	ASSERT_FALSE(a == b);
+	ASSERT_TRUE(a != b);
+
+	ASSERT_TRUE(a.insert("key2", 4));
+	ASSERT_FALSE(a == b);
+}
+
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);
