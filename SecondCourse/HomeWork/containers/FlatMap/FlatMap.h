@@ -92,122 +92,50 @@ public:
     // Удаляет элемент по заданному ключу.
     bool erase(const Key& k)
     {
-         if (sizeArray == 0)
+        size_t index = BinarySearch(k);
+        if (key[index] != k) return 0;
+
+        for (size_t i = index; i < sizeArray; ++i)
         {
-            return 0;
+            std::swap(key[i], key[i+1]);
+            std::swap(value[i], value[i+1]);
+        }
+        sizeArray--;
+
+        if (sizeArray < capacity / 2) //optimise memory
+        {
+            ReallocArray(capacity / 2);
         }
 
-        size_t r = sizeArray;
-        size_t l = 0;
-        size_t indexSearch = (r + l) / 2;
-        while (r - l > 0) {
-            if (key[indexSearch] == k)
-            {
-                for (size_t i = indexSearch; i < sizeArray; ++i)
-                {
-                    std::swap(key[i], key[i+1]);
-                    std::swap(value[i], value[i+1]);
-                }
-                sizeArray--;
-
-                if (sizeArray < capacity / 2) //optimise memory
-                {
-                    ReallocArray(capacity / 2);
-                }
-
-                return 1;
-            }
-            else if (key[indexSearch] > k)
-            {
-                if (r == indexSearch) indexSearch--;
-                r = indexSearch;
-            }
-            else
-            {
-                if (l == indexSearch) indexSearch++;
-                l = indexSearch;
-            }
-            indexSearch = (r + l) / 2;
-        }
-        return 0;
+        return 1;
     }
     // Вставка в контейнер. Возвращаемое значение - успешность вставки.
     bool insert(const Key& k, const Value& v)
     {
-        if (sizeArray == 0)
+        size_t index = BinarySearch(k);
+        if (key[index] == k) return 0; //mb old value needs to be replaced with a new one
+
+        if (sizeArray == capacity)
         {
-            key[0] = k;
-            value[0] = v;
-            sizeArray += 1;
+            ReallocArray(capacity * 2);
         }
-        else
+        
+        Key tempKey = k;
+        Value tempValue = v;
+        for (size_t i = index; i <= sizeArray; ++i)
         {
-            size_t r = sizeArray;
-            size_t l = 0;
-            size_t indexSearch = (r + l) / 2;
-            while (r - l > 0) {
-                if (key[indexSearch] == k)
-                {
-                    return 0; //mb old value needs to be replaced with a new one
-                }
-                else if (key[indexSearch] > k)
-                {
-                    if (r == indexSearch) indexSearch--;
-                    r = indexSearch;
-                }
-                else
-                {
-                    if (l == indexSearch) indexSearch++;
-                    l = indexSearch;
-                }
-                indexSearch = (r + l) / 2;
-            }
-            if (r == l)
-            {
-                if (sizeArray == capacity)
-                {
-                    ReallocArray(capacity * 2);
-                }
-                
-                Key tempKey = k;
-                Value tempValue = v;
-                for (size_t i = indexSearch; i <= sizeArray; ++i)
-                {
-                    std::swap(key[i], tempKey);
-                    std::swap(value[i], tempValue);
-                }
-                sizeArray++;
-            }
+            std::swap(key[i], tempKey);
+            std::swap(value[i], tempValue);
         }
+        sizeArray++;
         return 1;
     }
 
     // Проверка наличия значения по заданному ключу.
     bool contains(const Key& k) const
     {
-        if (sizeArray != 0)
-        {
-            size_t r = sizeArray;
-            size_t l = 0;
-            size_t indexSearch = (r + l) / 2;
-            while (r - l > 0) {
-                if (key[indexSearch] == k)
-                {
-                    return 1;
-                }
-                else if (key[indexSearch] > k)
-                {
-                    if (r == indexSearch) indexSearch--;
-                    r = indexSearch;
-                }
-                else
-                {
-                    if (l == indexSearch) indexSearch++;
-                    l = indexSearch;
-                }
-                indexSearch = (r + l) / 2;
-            }
-        }
+        size_t index = BinarySearch(k);
+        if (key[index] == k) return 1;
         return 0;
     }
 
@@ -216,111 +144,38 @@ public:
     // значение, созданное конструктором по умолчанию и вернуть ссылку на него. 
     Value& operator[](const Key& k)
     {
-        size_t indexSearch = 0;
-    
-        if (sizeArray == 0)
+        size_t index = BinarySearch(k);
+        if (key[index] == k) return value[index];
+
+        if (sizeArray == capacity)
         {
-            key[0] = k;
-            sizeArray += 1;
+            ReallocArray(capacity * 2);
         }
-        else
+        
+        Key tempKey = k;
+        Value tempValue = 0;
+        for (size_t i = index; i <= sizeArray; ++i)
         {
-            size_t r = sizeArray;
-            size_t l = 0;
-            indexSearch = (r + l) / 2;
-            while (r - l > 0) {
-                if (key[indexSearch] == k)
-                {
-                    return value[indexSearch];
-                }
-                else if (key[indexSearch] > k)
-                {
-                    if (r == indexSearch) indexSearch--;
-                    r = indexSearch;
-                }
-                else
-                {
-                    if (l == indexSearch) indexSearch++;
-                    l = indexSearch;
-                }
-                indexSearch = (r + l) / 2;
-            }
-            if (r == l)
-            {
-                if (sizeArray == capacity)
-                {
-                    ReallocArray(capacity*2);
-                }
-                
-                Key tempKey = k;
-                Value tempValue = 0;
-                for (size_t i = indexSearch; i <= sizeArray; ++i)
-                {
-                    std::swap(key[i], tempKey);
-                    std::swap(value[i], tempValue);
-                }
-                sizeArray++;
-            }
+            std::swap(key[i], tempKey);
+            std::swap(value[i], tempValue);
         }
-        return value[indexSearch];
+        sizeArray++;
+
+        return value[index];
     }
 
     // Возвращает значение по ключу. Бросает исключение при неудаче.
     Value& at(const Key& k)
     {
-        size_t r = sizeArray;
-        size_t l = 0;
-        size_t indexSearch = (r + l) / 2;
-        while (r - l > 0) {
-            if (key[indexSearch] == k)
-            {
-                return value[indexSearch];
-            }
-            else if (key[indexSearch] > k)
-            {
-                if (r == indexSearch) indexSearch--;
-                r = indexSearch;
-            }
-            else
-            {
-                if (l == indexSearch) indexSearch++;
-                l = indexSearch;
-            }
-            indexSearch = (r + l) / 2;
-        }
-        if (r == l)
-        {
-            throw std::out_of_range("Key isn't available");
-        }
-        return value[indexSearch];
+        size_t index = BinarySearch(k);
+        if (key[index] == k) return value[index];
+        else throw std::out_of_range("Key isn't available");
     }
     const Value& at(const Key& k) const
     {
-        size_t r = sizeArray;
-        size_t l = 0;
-        size_t indexSearch = (r + l) / 2;
-        while (r - l > 0) {
-            if (key[indexSearch] == k)
-            {
-                return value[indexSearch];
-            }
-            else if (key[indexSearch] > k)
-            {
-                if (r == indexSearch) indexSearch--;
-                r = indexSearch;
-            }
-            else
-            {
-                if (l == indexSearch) indexSearch++;
-                l = indexSearch;
-            }
-            indexSearch = (r + l) / 2;
-        }
-        if (r == l)
-        {
-            throw std::out_of_range("Key isn't available");
-        }
-        return value[indexSearch];
+        size_t index = BinarySearch(k);
+        if (key[index] == k) return value[index];
+        else throw std::out_of_range("Key isn't available");
     }
 
     size_t size() const
@@ -393,6 +248,25 @@ private:
         capacity = newSize;
     }
 
+    size_t BinarySearch(const Key k) const
+    {
+        if (sizeArray == 0) return 0;
+        if (k == key[0]) return 0;
+        if (k == key[sizeArray - 1]) return sizeArray - 1;
+
+        size_t r = sizeArray - 1;
+        size_t l = 0;
+        size_t mid = 0;
+        while (l < r)
+        {
+            mid = l + ((r - l) / 2);
+            if (k == key[mid]) return mid;
+            else if (k > key[mid]) l = mid + 1;
+            else r = mid;
+        }
+        
+        return l;
+    }
 };
 
 #endif
