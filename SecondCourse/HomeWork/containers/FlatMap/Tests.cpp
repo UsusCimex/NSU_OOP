@@ -9,10 +9,10 @@ class FlatMapTest : public testing::Test
 
 TEST_F(FlatMapTest, checkInsertAndErase)
 {
-	a.insert("fValue", 23);
-	a.insert("sValue", 91);
-	a.insert("tValue", 13);
-	a.insert("foValue", 32);
+	ASSERT_TRUE(a.insert("fValue", 23));
+	ASSERT_TRUE(a.insert("sValue", 91));
+	ASSERT_TRUE(a.insert("tValue", 13));
+	ASSERT_TRUE(a.insert("foValue", 32));
 
 	ASSERT_FALSE(a.empty());
 	ASSERT_EQ(a.size(), 4);
@@ -31,9 +31,11 @@ TEST_F(FlatMapTest, checkInsertAndErase)
 	ASSERT_EQ(a.at("sValue"), 91);
 	ASSERT_EQ(a.at("tValue"), 13);
 	ASSERT_EQ(a.at("foValue"), 32);
+	ASSERT_ANY_THROW(a.at("newValue"));
 
-	a.erase("sValue");
-	a.erase("foValue");
+	ASSERT_TRUE(a.erase("sValue"));
+	ASSERT_TRUE(a.erase("foValue"));
+	ASSERT_FALSE(a.erase("rnValue"));
 
 	ASSERT_TRUE(a.contains("fValue"));
 	ASSERT_FALSE(a.contains("sValue"));
@@ -42,17 +44,13 @@ TEST_F(FlatMapTest, checkInsertAndErase)
 
 	ASSERT_EQ(a.size(), 2);
 
-	a.erase("fValue");
-	a.erase("tValue");
+	ASSERT_TRUE(a.erase("fValue"));
+	ASSERT_TRUE(a.erase("tValue"));
+	ASSERT_FALSE(a.erase("fValue"));
 
-	ASSERT_FALSE(a.empty());
-	ASSERT_EQ(a.size(), 0);	
+	ASSERT_TRUE(a.empty());
+	ASSERT_EQ(a.size(), 0);
 }
-
-// TEST_F(FlatMapTest, EqualMaps)
-// {
-// 	a.insert("fValue", 15);
-// }
 
 int main(int argc, char *argv[])
 {

@@ -92,6 +92,7 @@ public:
     // Удаляет элемент по заданному ключу.
     bool erase(const Key& k)
     {
+        if (sizeArray == 0) return false;
         size_t index = BinarySearch(k);
         if (key[index] != k) return false;
 
@@ -229,7 +230,7 @@ private:
         }
         else //lose some value
         {
-            sizeArray = newSize;
+            sizeArray = std::min(sizeArray, newSize);
             for (size_t i = 0; i < newSize; ++i)
             {
                 tempKey[i] = key[i];
