@@ -93,13 +93,10 @@ public:
     bool erase(const Key& k)
     {
         size_t index = BinarySearch(k);
-        if (key[index] != k) return 0;
+        if (key[index] != k) return false;
 
-        for (size_t i = index; i < sizeArray; ++i)
-        {
-            std::swap(key[i], key[i+1]);
-            std::swap(value[i], value[i+1]);
-        }
+        std::copy(key + index + 1, key + sizeArray, key + index);
+        std::copy(value + index + 1, value + sizeArray, value + index);
         sizeArray--;
 
         if (sizeArray < capacity / 2) //optimise memory
@@ -107,13 +104,13 @@ public:
             ReallocArray(capacity / 2);
         }
 
-        return 1;
+        return true;
     }
     // Вставка в контейнер. Возвращаемое значение - успешность вставки.
     bool insert(const Key& k, const Value& v)
     {
         size_t index = BinarySearch(k);
-        if (key[index] == k) return 0; //mb old value needs to be replaced with a new one
+        if (key[index] == k) return false; //mb old value needs to be replaced with a new one
 
         if (sizeArray == capacity)
         {
@@ -128,15 +125,15 @@ public:
             std::swap(value[i], tempValue);
         }
         sizeArray++;
-        return 1;
+        return true;
     }
 
     // Проверка наличия значения по заданному ключу.
     bool contains(const Key& k) const
     {
         size_t index = BinarySearch(k);
-        if (key[index] == k) return 1;
-        return 0;
+        if (key[index] == k) return true;
+        return false;
     }
 
     // Возвращает значение по ключу. Небезопасный метод.
@@ -184,26 +181,26 @@ public:
     }
     bool empty() const
     {
-        if (sizeArray == 0) return 1;
-        return 0;
+        if (sizeArray == 0) return true;
+        return false;
     }
 
     friend bool operator==(const FlatMap& a, const FlatMap& b)
     {
         if (a.sizeArray != b.sizeArray) 
         {
-            return 0;
+            return false;
         }
 
         for (size_t i = 0; i < a.sizeArray; ++i)
         {
             if (a.key[i] != b.key[i] || a.value[i] != b.value[i])
             {
-                return 0;
+                return false;
             }
         }
 
-        return 1;
+        return true;
     }
     friend bool operator!=(const FlatMap& a, const FlatMap& b)
     {
