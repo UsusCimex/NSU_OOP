@@ -7,7 +7,7 @@ class FlatMapTest : public testing::Test
 	protected: FlatMap<std::string, int> a, b;	
 };
 
-TEST_F(FlatMapTest, checkInsertAndErase)
+TEST_F(FlatMapTest, Insert_Erase_Size_Empty_At)
 {
 	ASSERT_TRUE(a.insert("fValue", 23));
 	ASSERT_TRUE(a.insert("sValue", 91));
@@ -56,7 +56,7 @@ TEST_F(FlatMapTest, EqualMaps)
 {
 	ASSERT_TRUE(a.insert("key1", 1));
 	ASSERT_TRUE(a.insert("key2", 2));
-	ASSERT_TRUE(a.insert("3key", 3));
+	ASSERT_TRUE(a.insert("key3", 3));
 
 	b = a;
 	ASSERT_TRUE(a == b);
@@ -65,8 +65,58 @@ TEST_F(FlatMapTest, EqualMaps)
 	ASSERT_FALSE(a == b);
 	ASSERT_TRUE(a != b);
 
-	ASSERT_TRUE(a.insert("key2", 4));
+	ASSERT_TRUE(b.insert("key2", 4));
 	ASSERT_FALSE(a == b);
+}
+
+TEST_F(FlatMapTest, SwapMaps) //BAD...
+{
+	ASSERT_TRUE(a.insert("aKey1", 1));
+	ASSERT_TRUE(a.insert("aKey2", 2));
+	ASSERT_TRUE(a.insert("aKey3", 3));
+	ASSERT_TRUE(b.insert("bKey1", 4));
+	ASSERT_TRUE(b.insert("bKey2", 5));
+
+	ASSERT_FALSE(a == b);
+	a.swap(b);
+	ASSERT_FALSE(a == b);
+	ASSERT_TRUE(a.contains("bKey2"));
+	ASSERT_FALSE(b.contains("bKey1"));
+	ASSERT_TRUE(b.contains("aKey1"));
+	ASSERT_EQ(b.at("aKey3"), 3);
+
+	b.swap(a);
+	ASSERT_TRUE(a.contains("aKey1"));
+}
+
+TEST_F(FlatMapTest, ClearMap)
+{
+	std::string str = ".";
+	for (int i = 0; i < 100; ++i)
+	{
+		ASSERT_TRUE(a.insert(str, i));
+		str.push_back('.');
+		ASSERT_EQ(i + 1, a.size());
+	}
+
+	a.clear();
+	ASSERT_EQ(0, a.size());
+	ASSERT_ANY_THROW(a.at("..."));
+	ASSERT_ANY_THROW(a.at(""));
+}
+
+TEST_F(FlatMapTest, CheckResize)
+{
+	std::string str = ".";
+	for (int i = 0; i < 10000; ++i)
+	{
+		ASSERT_TRUE(a.insert(str, i));
+		str += '.';
+		ASSERT_EQ(i + 1, a.size());
+	}
+
+	a.clear();
+	ASSERT_EQ(0, a.size());
 }
 
 int main(int argc, char *argv[])
