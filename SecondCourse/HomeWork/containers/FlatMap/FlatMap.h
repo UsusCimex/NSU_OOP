@@ -1,11 +1,13 @@
 #ifndef FLATMAP_H
 #define FLATMAP_H
 
+#define DEFAULTSIZE 1
+
 template <class Key, class Value>
 class FlatMap
 {
 public:
-    FlatMap() : capacity(1)
+    FlatMap() : capacity(DEFAULTSIZE)
     {
         key = new Key[capacity];
         value = new Value[capacity];
@@ -81,7 +83,7 @@ public:
     {
         if (sizeArray == 0) return;
     
-        ReallocArray(1);
+        ReallocArray(DEFAULTSIZE);
         sizeArray = 0;
     }
     // Удаляет элемент по заданному ключу.
