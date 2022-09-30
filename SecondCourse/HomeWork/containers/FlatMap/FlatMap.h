@@ -18,18 +18,15 @@ public:
         delete[] value;
     }
     
-    FlatMap(const FlatMap& b) : capacity(b.capacity)
+    FlatMap(const FlatMap& b) : capacity(b.capacity), sizeArray(b.sizeArray)
     {
         key = new Key[capacity];
         value = new Value[capacity];
-        for (size_t i = 0; i < b.sizeArray; i++)
-        {
-            key[i] = b.key[i];
-            value[i] = b.value[i];
-        }
+        std::copy(b.key, b.key + sizeArray, key);
+        std::copy(b.value, b.value + sizeArray, value);
     }
     FlatMap(FlatMap&& b) : capacity(b.capacity), sizeArray(b.sizeArray)
-    {        
+    {
         key = b.key;
         value = b.value;
 
@@ -47,17 +44,14 @@ public:
 
     FlatMap& operator=(const FlatMap& b)
     {
-        if (b == *this) return *this;
+        if (&b == this) return *this;
         capacity = b.capacity;
         sizeArray = b.sizeArray;
         key = new Key[capacity];
         value = new Value[capacity];
         
-        for (size_t i = 0; i < sizeArray; ++i)
-        {
-            key[i] = b.key[i];
-            value[i] = b.value[i];
-        }
+        std::copy(b.key, b.key + sizeArray, key);
+        std::copy(b.value, b.value + sizeArray, value);
 
         return *this;
     }
