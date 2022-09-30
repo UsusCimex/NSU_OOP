@@ -69,7 +69,7 @@ TEST_F(FlatMapTest, EqualMaps)
 	ASSERT_FALSE(a == b);
 }
 
-TEST_F(FlatMapTest, SwapMaps) //BAD...
+TEST_F(FlatMapTest, SwapMaps)
 {
 	ASSERT_TRUE(a.insert("aKey1", 1));
 	ASSERT_TRUE(a.insert("aKey2", 2));
