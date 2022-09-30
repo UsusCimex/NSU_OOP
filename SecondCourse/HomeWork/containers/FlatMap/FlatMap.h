@@ -45,9 +45,6 @@ public:
         auto temp = std::move(b);
         b = std::move(*this);
         *this = std::move(temp);
-
-        temp.key = nullptr;
-        temp.value = nullptr;
     }
 
     FlatMap& operator=(const FlatMap& b)
@@ -72,11 +69,12 @@ public:
         
         capacity = b.capacity;
         sizeArray = b.sizeArray;
-        b.capacity = 0ull;
-        b.sizeArray = 0ull;
 
-        key = std::move(b.key);
-        value = std::move(b.value);
+        key = b.key;
+        value = b.value;
+
+        b.key = nullptr;
+        b.value = nullptr;
 
         return *this;
     }
