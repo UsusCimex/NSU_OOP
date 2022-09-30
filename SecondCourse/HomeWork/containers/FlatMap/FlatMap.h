@@ -1,10 +1,6 @@
 #ifndef FLATMAP_H
 #define FLATMAP_H
 
-#include <string>
-#include <cstdlib>
-#include <iostream>
-
 template <class Key, class Value>
 class FlatMap
 {
