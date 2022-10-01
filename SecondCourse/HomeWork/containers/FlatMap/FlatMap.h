@@ -1,16 +1,15 @@
 #ifndef FLATMAP_H
 #define FLATMAP_H
 
-#define DEFAULTSIZE 1
-
 template <class Key, class Value>
 class FlatMap
 {
 public:
-    FlatMap() : capacity(DEFAULTSIZE)
+    FlatMap() : capacity(kDefaultSize)
     {
         key = new Key[capacity];
-        value = new Value[capacity];
+        try { value = new Value[capacity]; }
+        catch (...) { delete[] key; }
     }
     ~FlatMap()
     {
@@ -21,10 +20,12 @@ public:
     FlatMap(const FlatMap& b) : capacity(b.capacity), sizeArray(b.sizeArray)
     {
         key = new Key[capacity];
-        value = new Value[capacity];
+        try { value = new Value[capacity]; }
+        catch (...) { delete[] key; }
         std::copy(b.key, b.key + sizeArray, key);
         std::copy(b.value, b.value + sizeArray, value);
     }
+
     FlatMap(FlatMap&& b) : capacity(b.capacity), sizeArray(b.sizeArray)
     {
         key = b.key;
@@ -48,7 +49,8 @@ public:
         capacity = b.capacity;
         sizeArray = b.sizeArray;
         key = new Key[capacity];
-        value = new Value[capacity];
+        try { value = new Value[capacity]; }
+        catch (...) { delete[] key; }
         
         std::copy(b.key, b.key + sizeArray, key);
         std::copy(b.value, b.value + sizeArray, value);
@@ -70,30 +72,28 @@ public:
 
         return *this;
     }
-
-
     // Очищает контейнер.
     void clear()
     {
         if (sizeArray == 0) return;
     
-        ReallocArray(DEFAULTSIZE);
+        ReallocArray(kDefaultSize);
         sizeArray = 0;
     }
     // Удаляет элемент по заданному ключу.
     bool erase(const Key& k)
     {
         if (sizeArray == 0) return false;
-        size_t index = BinarySearch(k);
+        const size_t index = BinarySearch(k);
         if (key[index] != k) return false;
 
-        std::copy(key + index + 1, key + sizeArray, key + index);
-        std::copy(value + index + 1, value + sizeArray, value + index);
+        std::move(key + index + 1, key + sizeArray, key + index);
+        std::move(value + index + 1, value + sizeArray, value + index);
         sizeArray--;
 
-        if (sizeArray < capacity / 2) //optimise memory
+        if (sizeArray < capacity / kDefaultMultiply) //optimise memory
         {
-            ReallocArray(capacity / 2);
+            ReallocArray(capacity / kDefaultMultiply);
         }
 
         return true;
@@ -101,21 +101,20 @@ public:
     // Вставка в контейнер. Возвращаемое значение - успешность вставки.
     bool insert(const Key& k, const Value& v)
     {
-        size_t index = BinarySearch(k);
+        const size_t index = BinarySearch(k);
         if (key[index] == k) return false; //mb old value needs to be replaced with a new one
 
         if (sizeArray == capacity)
         {
-            ReallocArray(capacity * 2);
+            ReallocArray(capacity * kDefaultMultiply);
         }
+
+        std::move_backward(key + index, key + sizeArray, key + sizeArray + 1);
+        key[index] = k;
+
+        std::move_backward(value + index, value + sizeArray, value + sizeArray + 1);
+        value[index] = v;
         
-        Key tempKey = k;
-        Value tempValue = v;
-        for (size_t i = index; i <= sizeArray; ++i)
-        {
-            std::swap(key[i], tempKey);
-            std::swap(value[i], tempValue);
-        }
         sizeArray++;
         return true;
     }
@@ -123,7 +122,7 @@ public:
     // Проверка наличия значения по заданному ключу.
     bool contains(const Key& k) const
     {
-        size_t index = BinarySearch(k);
+        const size_t index = BinarySearch(k);
         if (key[index] == k) return true;
         return false;
     }
@@ -133,36 +132,34 @@ public:
     // значение, созданное конструктором по умолчанию и вернуть ссылку на него. 
     Value& operator[](const Key& k)
     {
-        size_t index = BinarySearch(k);
+        const size_t index = BinarySearch(k);
         if (key[index] == k) return value[index];
 
         if (sizeArray == capacity)
         {
-            ReallocArray(capacity * 2);
+            ReallocArray(capacity * kDefaultMultiply);
         }
         
-        Key tempKey = k;
-        Value tempValue = 0;
-        for (size_t i = index; i <= sizeArray; ++i)
-        {
-            std::swap(key[i], tempKey);
-            std::swap(value[i], tempValue);
-        }
-        sizeArray++;
+        std::move_backward(key + index, key + sizeArray, key + sizeArray + 1);
+        key[index] = k;
 
+        std::move_backward(value + index, value + sizeArray, value + sizeArray + 1);
+        value[index] = 0;
+        
+        sizeArray++;
         return value[index];
     }
 
     // Возвращает значение по ключу. Бросает исключение при неудаче.
     Value& at(const Key& k)
     {
-        size_t index = BinarySearch(k);
+        const size_t index = BinarySearch(k);
         if (key[index] == k) return value[index];
         else throw std::out_of_range("Key isn't available");
     }
     const Value& at(const Key& k) const
     {
-        size_t index = BinarySearch(k);
+        const size_t index = BinarySearch(k);
         if (key[index] == k) return value[index];
         else throw std::out_of_range("Key isn't available");
     }
@@ -173,8 +170,7 @@ public:
     }
     bool empty() const
     {
-        if (sizeArray == 0) return true;
-        return false;
+        return (sizeArray == 0);
     }
 
     friend bool operator==(const FlatMap& a, const FlatMap& b)
@@ -184,21 +180,18 @@ public:
             return false;
         }
 
-        for (size_t i = 0; i < a.sizeArray; ++i)
-        {
-            if (a.key[i] != b.key[i] || a.value[i] != b.value[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
+        if (std::equal(a.key, a.key + a.sizeArray, b.key) && std::equal(a.value, a.value + a.sizeArray, b.value)) return true;
+        return false;
     }
     friend bool operator!=(const FlatMap& a, const FlatMap& b)
     {
         return !(a == b);
     }
+
 private:
+    static constexpr size_t kDefaultSize = 1;
+    static constexpr size_t kDefaultMultiply = 2;
+
     size_t capacity = 0ull;
     size_t sizeArray = 0ull;
     Key* key = nullptr;
@@ -209,7 +202,9 @@ private:
         if (newSize == capacity) return;
 
         Key* tempKey = new Key[newSize];
-        Value* tempValue = new Value[newSize];
+        Value* tempValue = nullptr;
+        try { tempValue = new Value[newSize]; }
+        catch (...) { delete[] tempKey; }
 
         if (newSize > capacity)
         {

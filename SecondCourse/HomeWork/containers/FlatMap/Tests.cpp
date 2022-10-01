@@ -9,84 +9,90 @@ class FlatMapTest : public testing::Test
 
 TEST_F(FlatMapTest, Insert_Erase_Size_Empty_At)
 {
-	ASSERT_TRUE(a.insert("fValue", 23));
-	ASSERT_TRUE(a.insert("sValue", 91));
-	ASSERT_TRUE(a.insert("tValue", 13));
-	ASSERT_TRUE(a.insert("foValue", 32));
+	EXPECT_TRUE(a.insert("fValue", 23));
+	EXPECT_TRUE(a.insert("sValue", 91));
+	EXPECT_TRUE(a.insert("tValue", 13));
+	EXPECT_TRUE(a.insert("foValue", 32));
 
-	ASSERT_FALSE(a.empty());
-	ASSERT_EQ(a.size(), 4);
+	EXPECT_FALSE(a.empty());
+	EXPECT_EQ(a.size(), 4);
 	
-	ASSERT_TRUE(a.contains("sValue"));
-	ASSERT_TRUE(a.contains("tValue"));
-	ASSERT_FALSE(a.contains("randomValue"));
-	ASSERT_FALSE(a.contains("mValue"));
+	EXPECT_TRUE(a.contains("sValue"));
+	EXPECT_TRUE(a.contains("tValue"));
+	EXPECT_FALSE(a.contains("randomValue"));
+	EXPECT_FALSE(a.contains("mValue"));
 
-	ASSERT_EQ(a["fValue"], 23);
-	ASSERT_EQ(a["sValue"], 91);
-	ASSERT_EQ(a["tValue"], 13);
-	ASSERT_EQ(a["foValue"], 32);
+	EXPECT_EQ(a["fValue"], 23);
+	EXPECT_EQ(a["sValue"], 91);
+	EXPECT_EQ(a["tValue"], 13);
+	EXPECT_EQ(a["foValue"], 32);
 
-	ASSERT_EQ(a.at("fValue"), 23);
-	ASSERT_EQ(a.at("sValue"), 91);
-	ASSERT_EQ(a.at("tValue"), 13);
-	ASSERT_EQ(a.at("foValue"), 32);
-	ASSERT_ANY_THROW(a.at("newValue"));
+	EXPECT_EQ(a.at("fValue"), 23);
+	EXPECT_EQ(a.at("sValue"), 91);
+	EXPECT_EQ(a.at("tValue"), 13);
+	EXPECT_EQ(a.at("foValue"), 32);
+	EXPECT_ANY_THROW(a.at("newValue"));
 
-	ASSERT_TRUE(a.erase("sValue"));
-	ASSERT_TRUE(a.erase("foValue"));
-	ASSERT_FALSE(a.erase("rnValue"));
+	EXPECT_TRUE(a.erase("sValue"));
+	EXPECT_TRUE(a.erase("foValue"));
+	EXPECT_FALSE(a.erase("rnValue"));
 
-	ASSERT_TRUE(a.contains("fValue"));
-	ASSERT_FALSE(a.contains("sValue"));
-	ASSERT_TRUE(a.contains("tValue"));
-	ASSERT_FALSE(a.contains("foValue"));
+	EXPECT_TRUE(a.contains("fValue"));
+	EXPECT_FALSE(a.contains("sValue"));
+	EXPECT_TRUE(a.contains("tValue"));
+	EXPECT_FALSE(a.contains("foValue"));
 
-	ASSERT_EQ(a.size(), 2);
+	EXPECT_EQ(a.size(), 2);
 
-	ASSERT_TRUE(a.erase("fValue"));
-	ASSERT_TRUE(a.erase("tValue"));
-	ASSERT_FALSE(a.erase("fValue"));
+	EXPECT_TRUE(a.erase("fValue"));
+	EXPECT_TRUE(a.erase("tValue"));
+	EXPECT_FALSE(a.erase("fValue"));
 
-	ASSERT_TRUE(a.empty());
-	ASSERT_EQ(a.size(), 0);
+	EXPECT_TRUE(a.empty());
+	EXPECT_EQ(a.size(), 0);
+
+	EXPECT_TRUE(a.insert("newValue", 0));
+	EXPECT_EQ(a.at("newValue"), 0);
+	EXPECT_ANY_THROW(a.at("lastValue"));
+
+	EXPECT_EQ(a.size(), 1);
 }
 
 TEST_F(FlatMapTest, EqualMaps)
 {
-	ASSERT_TRUE(a.insert("key1", 1));
-	ASSERT_TRUE(a.insert("key2", 2));
-	ASSERT_TRUE(a.insert("key3", 3));
+	EXPECT_TRUE(a.insert("key1", 1));
+	EXPECT_TRUE(a.insert("key2", 2));
+	EXPECT_TRUE(a.insert("key3", 3));
 
 	b = a;
-	ASSERT_TRUE(a == b);
+	EXPECT_TRUE(a == b);
 	
-	ASSERT_TRUE(b.erase("key2"));
-	ASSERT_FALSE(a == b);
-	ASSERT_TRUE(a != b);
+	EXPECT_TRUE(b.erase("key2"));
+	EXPECT_FALSE(a == b);
+	EXPECT_TRUE(a != b);
 
-	ASSERT_TRUE(b.insert("key2", 4));
-	ASSERT_FALSE(a == b);
+	EXPECT_TRUE(b.insert("key2", 4));
+	EXPECT_FALSE(a == b);
 }
 
 TEST_F(FlatMapTest, SwapMaps)
 {
-	ASSERT_TRUE(a.insert("aKey1", 1));
-	ASSERT_TRUE(a.insert("aKey2", 2));
-	ASSERT_TRUE(a.insert("aKey3", 3));
-	ASSERT_TRUE(b.insert("bKey1", 4));
-	ASSERT_TRUE(b.insert("bKey2", 5));
+	EXPECT_TRUE(a.insert("aKey1", 1));
+	EXPECT_TRUE(a.insert("aKey2", 2));
+	EXPECT_TRUE(a.insert("aKey3", 3));
+	EXPECT_TRUE(b.insert("bKey1", 4));
+	EXPECT_TRUE(b.insert("bKey2", 5));
 
-	ASSERT_FALSE(a == b);
+	EXPECT_FALSE(a == b);
 	a.swap(b);
-	ASSERT_FALSE(a == b);
-	ASSERT_TRUE(a.contains("bKey2"));
-	ASSERT_FALSE(b.contains("bKey1"));
-	ASSERT_TRUE(b.contains("aKey1"));
-	ASSERT_EQ(b.at("aKey3"), 3);
+	EXPECT_FALSE(a == b);
+	EXPECT_TRUE(a.contains("bKey2"));
+	EXPECT_FALSE(b.contains("bKey1"));
+	EXPECT_TRUE(b.contains("aKey1"));
+	EXPECT_EQ(b.at("aKey3"), 3);
 
 	b.swap(a);
-	ASSERT_TRUE(a.contains("aKey1"));
+	EXPECT_TRUE(a.contains("aKey1"));
 }
 
 TEST_F(FlatMapTest, ClearMap)
@@ -94,15 +100,15 @@ TEST_F(FlatMapTest, ClearMap)
 	std::string str = ".";
 	for (int i = 0; i < 100; ++i)
 	{
-		ASSERT_TRUE(a.insert(str, i));
+		EXPECT_TRUE(a.insert(str, i));
 		str.push_back('.');
-		ASSERT_EQ(i + 1, a.size());
+		EXPECT_EQ(i + 1, a.size());
 	}
 
 	a.clear();
-	ASSERT_EQ(0, a.size());
-	ASSERT_ANY_THROW(a.at("..."));
-	ASSERT_ANY_THROW(a.at(""));
+	EXPECT_EQ(0, a.size());
+	EXPECT_ANY_THROW(a.at("..."));
+	EXPECT_ANY_THROW(a.at(""));
 }
 
 TEST_F(FlatMapTest, CheckResize)
@@ -110,13 +116,13 @@ TEST_F(FlatMapTest, CheckResize)
 	std::string str = ".";
 	for (int i = 0; i < 10000; ++i)
 	{
-		ASSERT_TRUE(a.insert(str, i));
+		EXPECT_TRUE(a.insert(str, i));
 		str += '.';
-		ASSERT_EQ(i + 1, a.size());
+		EXPECT_EQ(i + 1, a.size());
 	}
 
 	a.clear();
-	ASSERT_EQ(0, a.size());
+	EXPECT_EQ(0, a.size());
 }
 
 int main(int argc, char *argv[])
