@@ -125,6 +125,17 @@ TEST_F(FlatMapTest, CheckResize)
 	EXPECT_EQ(0, a.size());
 }
 
+TEST_F(FlatMapTest, CopyConstructor)
+{
+	EXPECT_TRUE(a.insert("keyA", 65));
+	EXPECT_TRUE(a.insert("keyB", 66));
+	EXPECT_TRUE(a.insert("keyC", 13));
+
+	FlatMap<std::string, int> c = a;
+	EXPECT_TRUE(a == c);
+	EXPECT_EQ(c.at("keyB"), 66);
+}
+
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);
