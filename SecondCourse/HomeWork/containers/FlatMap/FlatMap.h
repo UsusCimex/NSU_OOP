@@ -34,8 +34,7 @@ public:
         b.key = nullptr;
         b.value = nullptr;
     }
-
-    // Обменивает значения двух флетмап.
+    // Swaps the values of two flatmaps.
     void swap(FlatMap& b)
     {
         auto temp = std::move(b);
@@ -72,7 +71,7 @@ public:
 
         return *this;
     }
-    // Очищает контейнер.
+    // Clears the container.
     void clear()
     {
         if (sizeArray == 0) return;
@@ -80,7 +79,8 @@ public:
         ReallocArray(kDefaultSize);
         sizeArray = 0;
     }
-    // Удаляет элемент по заданному ключу.
+    // Removes an element with the given key.
+    // Used Binary search and std::move
     bool erase(const Key& k)
     {
         if (sizeArray == 0) return false;
@@ -98,7 +98,8 @@ public:
 
         return true;
     }
-    // Вставка в контейнер. Возвращаемое значение - успешность вставки.
+    // Insert into container. The return value is the success of the insert.
+    // Used Binary search and std::move_backward
     bool insert(const Key& k, const Value& v)
     {
         const size_t index = BinarySearch(k);
@@ -119,7 +120,8 @@ public:
         return true;
     }
 
-    // Проверка наличия значения по заданному ключу.
+    // Checking if a value exists for a given key.
+    // Used Binary search
     bool contains(const Key& k) const
     {
         const size_t index = BinarySearch(k);
@@ -127,9 +129,10 @@ public:
         return false;
     }
 
-    // Возвращает значение по ключу. Небезопасный метод.
-    // В случае отсутствия ключа в контейнере, следует вставить в контейнер
-    // значение, созданное конструктором по умолчанию и вернуть ссылку на него. 
+    // Returns a value by key. Unsafe method.
+    // If the key is not in the container, it should be inserted into the container
+    // the value created by the default constructor and return a reference to it.
+    //Works like std::move_backward and BinarySearch
     Value& operator[](const Key& k)
     {
         const size_t index = BinarySearch(k);
@@ -144,13 +147,13 @@ public:
         key[index] = k;
 
         std::move_backward(value + index, value + sizeArray, value + sizeArray + 1);
-        value[index] = 0;
+        value[index] = kDefaultValue;
         
         sizeArray++;
         return value[index];
     }
 
-    // Возвращает значение по ключу. Бросает исключение при неудаче.
+    // Returns a value by key. Throws an exception on failure.
     Value& at(const Key& k)
     {
         const size_t index = BinarySearch(k);
@@ -172,7 +175,7 @@ public:
     {
         return (sizeArray == 0);
     }
-
+    //Works like std::equal
     friend bool operator==(const FlatMap& a, const FlatMap& b)
     {
         if (a.sizeArray != b.sizeArray) 
@@ -191,12 +194,15 @@ public:
 private:
     static constexpr size_t kDefaultSize = 1;
     static constexpr size_t kDefaultMultiply = 2;
+    static constexpr size_t kDefaultValue = 0;
 
     size_t capacity = 0ull;
     size_t sizeArray = 0ull;
     Key* key = nullptr;
     Value* value = nullptr;
 
+    //Changes array size. Allocates new memory or delete old memory
+    //Works just like std::copy
     void ReallocArray(size_t newSize)
     {
         if (newSize == capacity) return;
@@ -208,19 +214,13 @@ private:
 
         if (newSize > capacity)
         {
-            for (size_t i = 0; i < sizeArray; ++i)
-            {
-                tempKey[i] = key[i];
-                tempValue[i] = value[i];
-            }
+            std::copy(key, key + sizeArray, tempKey);
+            std::copy(value, value + sizeArray, tempValue);
         }
         else //lose some value
         {
             sizeArray = std::min(sizeArray, newSize);
-            for (size_t i = 0; i < newSize; ++i)
-            {
-                tempKey[i] = key[i];
-            }
+            std::copy(key, key + newSize, tempKey);
         }
 
         delete[] key;
@@ -231,7 +231,8 @@ private:
 
         capacity = newSize;
     }
-
+    //Searches key index in array and returns next position if key index is not found
+    //Works in O(logN)
     size_t BinarySearch(const Key k) const
     {
         if (sizeArray == 0) return 0;
