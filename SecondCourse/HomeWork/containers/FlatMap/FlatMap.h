@@ -190,11 +190,10 @@ public:
     {
         return !(a == b);
     }
-
 private:
-    static constexpr size_t kDefaultSize = 1;
-    static constexpr size_t kDefaultMultiply = 2;
-    static constexpr size_t kDefaultValue = 0;
+    static constexpr size_t kDefaultSize = 1ull;
+    static constexpr size_t kDefaultMultiply = 2ull;
+    static constexpr Value kDefaultValue = Value();
 
     size_t capacity = 0ull;
     size_t sizeArray = 0ull;

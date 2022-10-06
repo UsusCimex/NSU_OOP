@@ -136,6 +136,26 @@ TEST_F(FlatMapTest, CopyConstructor)
 	EXPECT_EQ(c.at("keyB"), 66);
 }
 
+TEST_F(FlatMapTest, CheckOperatorIndex)
+{
+	EXPECT_EQ(a["key1"], 0);
+	EXPECT_EQ(a["key2"], 0);
+	EXPECT_EQ(a["key3"], 0);
+
+	std::string str = ".";
+	for (int i = 0; i < 50; ++i)
+	{
+		EXPECT_EQ(a[str], 0);
+		str += '.';
+		EXPECT_EQ(i + 3 + 1, a.size());
+	}
+
+	a["key2"] = 23;
+	EXPECT_EQ(a["key2"], 23);
+	a.clear();
+	EXPECT_EQ(a.size(), 0);
+}
+
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);
