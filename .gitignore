@@ -3,4 +3,6 @@
 googletest
 build
 temp.*
-doList.txt
+*.txt
+ClassWork
+report
