@@ -58,7 +58,7 @@ TEST_F(FlatMapTest, Insert_Erase_Size_Empty_At)
 	EXPECT_EQ(a.size(), 1);
 }
 
-TEST_F(FlatMapTest, EqualMaps)
+TEST_F(FlatMapTest, EqualMaps) 
 {
 	EXPECT_TRUE(a.insert("key1", 1));
 	EXPECT_TRUE(a.insert("key2", 2));

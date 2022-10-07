@@ -45,12 +45,11 @@ public:
     FlatMap& operator=(const FlatMap& b)
     {
         if (&b == this) return *this;
-        capacity = b.capacity;
-        sizeArray = b.sizeArray;
-        key = new Key[capacity];
-        try { value = new Value[capacity]; }
-        catch (...) { delete[] key; }
+
+        ReallocArray(b.capacity);
         
+        sizeArray = b.sizeArray;
+
         std::copy(b.key, b.key + sizeArray, key);
         std::copy(b.value, b.value + sizeArray, value);
 
