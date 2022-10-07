@@ -73,6 +73,9 @@ TEST_F(FlatMapTest, EqualMaps)
 
 	EXPECT_TRUE(b.insert("key2", 4));
 	EXPECT_FALSE(a == b);
+
+	a=a;
+	EXPECT_TRUE(a == a);
 }
 
 TEST_F(FlatMapTest, SwapMaps)
