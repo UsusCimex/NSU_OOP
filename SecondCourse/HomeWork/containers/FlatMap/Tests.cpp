@@ -159,6 +159,73 @@ TEST_F(FlatMapTest, CheckOperatorIndex)
 	EXPECT_EQ(a.size(), 0);
 }
 
+class BadClass1
+{
+public:
+	BadClass1() { throw std::bad_alloc(); }
+	~BadClass1() = default;
+};
+
+TEST(AllocateTests, ConstructorClass)
+{
+	try { FlatMap<BadClass1, int> a; FAIL() << "expected bad_alloc"; }
+	catch( std::exception& ex ) {}
+}
+
+class BadClass2
+{
+public:
+	BadClass2() = default;
+	~BadClass2() = default;
+	void* operator new(size_t sz) {
+		sz = 0;
+		throw std::bad_alloc();
+	}
+	void* operator new[](size_t sz) {
+		sz = 0;
+		throw std::bad_alloc();
+	}
+};
+
+TEST(AllocateTests, NewLocateClass)
+{
+	try { FlatMap<int, BadClass2> a; FAIL() << "expected bad_alloc"; }
+	catch( std::exception& ex ) {}
+}
+
+class BadClass3
+{
+public:
+	BadClass3() = default;
+	~BadClass3() = default;
+	void editCounter()
+	{
+		counter++;
+	}
+	void* operator new[](size_t sz) {
+		if (sz == 32) throw std::bad_alloc(); //32 bytes is 4 elems
+		return ::operator new[](sz);
+	}
+private:
+	size_t counter = 0ull;
+};
+
+TEST(AllocateTests, AllocateNewMem)
+{
+	try
+	{
+		FlatMap<int, BadClass3> a;
+		for (int i = 0; i < 2; ++i)
+		{
+			EXPECT_TRUE(a.insert(i, BadClass3()));
+		}
+		EXPECT_EQ(a.size(), 2);
+		a.insert(10, BadClass3());
+		FAIL() << "expected bad_alloc";
+	}
+	catch( std::exception& ex ) {}
+}
+
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);

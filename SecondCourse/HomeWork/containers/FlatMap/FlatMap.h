@@ -9,7 +9,7 @@ public:
     {
         key = new Key[capacity];
         try { value = new Value[capacity]; }
-        catch (...) { delete[] key; }
+        catch (...) { delete[] key; throw std::bad_alloc();}
     }
     ~FlatMap()
     {
@@ -21,7 +21,8 @@ public:
     {
         key = new Key[capacity];
         try { value = new Value[capacity]; }
-        catch (...) { delete[] key; }
+        catch (...) { delete[] key; throw std::bad_alloc();}
+
         std::copy(b.key, b.key + sizeArray, key);
         std::copy(b.value, b.value + sizeArray, value);
     }
@@ -46,7 +47,7 @@ public:
     {
         if (&b == this) return *this;
 
-        ReallocArray(b.capacity);
+        EditCapacity(b.capacity);
         
         sizeArray = b.sizeArray;
 
@@ -57,14 +58,14 @@ public:
     }
     FlatMap& operator=(FlatMap&& b)
     {
-        if (b == *this) return *this;
+        if (&b == this) return *this;
         
         capacity = b.capacity;
         sizeArray = b.sizeArray;
 
         key = b.key;
         value = b.value;
-
+        
         b.key = nullptr;
         b.value = nullptr;
 
@@ -75,7 +76,7 @@ public:
     {
         if (sizeArray == 0) return;
     
-        ReallocArray(kDefaultSize);
+        EditCapacity(kDefaultSize);
         sizeArray = 0;
     }
     // Removes an element with the given key.
@@ -92,7 +93,7 @@ public:
 
         if (sizeArray < capacity / kDefaultMultiply) //optimise memory
         {
-            ReallocArray(capacity / kDefaultMultiply);
+            EditCapacity(capacity / kDefaultMultiply);
         }
 
         return true;
@@ -106,7 +107,7 @@ public:
 
         if (sizeArray == capacity)
         {
-            ReallocArray(capacity * kDefaultMultiply);
+            EditCapacity(capacity * kDefaultMultiply);
         }
 
         std::move_backward(key + index, key + sizeArray, key + sizeArray + 1);
@@ -124,8 +125,7 @@ public:
     bool contains(const Key& k) const
     {
         const size_t index = BinarySearch(k);
-        if (key[index] == k) return true;
-        return false;
+        return key[index] == k;
     }
 
     // Returns a value by key. Unsafe method.
@@ -139,7 +139,7 @@ public:
 
         if (sizeArray == capacity)
         {
-            ReallocArray(capacity * kDefaultMultiply);
+            EditCapacity(capacity * kDefaultMultiply);
         }
         
         std::move_backward(key + index, key + sizeArray, key + sizeArray + 1);
@@ -172,18 +172,14 @@ public:
     }
     bool empty() const
     {
-        return (sizeArray == 0);
+        return sizeArray == 0;
     }
     //Works like std::equal
     friend bool operator==(const FlatMap& a, const FlatMap& b)
     {
-        if (a.sizeArray != b.sizeArray) 
-        {
-            return false;
-        }
+        if (a.sizeArray != b.sizeArray) return false;
 
-        if (std::equal(a.key, a.key + a.sizeArray, b.key) && std::equal(a.value, a.value + a.sizeArray, b.value)) return true;
-        return false;
+        return (std::equal(a.key, a.key + a.sizeArray, b.key) && std::equal(a.value, a.value + a.sizeArray, b.value));
     }
     friend bool operator!=(const FlatMap& a, const FlatMap& b)
     {
@@ -201,24 +197,24 @@ private:
 
     //Changes array size. Allocates new memory or delete old memory
     //Works just like std::copy
-    void ReallocArray(size_t newSize)
+    void EditCapacity(size_t newCapacity)
     {
-        if (newSize == capacity) return;
+        if (newCapacity == capacity) return;
 
-        Key* tempKey = new Key[newSize];
+        Key* tempKey = new Key[newCapacity];
         Value* tempValue = nullptr;
-        try { tempValue = new Value[newSize]; }
-        catch (...) { delete[] tempKey; }
+        try { tempValue = new Value[newCapacity]; }
+        catch (...) { delete[] tempKey; throw std::bad_alloc();} 
 
-        if (newSize > capacity)
+        if (newCapacity > capacity)
         {
             std::copy(key, key + sizeArray, tempKey);
             std::copy(value, value + sizeArray, tempValue);
         }
         else //lose some value
         {
-            sizeArray = std::min(sizeArray, newSize);
-            std::copy(key, key + newSize, tempKey);
+            sizeArray = std::min(sizeArray, newCapacity);
+            std::copy(key, key + newCapacity, tempKey);
         }
 
         delete[] key;
@@ -227,7 +223,7 @@ private:
         key = tempKey;
         value = tempValue;
 
-        capacity = newSize;
+        capacity = newCapacity;
     }
     //Searches key index in array and returns next position if key index is not found
     //Works in O(logN)
