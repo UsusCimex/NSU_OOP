@@ -26,13 +26,16 @@ int main(int argc, char ** argv)
             rules.mode = DETAILED;
         else
             rules.mode = TOURNAMENT;
-    if ((rules.mode == DETAILED || rules.mode == FAST) && rules.playerCount > 2) 
+    if ((rules.mode == DETAILED || rules.mode == FAST) && rules.playerCount > 2)
     {
         std::cerr << "mode changed to tournament" << std::endl;
         rules.mode == TOURNAMENT;
     }
 
-    if (rules.mode == FAST)
+    if (rules.mode == FAST || rules.mode == TOURNAMENTFAST)
+        for (auto pl : rules.players)
+            if (pl.front() != '-')
+                throw std::invalid_argument("In Fast and TournamentFast modes can participate only bots!");
 
     Game game(rules);
     game.start();

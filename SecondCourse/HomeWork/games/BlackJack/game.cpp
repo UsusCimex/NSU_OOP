@@ -65,10 +65,9 @@ std::vector<Player> Game::detailedGame(std::vector<Player> players)
 
     Deck deck;
     deck.GenerateDeck();
+    size_t readyPlayers = 0;
 
-    std::vector<Player> inactivePlayers;
-
-    while(players.size() != 0)
+    while(readyPlayers != 2)
     {
         size_t ptr = 0;
         while (ptr < players.size())
@@ -83,23 +82,33 @@ std::vector<Player> Game::detailedGame(std::vector<Player> players)
                     std::cout << players[ptr].name << " took " << curCard.card << ". His score: " << players[ptr].GetScore() << std::endl;
                     if (!players[ptr].GoodScore())
                     {
-                        inactivePlayers = std::move(players); // players.size == 0?
+                        std::cout << players[ptr].name << " oops... enumeration!" << std::endl;
+                        return players;
                     }
-                    else ptr++;
+                    else if (!readyPlayers) ptr ^= 1;
 
                     if (players[ptr].GetScore() == 21)
                     {
-                        inactivePlayers = std::move(players); //up
+                        std::cout << players[ptr].name << " WOW! It's 21!" << std::endl; 
+                        return players;
                     }
                 }
                 else if (status == "s" || status == "stop") 
                 {
-                    inactivePlayers.push_back(players[ptr]);
-                    players.erase(players.begin() + ptr);
+                    std::cout << players[ptr].name << " stop getting card! His score: " << players[ptr].GetScore() << std::endl;
+                    readyPlayers++;
+                    ptr ^= 1;
                 }
                 else if (status == "q" || status == "quit")
                 {
-                    return;
+                    try
+                    {                       
+                        throw std::runtime_error("Bye! Bye!");
+                    }
+                    catch(const std::exception& e)
+                    {
+                        std::cerr << e.what() << '\n';
+                    }
                 }
                 else continue;
 
@@ -108,7 +117,7 @@ std::vector<Player> Game::detailedGame(std::vector<Player> players)
         }
     }
 
-    return inactivePlayers;
+    return players;
 }
 
 std::vector<Player> Game::fastGame(std::vector<Player> players)
@@ -116,9 +125,9 @@ std::vector<Player> Game::fastGame(std::vector<Player> players)
     Deck deck;
     deck.GenerateDeck();
 
-    std::vector<Player> inactivePlayers;
+    size_t readyPlayers = 0;
 
-    while(players.size() != 0)
+    while(readyPlayers != 2)
     {
         size_t ptr = 0;
         while (ptr < players.size())
@@ -129,19 +138,19 @@ std::vector<Player> Game::fastGame(std::vector<Player> players)
             {
                 if (!players[ptr].GoodScore())
                 {
-                    inactivePlayers = std::move(players); // players.size == 0?
+                    return players;
                 }
-                else ptr++;
+                else if (!readyPlayers) ptr ^= 1;
 
                 if (players[ptr].GetScore() == 21)
                 {
-                    inactivePlayers = std::move(players); //up
+                    return players;
                 }
             }
-            else if (status == "s") 
+            else if (status == "s")
             {
-                inactivePlayers.push_back(players[ptr]);
-                players.erase(players.begin() + ptr);
+                readyPlayers++;
+                ptr ^= 1;
             }
             else
             {
@@ -150,7 +159,7 @@ std::vector<Player> Game::fastGame(std::vector<Player> players)
         }
     }
 
-    return inactivePlayers;
+    return players;
 }
 
 void Game::tournamentGame(std::vector<Player> players)
