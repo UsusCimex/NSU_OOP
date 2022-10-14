@@ -23,7 +23,7 @@ bool Person::GetCard(Deck & deck)
     score += curCard.power;
     if (score > 21)
     {
-        for (size_t i = 0; i < card.size(); ++i)
+        for (size_t i = 0; i < card.size(); ++i) //Ace check
         {
             if (card[i].power == 11) 
             {

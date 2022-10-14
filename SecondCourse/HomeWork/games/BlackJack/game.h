@@ -8,7 +8,7 @@
 class Game
 {
 public:
-    void start(size_t countPlayer);
+    void start(Rules rules);
 };
 
 #endif

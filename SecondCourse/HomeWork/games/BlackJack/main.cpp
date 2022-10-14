@@ -3,11 +3,6 @@
 #include "player.h"
 #include "game.h"
 
-struct Rules
-{
-    size_t playerCount = 2;
-};
-
 int main(int argc, char ** argv)
 {
     if (argc < 2) throw std::invalid_argument("Enter something...");
@@ -23,6 +18,6 @@ int main(int argc, char ** argv)
     }
     
     Game game;
-    game.start(rules.playerCount);
+    game.start(rules);
     return 0;
 }

@@ -1,9 +1,9 @@
 #include "game.h"
 
-void Game::start(size_t countPlayer)
+void Game::start(Rules rules)
 {
     std::vector<Person> players;
-    for (size_t i = 0; i < countPlayer; ++i)
+    for (size_t i = 0; i < rules.playerCount; ++i)
     {
         std::string name;
         std::cout << "Enter " << i + 1 << " player name: ";
@@ -40,7 +40,7 @@ void Game::start(size_t countPlayer)
                         std::cout << "System: Player " << players[pl].name << " lost, his score is " << players[pl].GetScore() <<  std::endl;
                         players.erase(players.begin() + pl);
                         pl--;
-                        if (players.size() == 1)
+                        if (players.size() <= 1)
                         {
                             pr.push_back(players.at(0));
                             game = 0;
@@ -60,7 +60,7 @@ void Game::start(size_t countPlayer)
                     pr.push_back(players[pl]);
                     players.erase(players.begin() + pl);
                     pl--;
-                    if (players.size() == 0) 
+                    if (players.size() == 0)
                     {
                         game = 0;
                         break;
@@ -71,7 +71,7 @@ void Game::start(size_t countPlayer)
                     std::cout << "System: Player " << players[pl].name << " lost" << std::endl;
                     players.erase(players.begin() + pl);
                     pl--;
-                    if (players.size() == 1)
+                    if (players.size() <= 1)
                     {
                         pr.push_back(players.at(0));
                         game = 0;
