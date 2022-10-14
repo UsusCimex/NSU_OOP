@@ -8,9 +8,21 @@
 
 #include <time.h>
 
+enum Mode
+{
+    NONE,
+    DETAILED,
+    FAST,
+    TOURNAMENT
+};
+
 struct Rules
 {
-    size_t playerCount = 2;
+    std::vector<std::string> players;
+    Mode mode = NONE;
+    std::string configFile;
+
+    size_t playerCount = 0ull;
 };
 
 #define DECKSIZE 52
