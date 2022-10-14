@@ -61,61 +61,58 @@ void Game::start()
 std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
 {
     std::cout << "### BLACKJACK ###" << std::endl;
-    std::cout << "Control:\ng - get card\ns - stop get card\nq - quite" << std::endl;
+    std::cout << "Control:\ng - get card\ns - stop get card\nq - quit" << std::endl;
 
     Deck deck;
     deck.GenerateDeck();
     size_t readyPlayers = 0;
 
-    while(readyPlayers != 2)
+    size_t ptr = 0;
+    while (readyPlayers != 2)
     {
-        size_t ptr = 0;
-        while (ptr < players.size())
+        while (true) //successful command enter
         {
-            while (true) //successful command enter
+            std::string status = players[ptr]->makeAction();
+
+            if (status == "g" || status == "get")
             {
-                std::string status = players[ptr]->makeAction();
-
-                if (status == "g" || status == "get")
+                Card curCard = players[ptr]->GetCard(deck);
+                players[ptr]->GoodScore();
+                std::cout << players[ptr]->name << " took " << curCard.card << ". His score: " << players[ptr]->GetScore() << std::endl;
+                if (!players[ptr]->GoodScore())
                 {
-                    Card curCard = players[ptr]->GetCard(deck);
-                    players[ptr]->GoodScore();
-                    std::cout << players[ptr]->name << " took " << curCard.card << ". His score: " << players[ptr]->GetScore() << std::endl;
-                    if (!players[ptr]->GoodScore())
-                    {
-                        std::cout << players[ptr]->name << " oops... enumeration!" << std::endl;
-                        return players;
-                    }
-
-                    if (players[ptr]->GetScore() == 21)
-                    {
-                        std::cout << players[ptr]->name << " WOW! It's 21!" << std::endl; 
-                        return players;
-                    }
-
-                    if (!readyPlayers) ptr ^= 1;
+                    std::cout << players[ptr]->name << " oops... enumeration!" << std::endl;
+                    return players;
                 }
-                else if (status == "s" || status == "stop") 
+
+                if (players[ptr]->GetScore() == 21)
                 {
-                    std::cout << players[ptr]->name << " stop getting card! His score: " << players[ptr]->GetScore() << std::endl;
-                    readyPlayers++;
-                    ptr ^= 1;
+                    std::cout << players[ptr]->name << " WOW! It's 21!" << std::endl; 
+                    return players;
                 }
-                else if (status == "q" || status == "quit")
-                {
-                    try
-                    {                       
-                        throw std::runtime_error("Bye! Bye!");
-                    }
-                    catch(const std::exception& e)
-                    {
-                        std::cerr << e.what() << '\n';
-                    }
-                }
-                else continue;
 
-                break;
+                if (!readyPlayers) ptr ^= 1;
             }
+            else if (status == "s" || status == "stop") 
+            {
+                std::cout << players[ptr]->name << " stop getting card! His score: " << players[ptr]->GetScore() << std::endl;
+                readyPlayers++;
+                ptr ^= 1;
+            }
+            else if (status == "q" || status == "quit")
+            {
+                try
+                {                       
+                    throw std::runtime_error("Bye! Bye!");
+                }
+                catch(const std::exception& e)
+                {
+                    std::cerr << e.what() << '\n';
+                }
+            }
+            else continue;
+
+            break;
         }
     }
 
@@ -129,37 +126,34 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
 
     size_t readyPlayers = 0;
 
-    while(readyPlayers != 2)
+    size_t ptr = 0;
+    while (readyPlayers != 2)
     {
-        size_t ptr = 0;
-        while (ptr < players.size())
+        std::string status = players[ptr]->makeAction();
+
+        if (status == "g")
         {
-            std::string status = players[ptr]->makeAction();
-
-            if (status == "g")
+            players[ptr]->GetCard(deck);
+            if (!players[ptr]->GoodScore())
             {
-                players[ptr]->GetCard(deck);
-                if (!players[ptr]->GoodScore())
-                {
-                    return players;
-                }
+                return players;
+            }
 
-                if (players[ptr]->GetScore() == 21)
-                {
-                    return players;
-                }
+            if (players[ptr]->GetScore() == 21)
+            {
+                return players;
+            }
 
-                if (!readyPlayers) ptr ^= 1;
-            }
-            else if (status == "s")
-            {
-                readyPlayers++;
-                ptr ^= 1;
-            }
-            else
-            {
-                throw std::logic_error("Bot is destroyed...");
-            }
+            if (!readyPlayers) ptr ^= 1;
+        }
+        else if (status == "s")
+        {
+            readyPlayers++;
+            ptr ^= 1;
+        }
+        else
+        {
+            throw std::logic_error("Bot is destroyed...");
         }
     }
 
