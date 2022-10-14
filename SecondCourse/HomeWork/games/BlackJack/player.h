@@ -8,6 +8,7 @@ class Player
 {
 public:
     Player(std::string name) : name(name) {}
+    void reset();
     virtual std::string makeAction();
     Card GetCard(Deck & deck);
     bool GoodScore();

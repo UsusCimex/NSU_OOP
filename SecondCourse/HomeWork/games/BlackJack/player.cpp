@@ -39,6 +39,12 @@ bool Player::GoodScore()
     return 1;
 }
 
+void Player::reset()
+{
+    score = 0;
+    card.clear();
+}
+
 std::string Player::makeAction()
 {
     std::cout << name << ": ";

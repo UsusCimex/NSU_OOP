@@ -79,19 +79,21 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
                 if (status == "g" || status == "get")
                 {
                     Card curCard = players[ptr]->GetCard(deck);
+                    players[ptr]->GoodScore();
                     std::cout << players[ptr]->name << " took " << curCard.card << ". His score: " << players[ptr]->GetScore() << std::endl;
                     if (!players[ptr]->GoodScore())
                     {
                         std::cout << players[ptr]->name << " oops... enumeration!" << std::endl;
                         return players;
                     }
-                    else if (!readyPlayers) ptr ^= 1;
 
                     if (players[ptr]->GetScore() == 21)
                     {
                         std::cout << players[ptr]->name << " WOW! It's 21!" << std::endl; 
                         return players;
                     }
+
+                    if (!readyPlayers) ptr ^= 1;
                 }
                 else if (status == "s" || status == "stop") 
                 {
@@ -136,16 +138,18 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
 
             if (status == "g")
             {
+                players[ptr]->GetCard(deck);
                 if (!players[ptr]->GoodScore())
                 {
                     return players;
                 }
-                else if (!readyPlayers) ptr ^= 1;
 
                 if (players[ptr]->GetScore() == 21)
                 {
                     return players;
                 }
+
+                if (!readyPlayers) ptr ^= 1;
             }
             else if (status == "s")
             {
@@ -170,6 +174,8 @@ void Game::tournamentGame(std::vector<Player*> players)
         {
             std::vector<Player*> match = {players[playerA], players[playerB]};
             std::vector<Player*> res = detailedGame(match);
+            players[playerA]->reset();
+            players[playerB]->reset();
         }
     }
 }
@@ -182,6 +188,8 @@ void Game::tournamentfastGame(std::vector<Player*> players)
         {
             std::vector<Player*> match = {players[playerA], players[playerB]};
             std::vector<Player*> res = fastGame(match);
+            players[playerA]->reset();
+            players[playerB]->reset();
         }
     }
 }
