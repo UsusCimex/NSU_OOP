@@ -47,11 +47,3 @@ void Deck::GenerateDeck()
 
     deckPointer = 0ull;
 }
-
-void Deck::PrintDeck()
-{
-    for (int i = 0; i < DECKSIZE; ++i)
-    {
-        std::cout << deck[i].card << std::endl;
-    }
-}

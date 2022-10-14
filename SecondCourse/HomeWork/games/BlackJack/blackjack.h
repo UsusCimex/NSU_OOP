@@ -5,15 +5,19 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <map>
 
 #include <time.h>
+
+#define DECKSIZE 52
 
 enum Mode
 {
     NONE,
     DETAILED,
     FAST,
-    TOURNAMENT
+    TOURNAMENT,
+    TOURNAMENTFAST
 };
 
 struct Rules
@@ -24,7 +28,5 @@ struct Rules
 
     size_t playerCount = 0ull;
 };
-
-#define DECKSIZE 52
 
 #endif

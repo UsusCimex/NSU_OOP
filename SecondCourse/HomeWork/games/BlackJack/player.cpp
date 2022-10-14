@@ -1,39 +1,54 @@
 #include "player.h"
 
-std::vector<Card> Person::SeeCards()
+std::vector<Card> Player::SeeCards()
 {
     return card;
 }
 
-Card Person::SeeLastCard()
-{
-    return card.at(card.size() - 1);
-}
-
-int Person::GetScore()
+int Player::GetScore()
 {
     return score;
 }
 
-bool Person::GetCard(Deck & deck)
+Card Player::GetCard(Deck & deck)
 {
     Card curCard = deck.PopCard();
     card.push_back(curCard);
 
     score += curCard.power;
-    if (score > 21)
-    {
-        for (size_t i = 0; i < card.size(); ++i) //Ace check
-        {
-            if (card[i].power == 11) 
-            {
-                card[i].power = 1;
-                score -= 10;
-                break;
-            }
-        }
+    return curCard;
+}
 
-        if (score > 21) return 1;
+bool Player::TryEditAce()
+{
+    for (size_t i = 0; i < card.size(); ++i)
+    {
+        if (card[i].power == 11) 
+        {
+            card[i].power = 1;
+            score -= 10;
+            return 1;
+        }
     }
     return 0;
+}
+
+bool Player::GoodScore()
+{
+    if (score > 21) return TryEditAce();
+    return 1;
+}
+
+std::string Player::makeAction()
+{
+    std::cout << name << ": ";
+    std::string status;
+    std::cin >> status;
+
+    return status;
+}
+
+std::string Bot::makeAction()
+{
+    return "g"; //temp
 }

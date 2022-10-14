@@ -1,104 +1,178 @@
 #include "game.h"
 
-void Game::start(Rules rules)
+void PrintWinner(std::vector<Player> vec)
 {
-    std::vector<Person> players;
-    for (size_t i = 0; i < rules.playerCount; ++i)
+    if (vec[0].GetScore() > 21 || vec[1].GetScore() == 21)
     {
-        std::string name;
-        std::cout << "Enter " << i + 1 << " player name: ";
-        std::cin >> name;
-        players.push_back(Person(name));
+        std::cout << vec[1].name << " WIN!" << std::endl;
+    }
+    else if (vec[1].GetScore() > 21 || vec[0].GetScore() == 21)
+    {
+        std::cout << vec[0].name << " WIN!" << std::endl;
+    }
+    else if (vec[0].GetScore() > vec[1].GetScore())
+    {
+        std::cout << vec[0].name << " scored " << vec[0].GetScore() << std::endl;
+        std::cout << vec[1].name << " scored " << vec[1].GetScore() << std::endl;
+        std::cout << vec[0].name << " WIN!" << std::endl;
+    }
+    else if (vec[0].GetScore() < vec[1].GetScore())
+    {
+        std::cout << vec[1].name << " scored " << vec[1].GetScore() << std::endl;
+        std::cout << vec[0].name << " scored " << vec[0].GetScore() << std::endl;
+        std::cout << vec[1].name << " WIN!" << std::endl;
+    }
+    else
+    {
+        std::cout << "Both players scored " << vec[0].GetScore() << std::endl;
+        std::cout << "Tie!" << std::endl;
+    }
+}
+
+void Game::start()
+{
+    std::vector<Player> players;
+    for (auto player : rules.players)
+    {
+        if (player.front() == '-') players.push_back(Bot(player));
+        else players.push_back(Player(player));
     }
 
-    std::cout << "Game started!" << std::endl;
-    std::cout << "Control: g - get card, s - stop get card, q - quite, r - see all your cards" << std::endl;
+    if (rules.mode == DETAILED) 
+    {
+        std::vector<Player> result = detailedGame(players);
+        PrintWinner(result);
+    }
+    else if (rules.mode == FAST) 
+    {
+        std::vector<Player> result = fastGame(players);
+        PrintWinner(result);
+    }
+    else if (rules.mode == TOURNAMENT) 
+    {
+        tournamentGame(players);
+    }
+    else 
+    {
+        tournamentfastGame(players);
+    }
+}
+
+std::vector<Player> Game::detailedGame(std::vector<Player> players)
+{
+    std::cout << "### BLACKJACK ###" << std::endl;
+    std::cout << "Control:\ng - get card\ns - stop get card\nq - quite" << std::endl;
 
     Deck deck;
     deck.GenerateDeck();
 
-    std::vector<Person> pr; //
+    std::vector<Player> inactivePlayers;
 
-    bool game = 1;
-    std::string read;
-    
-    while (game)
+    while(players.size() != 0)
     {
-        int pl;
-        for (pl = 0; pl < players.size(); ++pl)
+        size_t ptr = 0;
+        while (ptr < players.size())
         {
-            while (true)
+            while (true) //successful command enter
             {
-                std::cout << players[pl].name << ": ";
-                std::cin >> read;
-                
-                if (read == "g")
+                std::string status = players[ptr].makeAction();
+
+                if (status == "g" || status == "get")
                 {
-                    if (players[pl].GetCard(deck))
+                    Card curCard = players[ptr].GetCard(deck);
+                    std::cout << players[ptr].name << " took " << curCard.card << ". His score: " << players[ptr].GetScore() << std::endl;
+                    if (!players[ptr].GoodScore())
                     {
-                        std::cout << players[pl].name << ": You took " << players[pl].SeeLastCard().card << " and your score: " << players[pl].GetScore() << std::endl;
-                        std::cout << "System: Player " << players[pl].name << " lost, his score is " << players[pl].GetScore() <<  std::endl;
-                        players.erase(players.begin() + pl);
-                        pl--;
-                        if (players.size() <= 1)
-                        {
-                            pr.push_back(players.at(0));
-                            game = 0;
-                            break;
-                        }
-                        continue;
+                        inactivePlayers = std::move(players); // players.size == 0?
                     }
-                    std::cout << players[pl].name << ": You took " << players[pl].SeeLastCard().card << " and your score: " << players[pl].GetScore() << std::endl;
-                    if (players[pl].GetScore() == 21)
+                    else ptr++;
+
+                    if (players[ptr].GetScore() == 21)
                     {
-                        std::cout << "Player " << players[pl].name << " WIN!!!" << std::endl;
-                        return;
+                        inactivePlayers = std::move(players); //up
                     }
                 }
-                else if (read == "s")
+                else if (status == "s" || status == "stop") 
                 {
-                    pr.push_back(players[pl]);
-                    players.erase(players.begin() + pl);
-                    pl--;
-                    if (players.size() == 0)
-                    {
-                        game = 0;
-                        break;
-                    }
+                    inactivePlayers.push_back(players[ptr]);
+                    players.erase(players.begin() + ptr);
                 }
-                else if (read == "q")
+                else if (status == "q" || status == "quit")
                 {
-                    std::cout << "System: Player " << players[pl].name << " lost" << std::endl;
-                    players.erase(players.begin() + pl);
-                    pl--;
-                    if (players.size() <= 1)
-                    {
-                        pr.push_back(players.at(0));
-                        game = 0;
-                        break;
-                    }
+                    return;
                 }
-                else if (read == "r")
-                {
-                    for (auto el : players[pl].SeeCards()) std::cout << el.card << ", ";
-                    std::cout << "Score: " << players[pl].GetScore() << std::endl;
-                    continue;
-                }
-                else
-                {
-                    continue;
-                }
+                else continue;
+
                 break;
             }
         }
     }
 
-    if (pr.size() == 0) std::cout << "System: Tie" << std::endl;
-    else
+    return inactivePlayers;
+}
+
+std::vector<Player> Game::fastGame(std::vector<Player> players)
+{
+    Deck deck;
+    deck.GenerateDeck();
+
+    std::vector<Player> inactivePlayers;
+
+    while(players.size() != 0)
     {
-        for (int i = 0; i < pr.size(); ++i)
+        size_t ptr = 0;
+        while (ptr < players.size())
         {
-            std::cout << pr[i].name << " scored " << pr[i].GetScore() << " points" << std::endl; 
+            std::string status = players[ptr].makeAction();
+
+            if (status == "g")
+            {
+                if (!players[ptr].GoodScore())
+                {
+                    inactivePlayers = std::move(players); // players.size == 0?
+                }
+                else ptr++;
+
+                if (players[ptr].GetScore() == 21)
+                {
+                    inactivePlayers = std::move(players); //up
+                }
+            }
+            else if (status == "s") 
+            {
+                inactivePlayers.push_back(players[ptr]);
+                players.erase(players.begin() + ptr);
+            }
+            else
+            {
+                throw std::logic_error("Bot is destroyed...");
+            }
+        }
+    }
+
+    return inactivePlayers;
+}
+
+void Game::tournamentGame(std::vector<Player> players)
+{
+    for (size_t playerA = 0; playerA < players.size() - 1; ++playerA)
+    {
+        for (size_t playerB = playerA + 1; playerB < players.size(); ++playerB)
+        {
+            std::vector<Player> match = {players[playerA], players[playerB]};
+            std::vector<Player> res = detailedGame(match);
+        }
+    }
+}
+
+void Game::tournamentfastGame(std::vector<Player> players)
+{
+    for (size_t playerA = 0; playerA < players.size() - 1; ++playerA)
+    {
+        for (size_t playerB = playerA + 1; playerB < players.size(); ++playerB)
+        {
+            std::vector<Player> match = {players[playerA], players[playerB]};
+            std::vector<Player> res = fastGame(match);
         }
     }
 }

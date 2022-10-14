@@ -4,18 +4,27 @@
 #include "blackjack.h"
 #include "deck.h"
 
-struct Person
+class Player
 {
 public:
-    Person(std::string name) : name(name) {}
-    bool GetCard(Deck & deck);
+    Player(std::string name) : name(name) {}
+    virtual std::string makeAction();
+    Card GetCard(Deck & deck);
+    bool GoodScore();
+    bool TryEditAce(); //Power Ace = 1, return 0 if don't searched
     int GetScore();
     std::vector<Card> SeeCards();
-    Card SeeLastCard();
     std::string name;
 private:
     int score = 0;
     std::vector<Card> card;
+};
+
+class Bot : public Player
+{
+public:
+    Bot(std::string name) : Player(name) {}
+    std::string makeAction();
 };
 
 #endif

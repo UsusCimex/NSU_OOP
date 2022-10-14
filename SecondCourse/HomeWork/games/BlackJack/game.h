@@ -8,7 +8,14 @@
 class Game
 {
 public:
-    void start(Rules rules);
+    Game(Rules rules) : rules(rules) {}
+    void start();
+    std::vector<Player> detailedGame(std::vector<Player>);
+    std::vector<Player> fastGame(std::vector<Player>); //only bots
+    void tournamentGame(std::vector<Player>);
+    void tournamentfastGame(std::vector<Player>); //only bots
+private:
+    Rules rules;
 };
 
 #endif
