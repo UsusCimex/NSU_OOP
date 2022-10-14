@@ -24,7 +24,7 @@ class Bot : public Player
 {
 public:
     Bot(std::string name) : Player(name) {}
-    std::string makeAction();
+    std::string makeAction() override;
 };
 
 #endif
