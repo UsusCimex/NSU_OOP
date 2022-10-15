@@ -37,8 +37,6 @@ void Deck::generateDeck()
         deck[i] = c;
     }
 
-    srand(time(0));
-
     for (size_t i = 0; i < 3 * DECKSIZE; ++i) //3 times, why not)
     {
         int rm = rand() % DECKSIZE;

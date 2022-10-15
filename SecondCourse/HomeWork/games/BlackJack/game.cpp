@@ -33,8 +33,8 @@ void PrintWinner(std::vector<Player*> vec)
 
 void Game::start()
 {
-    std::cout << "### BLACKJACK ###" << std::endl;
-    std::cout << "Control:\ng - get card\ns - stop get card\nq - quit" << std::endl;
+    // std::cout << "### BLACKJACK ###" << std::endl;
+    // std::cout << "Control:\ng - get card\ns - stop get card\nq - quit" << std::endl;
 
     std::vector<Player*> players;
     for (auto player : rules.players)
@@ -57,9 +57,13 @@ void Game::start()
     {
         tournamentGame(players);
     }
-    else
+    else if (rules.mode == TOURNAMENTFAST)
     {
         tournamentfastGame(players);
+    }
+    else
+    {
+        throw std::runtime_error("mode isn't available...");
     }
 }
 
@@ -159,8 +163,8 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
 
 void UpgradeScore(std::vector<Player*> vec)
 {
-    if (vec[0]->getScore() > 21 || vec[1]->getScore() == 21) vec[0]->addTournamentScore(2);
-    else if (vec[1]->getScore() > 21 || vec[0]->getScore() == 21) vec[1]->addTournamentScore(2);
+    if (vec[0]->getScore() > 21 || vec[1]->getScore() == 21) vec[1]->addTournamentScore(2);
+    else if (vec[1]->getScore() > 21 || vec[0]->getScore() == 21) vec[0]->addTournamentScore(2);
     else if (vec[0]->getScore() > vec[1]->getScore()) vec[0]->addTournamentScore(2);
     else if (vec[0]->getScore() < vec[1]->getScore()) vec[1]->addTournamentScore(2);
     else { vec[0]->addTournamentScore(1); vec[1]->addTournamentScore(1); }
@@ -178,6 +182,7 @@ void Game::tournamentGame(std::vector<Player*> players)
             std::cout << std::endl << players[playerA]->name << " VS " << players[playerB]->name << std::endl;
             std::vector<Player*> match = {players[playerA], players[playerB]};
             std::vector<Player*> res = detailedGame(match);
+            PrintWinner(res);
             UpgradeScore(res);
         }
     }
