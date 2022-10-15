@@ -6,7 +6,7 @@ Card Deck::PopCard()
     return deck[deckPointer++];
 }
 
-void Deck::GenerateDeck()
+void Deck::generateDeck()
 {
     for (size_t i = 0; i < DECKSIZE; ++i) //Know... It isn't normal :d
     {

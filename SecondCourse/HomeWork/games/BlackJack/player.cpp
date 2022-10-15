@@ -1,16 +1,26 @@
 #include "player.h"
 
-std::vector<Card> Player::SeeCards()
+std::vector<Card> Player::seeCards()
 {
     return card;
 }
 
-int Player::GetScore()
+int Player::getScore()
 {
     return score;
 }
 
-Card Player::GetCard(Deck & deck)
+void Player::addTournamentScore(int score)
+{
+    tournamentScore += score;
+}
+
+int Player::getTournamentScore()
+{
+    return tournamentScore;
+}
+
+Card Player::getCard(Deck & deck)
 {
     Card curCard = deck.PopCard();
     card.push_back(curCard);
@@ -19,7 +29,7 @@ Card Player::GetCard(Deck & deck)
     return curCard;
 }
 
-bool Player::TryEditAce()
+bool Player::tryEditAce()
 {
     for (size_t i = 0; i < card.size(); ++i)
     {
@@ -33,9 +43,9 @@ bool Player::TryEditAce()
     return 0;
 }
 
-bool Player::GoodScore()
+bool Player::goodScore()
 {
-    if (score > 21) return TryEditAce();
+    if (score > 21) return tryEditAce();
     return 1;
 }
 

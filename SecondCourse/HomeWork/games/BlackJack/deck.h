@@ -15,7 +15,7 @@ struct Card
 struct Deck
 {
 public:
-    void GenerateDeck();
+    void generateDeck();
     Card PopCard();
 private:
     std::array<Card, DECKSIZE> deck;
