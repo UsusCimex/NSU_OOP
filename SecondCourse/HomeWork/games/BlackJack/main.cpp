@@ -11,6 +11,7 @@ void SettingRules(std::string arg, Rules & rules)
     else if (arg.compare("--mode=tournament") == 0) rules.mode = TOURNAMENT;
     else if (arg.compare("--mode=tournamentfast") == 0 || arg.compare("--mode=fasttournament") == 0) rules.mode = TOURNAMENTFAST; 
     else if (arg.compare(0, 10, "--configs=") == 0) rules.configFile = arg.substr(arg.find('=') + 1);
+    else if (arg.compare(0,13,"--countdecks=") == 0 || arg.compare(0,13,"--deckscount=") == 0) rules.decksCount = stoi(arg.substr(arg.find('=') + 1));
     else { rules.players.push_back(arg); rules.playerCount++; }
 }
 
@@ -45,6 +46,8 @@ int main(int argc, char ** argv)
         for (auto pl : rules.players)
             if (pl[0] != '-')
                 throw std::invalid_argument("In Fast and TournamentFast modes can participate only bots!");
+    
+    if (rules.decksCount < 1) throw std::invalid_argument("Minimal decks count 1!");
 
     Factory fac;
     std::vector<Player*> players;

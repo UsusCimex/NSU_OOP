@@ -89,7 +89,7 @@ bool InitialDistribution(std::vector<Player*> players, Deck & deck, bool printSc
 
 std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
 {
-    Deck deck;
+    Deck deck(rules.decksCount);
     deck.generateDeck();
     if (InitialDistribution(players, deck, true)) return players;
     size_t inactivePlayersCount = 0;
@@ -143,8 +143,9 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
 
 std::vector<Player*> Game::fastGame(std::vector<Player*> players)
 {
-    Deck deck;
+    Deck deck(rules.decksCount);
     deck.generateDeck();
+    // std::cerr << rules.decksCount << std::endl;
     if (InitialDistribution(players, deck, false)) return players;
 
     size_t inactivePlayersCount = 0;

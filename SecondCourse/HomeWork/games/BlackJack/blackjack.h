@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <string>
-#include <array>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -26,8 +25,9 @@ struct Rules
     std::vector<std::string> players;
     Mode mode = NONE;
     std::string configFile;
+    int decksCount = 1;
 
-    size_t playerCount = 0ull;
+    int playerCount = 0;
 };
 
 #endif

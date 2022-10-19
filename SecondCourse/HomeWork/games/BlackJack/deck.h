@@ -15,10 +15,12 @@ struct Card
 struct Deck
 {
 public:
+    Deck(int countDecks) : countDecks(countDecks) {}
     void generateDeck();
     Card PopCard();
 private:
-    std::array<Card, DECKSIZE> deck;
+    std::vector<Card> deck;
+    int countDecks;
     size_t deckPointer = 0ull;
 };
 
