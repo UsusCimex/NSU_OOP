@@ -16,19 +16,12 @@ public:
     bool goodScore();
     bool tryEditAce(); //Power Ace = 1, return 0 if don't searched
     int getScore();
-    std::vector<Card> seeCards();
+    Card seeCard(); //See the first(opened) card.
     std::string name;
-private:
+protected:
     int score = 0;
     int tournamentScore = 0;
     std::vector<Card> card;
-};
-
-class Bot : public Player
-{
-public:
-    Bot(std::string name) : Player(name) {}
-    std::string makeAction() override;
 };
 
 #endif

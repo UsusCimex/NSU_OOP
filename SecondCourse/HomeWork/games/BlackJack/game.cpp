@@ -36,13 +36,6 @@ void Game::start()
     // std::cout << "### BLACKJACK ###" << std::endl;
     // std::cout << "Control:\ng - get card\ns - stop get card\nq - quit" << std::endl;
 
-    std::vector<Player*> players;
-    for (auto player : rules.players)
-    {
-        if (player.front() == '-') players.push_back(new Bot(player));
-        else players.push_back(new Player(player));
-    }
-
     if (rules.mode == DETAILED) 
     {
         std::vector<Player*> result = detailedGame(players);
@@ -55,11 +48,11 @@ void Game::start()
     }
     else if (rules.mode == TOURNAMENT) 
     {
-        tournamentGame(players);
+        tournamentGame();
     }
     else if (rules.mode == TOURNAMENTFAST)
     {
-        tournamentfastGame(players);
+        tournamentfastGame();
     }
     else
     {
@@ -173,7 +166,7 @@ void UpgradeScore(std::vector<Player*> vec)
     vec[1]->reset();
 }
 
-void Game::tournamentGame(std::vector<Player*> players)
+void Game::tournamentGame()
 {
     for (size_t playerA = 0; playerA < players.size() - 1; ++playerA)
     {
@@ -207,7 +200,7 @@ void Game::tournamentGame(std::vector<Player*> players)
     }
 }
 
-void Game::tournamentfastGame(std::vector<Player*> players)
+void Game::tournamentfastGame()
 {
     for (size_t playerA = 0; playerA < players.size() - 1; ++playerA)
     {

@@ -1,8 +1,9 @@
 #include "player.h"
 
-std::vector<Card> Player::seeCards()
+Card Player::seeCard()
 {
-    return card;
+    if (card.size() == 0) throw "Cards is empty";
+    return card.at(0);
 }
 
 int Player::getScore()
@@ -62,9 +63,4 @@ std::string Player::makeAction()
     std::cin >> status;
 
     return status;
-}
-
-std::string Bot::makeAction()
-{
-    return "g"; //temp
 }
