@@ -10,7 +10,12 @@ class Factory {
 public:
     Factory()
     {
-        RegisterStrategy("-testBot1", createTestBot1);
+        RegisterStrategy("-trivialBot1", createTrivialBot1);
+        RegisterStrategy("-trivialBot2", createTrivialBot2);
+        RegisterStrategy("-trivialBot3", createTrivialBot3);
+        RegisterStrategy("-bot1", createBot1);
+        RegisterStrategy("-bot2", createBot2);
+        RegisterStrategy("-bot3", createBot3);
     }
 
     Player* CreateBot(const std::string& name) {

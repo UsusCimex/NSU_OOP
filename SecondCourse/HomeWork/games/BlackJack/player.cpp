@@ -44,7 +44,7 @@ bool Player::tryEditAce()
     return 0;
 }
 
-bool Player::goodScore()
+bool Player::checkScore()
 {
     if (score > 21) return tryEditAce();
     return 1;

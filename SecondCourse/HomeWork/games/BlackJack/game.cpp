@@ -60,48 +60,73 @@ void Game::start()
     }
 }
 
+//If one of players get 21, return 1
+bool InitialDistribution(std::vector<Player*> players, Deck & deck)
+{
+    for (size_t i = 0; i < 2; ++i) //defaul 2 cards in start game
+    {
+        for (auto pl : players)
+        {
+            pl->getCard(deck);
+        }
+    }
+
+    for (auto pl : players)
+    {
+        pl->checkScore();
+        std::cout << pl->name << " has " << pl->getScore() << " score" << std::endl;
+    }
+
+    for (auto pl : players)
+    {
+        if (pl->getScore() == 21) return 1;
+    }
+    return 0;
+}
+
 std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
 {
     Deck deck;
     deck.generateDeck();
+    if (InitialDistribution(players, deck)) return players;
     size_t inactivePlayersCount = 0;
 
-    size_t ptr = 0;
+    size_t curPlayer = 0;
     while (inactivePlayersCount != 2)
     {
         while (true) //successful command enter
         {
-            std::string status = players[ptr]->makeAction();
+            std::string status = players[curPlayer]->makeAction();
 
             if (status == "g" || status == "get")
             {
-                Card curCard = players[ptr]->getCard(deck);
-                players[ptr]->goodScore();
-                std::cout << players[ptr]->name << " took " << curCard.card << ". His score: " << players[ptr]->getScore() << std::endl;
-                if (!players[ptr]->goodScore())
+                Card curCard = players[curPlayer]->getCard(deck);
+                players[curPlayer]->checkScore();
+                std::cout << players[curPlayer]->name << " took " << curCard.card << ". His score: " << players[curPlayer]->getScore() << std::endl;
+                if (!players[curPlayer]->checkScore())
                 {
-                    std::cout << players[ptr]->name << " oops... enumeration!" << std::endl;
+                    std::cout << players[curPlayer]->name << " oops... enumeration!" << std::endl;
                     return players;
                 }
 
-                if (players[ptr]->getScore() == 21)
+                if (players[curPlayer]->getScore() == 21)
                 {
-                    std::cout << players[ptr]->name << " WOW! It's 21!" << std::endl; 
+                    std::cout << players[curPlayer]->name << " WOW! It's 21!" << std::endl; 
                     return players;
                 }
 
-                if (inactivePlayersCount == 0) CHANGEPLAYER(ptr);
+                if (inactivePlayersCount == 0) CHANGEPLAYER(curPlayer);
             }
             else if (status == "s" || status == "stop") 
             {
-                std::cout << players[ptr]->name << " stop getting card! His score: " << players[ptr]->getScore() << std::endl;
+                std::cout << players[curPlayer]->name << " stop getting card! His score: " << players[curPlayer]->getScore() << std::endl;
                 inactivePlayersCount++;
-                CHANGEPLAYER(ptr);
+                CHANGEPLAYER(curPlayer);
             }
             else if (status == "q" || status == "quit")
             {
-                std::cout << players[ptr]->name << " left the game!" << std::endl;
-                players[ptr]->reset();
+                std::cout << players[curPlayer]->name << " left the game!" << std::endl;
+                players[curPlayer]->reset();
                 return players;
             }
             else continue;
@@ -117,33 +142,34 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
 {
     Deck deck;
     deck.generateDeck();
+    InitialDistribution(players, deck);
 
     size_t inactivePlayersCount = 0;
 
-    size_t ptr = 0;
+    size_t curPlayer = 0;
     while (inactivePlayersCount != 2)
     {
-        std::string status = players[ptr]->makeAction();
+        std::string status = players[curPlayer]->makeAction();
 
         if (status == "g")
         {
-            players[ptr]->getCard(deck);
-            if (!players[ptr]->goodScore())
+            players[curPlayer]->getCard(deck);
+            if (!players[curPlayer]->checkScore())
             {
                 return players;
             }
 
-            if (players[ptr]->getScore() == 21)
+            if (players[curPlayer]->getScore() == 21)
             {
                 return players;
             }
 
-            if (!inactivePlayersCount) CHANGEPLAYER(ptr);
+            if (!inactivePlayersCount) CHANGEPLAYER(curPlayer);
         }
         else if (status == "s")
         {
             inactivePlayersCount++;
-            CHANGEPLAYER(ptr);
+            CHANGEPLAYER(curPlayer);
         }
         else
         {

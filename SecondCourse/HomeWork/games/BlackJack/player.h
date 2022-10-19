@@ -13,7 +13,7 @@ public:
     int getTournamentScore();
     virtual std::string makeAction();
     Card getCard(Deck & deck);
-    bool goodScore();
+    bool checkScore(); // If Score > 21, start method tryEditAce. If score is good return 1
     bool tryEditAce(); //Power Ace = 1, return 0 if don't searched
     int getScore();
     Card seeCard(); //See the first(opened) card.
