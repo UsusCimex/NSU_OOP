@@ -61,7 +61,7 @@ void Game::start()
 }
 
 //If one of players get 21, return 1
-bool InitialDistribution(std::vector<Player*> players, Deck & deck)
+bool InitialDistribution(std::vector<Player*> players, Deck & deck, bool printScore)
 {
     for (size_t i = 0; i < 2; ++i) //defaul 2 cards in start game
     {
@@ -71,10 +71,13 @@ bool InitialDistribution(std::vector<Player*> players, Deck & deck)
         }
     }
 
-    for (auto pl : players)
+    if (printScore)
     {
-        pl->checkScore();
-        std::cout << pl->name << " has " << pl->getScore() << " score" << std::endl;
+        for (auto pl : players)
+        {
+            pl->checkScore();
+            std::cout << pl->name << " has " << pl->getScore() << " score" << std::endl;
+        }
     }
 
     for (auto pl : players)
@@ -88,7 +91,7 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
 {
     Deck deck;
     deck.generateDeck();
-    if (InitialDistribution(players, deck)) return players;
+    if (InitialDistribution(players, deck, true)) return players;
     size_t inactivePlayersCount = 0;
 
     size_t curPlayer = 0;
@@ -142,7 +145,7 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
 {
     Deck deck;
     deck.generateDeck();
-    InitialDistribution(players, deck);
+    if (InitialDistribution(players, deck, false)) return players;
 
     size_t inactivePlayersCount = 0;
 
@@ -220,10 +223,10 @@ void Game::tournamentGame()
         }
         else
         {
-            std::cout << "WIN!" << std::endl;
             break;
         }
     }
+    std::cout << "WIN!" << std::endl;
 }
 
 void Game::tournamentfastGame()
@@ -247,8 +250,8 @@ void Game::tournamentfastGame()
         }
         else
         {
-            std::cout << "WIN!" << std::endl;
             break;
         }
     }
+    std::cout << "WIN!" << std::endl;
 }

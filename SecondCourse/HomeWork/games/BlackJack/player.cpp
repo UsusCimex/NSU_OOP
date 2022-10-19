@@ -34,7 +34,7 @@ bool Player::tryEditAce()
 {
     for (size_t i = 0; i < card.size(); ++i)
     {
-        if (card[i].power == 11) 
+        if (card[i].power == 11)
         {
             card[i].power = 1;
             score -= 10;
