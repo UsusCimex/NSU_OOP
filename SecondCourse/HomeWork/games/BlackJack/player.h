@@ -11,7 +11,7 @@ public:
     void reset();
     void addTournamentScore(int score);
     int getTournamentScore();
-    virtual std::string makeAction();
+    virtual std::string makeAction(Player * enemy);
     Card getCard(Deck & deck);
     bool checkScore(); // If Score > 21, start method tryEditAce. If score is good return 1
     bool tryEditAce(); //Power Ace = 1, return 0 if don't searched

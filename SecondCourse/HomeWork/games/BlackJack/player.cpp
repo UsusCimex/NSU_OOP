@@ -56,7 +56,7 @@ void Player::reset()
     card.clear();
 }
 
-std::string Player::makeAction()
+std::string Player::makeAction(Player * enemy)
 {
     std::cout << name << ": ";
     std::string status;

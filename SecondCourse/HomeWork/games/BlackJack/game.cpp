@@ -99,7 +99,7 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
     {
         while (true) //successful command enter
         {
-            std::string status = players[curPlayer]->makeAction();
+            std::string status = players[curPlayer]->makeAction(players[!curPlayer]);
 
             if (status == "g" || status == "get")
             {
@@ -114,7 +114,7 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
 
                 if (players[curPlayer]->getScore() == 21)
                 {
-                    std::cout << players[curPlayer]->name << " WOW! It's 21!" << std::endl; 
+                    std::cout << players[curPlayer]->name << " WOW! It's 21!" << std::endl;
                     return players;
                 }
 
@@ -153,7 +153,7 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
     size_t curPlayer = 0;
     while (inactivePlayersCount != 2)
     {
-        std::string status = players[curPlayer]->makeAction();
+        std::string status = players[curPlayer]->makeAction(players[!curPlayer]);
 
         if (status == "g")
         {

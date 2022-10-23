@@ -2,13 +2,13 @@
 
 Card Deck::PopCard()
 {
-    if (deckPointer >= (DECKSIZE * countDecks)) throw std::runtime_error("deck is empty");
+    if (deckPointer >= (size_t)(DECKSIZE * countDecks)) throw std::runtime_error("deck is empty");
     return deck[deckPointer++];
 }
 
 void Deck::generateDeck()
 {
-    for (size_t i = 0; i < (DECKSIZE * countDecks); ++i)
+    for (size_t i = 0; i < (size_t)(DECKSIZE * countDecks); ++i)
     {
         std::string card;
 
@@ -37,7 +37,7 @@ void Deck::generateDeck()
         deck.push_back(c);
     }
 
-    for (size_t i = 0; i < (DECKSIZE * countDecks); ++i)
+    for (size_t i = 0; i < (size_t)(DECKSIZE * countDecks); ++i)
     {
         int rm = rand() % (DECKSIZE * countDecks);
         std::swap(deck[i % (DECKSIZE * countDecks)], deck[rm]);
