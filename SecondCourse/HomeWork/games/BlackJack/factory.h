@@ -10,8 +10,11 @@ public:
     Factory()
     {
         RegisterStrategy("-trivialBot1", CreateTrivialBot1);
+        RegisterStrategy("-trivialbot1", CreateTrivialBot1);
         RegisterStrategy("-trivialBot2", CreateTrivialBot2);
+        RegisterStrategy("-trivialbot2", CreateTrivialBot2);
         RegisterStrategy("-trivialBot3", CreateTrivialBot3);
+        RegisterStrategy("-trivialbot3", CreateTrivialBot3);
         if (!rules.configFile.empty())
         {
             RegisterStrategy("-bot1", CreateBot1);
