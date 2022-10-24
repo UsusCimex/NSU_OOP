@@ -57,6 +57,7 @@ int main(int argc, char ** argv)
     for (auto pl : rules.players)
     {
         auto rm = fac.CreateBot(pl);
+        if (rm == nullptr && pl[0] == '-') throw std::invalid_argument("Strategy not found...");
         if (rm == nullptr) rm = new Player(pl);
         players.push_back(rm);
     }
