@@ -3,7 +3,7 @@
 
 #include "blackjack.h"
 #include "player.h"
-#include "factory.h"
+#include "fstream"
 
 char ** GetStrategy(std::string name);
 

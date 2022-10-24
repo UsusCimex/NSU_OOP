@@ -35,7 +35,6 @@ void Game::start()
 {
     // std::cout << "### BLACKJACK ###" << std::endl;
     // std::cout << "Control:\ng - get card\ns - stop get card\nq - quit" << std::endl;
-
     if (rules.mode == DETAILED) 
     {
         std::vector<Player*> result = detailedGame(players);
@@ -76,7 +75,7 @@ bool InitialDistribution(std::vector<Player*> players, Deck & deck, bool printSc
         for (auto pl : players)
         {
             pl->checkScore();
-            std::cout << pl->name << " has " << pl->getScore() << " score" << std::endl;
+            std::cout << pl->name << " has " << pl->getScore() << " score, his openned card: " << pl->seeCard().card << "(" << pl->seeCard().power << ")" << std::endl;
         }
     }
 
@@ -105,7 +104,7 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
             {
                 Card curCard = players[curPlayer]->getCard(deck);
                 players[curPlayer]->checkScore();
-                std::cout << players[curPlayer]->name << " took " << curCard.card << ". His score: " << players[curPlayer]->getScore() << std::endl;
+                std::cout << players[curPlayer]->name << " took " << curCard.card << "(" << curCard.power << ")" << ". His score: " << players[curPlayer]->getScore() << std::endl;
                 if (!players[curPlayer]->checkScore())
                 {
                     std::cout << players[curPlayer]->name << " oops... enumeration!" << std::endl;

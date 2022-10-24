@@ -9,14 +9,13 @@
 class Game
 {
 public:
-    Game(Rules & rules, std::vector<Player*> & players) : rules(rules), players(players) {}
+    Game(std::vector<Player*> & players) : players(players) {}
     void start();
     std::vector<Player*> detailedGame(std::vector<Player*>);
     std::vector<Player*> fastGame(std::vector<Player*>); //only bots
     void tournamentGame();
     void tournamentfastGame(); //only bots
 private:
-    Rules rules;
     std::vector<Player*> players;
 };
 

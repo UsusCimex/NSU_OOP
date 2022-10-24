@@ -30,6 +30,6 @@ struct Rules
     int playerCount = 0;
 };
 
-Rules rules;
+extern Rules rules;
 
 #endif
