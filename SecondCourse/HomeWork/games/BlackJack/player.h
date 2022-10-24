@@ -8,15 +8,24 @@ class Player
 {
 public:
     Player(std::string name) : name(name) {}
+    //Remove all cards and reset the account. Tournament score remains the same
     void reset();
+    //Edit tournament score, your score += score
     void addTournamentScore(int score);
+    //Getter tournament score
     int getTournamentScore();
+    //Choice of action
     virtual std::string makeAction(Player * enemy);
+    //Get a card from the deck
     Card getCard(Deck & deck);
-    bool checkScore(); // If Score > 21, start method tryEditAce. If score is good return 1
-    bool tryEditAce(); //Power Ace = 1, return 0 if don't searched
+    //If Score > 21, start method tryEditAce. If score is good return 1
+    bool checkScore();
+    //Power Ace = 1, return 0 if don't searched
+    bool tryEditAce();
     int getScore();
-    Card seeCard(); //See the first(opened) card.
+    //See the first(opened) card.
+    //The method needed for opponents
+    Card seeCard();
     std::string name;
 protected:
     int score = 0;

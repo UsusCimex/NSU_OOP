@@ -10,11 +10,16 @@ class Game
 {
 public:
     Game(std::vector<Player*> & players) : players(players) {}
+    //Default function, start the desired game
     void start();
+    //A game with a full description of the actions
     std::vector<Player*> detailedGame(std::vector<Player*>);
-    std::vector<Player*> fastGame(std::vector<Player*>); //only bots
+    //A game with a deduced result (Only bots)
+    std::vector<Player*> fastGame(std::vector<Player*>);
+    //Start detailed games with combinations of players
     void tournamentGame();
-    void tournamentfastGame(); //only bots
+    //Start fast games with combinations of players
+    void tournamentfastGame();
 private:
     std::vector<Player*> players;
 };

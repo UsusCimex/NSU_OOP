@@ -14,32 +14,17 @@ char ** GetStrategy(std::string name)
     char ** strategyConfig = new char* [21];
     for (int i = 0; i <21; ++i) strategyConfig[i] = new char[12];
 
-    std::cerr << "[ PARSING ] " << patch << std::endl; /////
     for (int i = 4; i <= 20; ++i)
     {
         for (int j = 2; j <= 11; j++)
         {
             static char value;
-            value = config.get();
             config >> value;
             if (value == ',') config >> value;
-            // std::cerr << value << " ";
             strategyConfig[i][j] = value;
         }
-        // std::cerr << std::endl;
     }
-    // std::cerr << std::endl;
-
-    for (int i = 4; i <= 20; ++i)
-    {
-        for (int j = 2; j <= 11; j++)
-        {
-            std::cerr << strategyConfig[i][j] << " ";
-        }
-        std::cerr << std::endl;
-    }
-    std::cerr << std::endl;
-
+    
     config.close();
 
     return strategyConfig;
@@ -67,7 +52,6 @@ std::string Bot1::makeAction(Player * enemy)
 {
     std::string a = "";
     a += strategyTable[getScore()][enemy->seeCard().power];
-    std::cerr << "[ \033[33mDEBUG\033[0m ]  " << a << " " << getScore() << " " << enemy->seeCard().power << std::endl;
     return a;
 }
 
@@ -75,7 +59,6 @@ std::string Bot2::makeAction(Player * enemy)
 {
     std::string a = "";
     a += strategyTable[getScore()][enemy->seeCard().power];
-    std::cerr << "[ \033[34mDEBUG\033[0m ]  " << a << " " << getScore() << " " << enemy->seeCard().power << std::endl;
     return a;
 }
 

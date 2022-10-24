@@ -6,6 +6,7 @@
 
 Rules rules;
 
+//Parameter handler
 void SettingRules(std::string arg)
 {
     if (arg.compare("--mode=detailed") == 0) rules.mode = DETAILED;

@@ -5,6 +5,7 @@
 #include "player.h"
 #include "fstream"
 
+//Load CSV file from patch
 char ** GetStrategy(std::string name);
 
 class TrivialBot1 : public Player 

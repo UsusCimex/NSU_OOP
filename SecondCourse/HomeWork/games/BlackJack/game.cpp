@@ -2,6 +2,7 @@
 
 #define CHANGEPLAYER( A ) ( ( A ) ^= 1 )
 
+//Selects the winner from two players, by points
 void PrintWinner(std::vector<Player*> vec)
 {
     if (vec[0]->getScore() > 21 || vec[1]->getScore() == 21)
@@ -59,6 +60,7 @@ void Game::start()
     }
 }
 
+//Initial deal of cards
 //If one of players get 21, return 1
 bool InitialDistribution(std::vector<Player*> players, Deck & deck, bool printScore)
 {
@@ -183,6 +185,7 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
     return players;
 }
 
+//Selects the winner from two players, by points
 void UpgradeScore(std::vector<Player*> vec)
 {
     if (vec[0]->getScore() > 21 || vec[1]->getScore() == 21) vec[1]->addTournamentScore(2);
