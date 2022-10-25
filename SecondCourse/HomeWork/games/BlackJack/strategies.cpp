@@ -64,8 +64,11 @@ std::string Bot2::makeAction(Player * enemy)
 
 std::string MetaBot::makeAction(Player * enemy)
 {
-    if (enemy->seeCard().power >= 8) return "g";
-    else return "s";
+    std::string a = "";
+    if (enemy->seeCard().power >= 8) a += riskStrategy[getScore()][enemy->seeCard().power];
+    else a += normStrategy[getScore()][enemy->seeCard().power];
+
+    return a;
 }
 
 Player* CreateTrivialBot1()
@@ -95,5 +98,5 @@ Player* CreateBot2()
 
 Player* CreateMetaBot()
 {
-    return new MetaBot;
+    return new MetaBot();
 }

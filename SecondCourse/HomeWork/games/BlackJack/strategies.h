@@ -69,18 +69,34 @@ private:
    char ** strategyTable = nullptr;
 };
 
-class MetaBot : public Player
-{
-public:
-    MetaBot() : Player("MetaBot") {}
-    std::string makeAction(Player * enemy) override;
-};
-
 Player* CreateTrivialBot1();
 Player* CreateTrivialBot2();
 Player* CreateTrivialBot3();
 Player* CreateBot1();
 Player* CreateBot2();
+
+class MetaBot : public Player
+{
+public:
+    MetaBot() : Player("MetaBot")
+    {
+        riskStrategy = GetStrategy("bot1");
+        normStrategy = GetStrategy("bot2");
+    }
+    ~MetaBot()
+    {
+        for (int i = 0; i < 21; ++i) delete[] riskStrategy[i];
+        delete[] riskStrategy;
+
+        for (int i = 0; i < 21; ++i) delete[] normStrategy[i];
+        delete[] normStrategy;
+    }
+    std::string makeAction(Player * enemy) override;
+private:
+    char ** riskStrategy = nullptr;
+    char ** normStrategy = nullptr;
+};
+
 Player* CreateMetaBot();
 
 #endif

@@ -13,7 +13,7 @@ void SettingRules(std::string arg)
     else if (arg.compare("--mode=fast") == 0) rules.mode = FAST;
     else if (arg.compare("--mode=tournament") == 0) rules.mode = TOURNAMENT;
     else if (arg.compare("--mode=tournamentfast") == 0 || arg.compare("--mode=fasttournament") == 0) rules.mode = TOURNAMENTFAST; 
-    else if (arg.compare(0, 10, "--configs=") == 0 || arg.compare(0, 16, "--configfile=") == 0) rules.configFile = arg.substr(arg.find('=') + 1);
+    else if (arg.compare(0, 9, "--config=") == 0 || arg.compare(0, 13, "--configfile=") == 0) rules.configFile = arg.substr(arg.find('=') + 1);
     else if (arg.compare(0, 13, "--countdecks=") == 0 || arg.compare(0, 13, "--deckscount=") == 0) rules.decksCount = stoi(arg.substr(arg.find('=') + 1));
     else { rules.players.push_back(arg); rules.playerCount++; }
 }
