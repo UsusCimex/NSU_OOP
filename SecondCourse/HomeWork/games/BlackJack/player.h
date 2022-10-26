@@ -17,7 +17,7 @@ public:
     //Choice of action
     virtual std::string makeAction(Player * enemy);
     //Get a card from the deck
-    Card getCard(Deck & deck);
+    Card getCard(Deck &);
     //If Score > 21, start method tryEditAce. If score is good return 1
     bool checkScore();
     //Power Ace = 1, return 0 if don't searched
