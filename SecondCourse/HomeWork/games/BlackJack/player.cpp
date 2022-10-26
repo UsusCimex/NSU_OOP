@@ -50,7 +50,7 @@ bool Player::checkScore()
     return 1;
 }
 
-void Player::reset()
+void Player::resetHand()
 {
     score = 0;
     card.clear();

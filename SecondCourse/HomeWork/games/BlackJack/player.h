@@ -8,8 +8,8 @@ class Player
 {
 public:
     Player(std::string name) : name(name) {}
-    //Remove all cards and reset the account. Tournament score remains the same
-    void reset();
+    //Remove hand deck. Tournament score remains the same
+    void resetHand();
     //Edit tournament score, your score += score
     void addTournamentScore(int score);
     //Getter tournament score

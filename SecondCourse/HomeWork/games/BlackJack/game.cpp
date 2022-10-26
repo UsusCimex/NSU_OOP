@@ -130,7 +130,7 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
             else if (status == "q" || status == "quit")
             {
                 std::cout << players[curPlayer]->name << " left the game!" << std::endl;
-                players[curPlayer]->reset();
+                players[curPlayer]->resetHand();
                 return players;
             }
             else continue;
@@ -194,8 +194,8 @@ void UpgradeScore(std::vector<Player*> vec)
     else if (vec[0]->getScore() < vec[1]->getScore()) vec[1]->addTournamentScore(2);
     else { vec[0]->addTournamentScore(1); vec[1]->addTournamentScore(1); }
 
-    vec[0]->reset();
-    vec[1]->reset();
+    vec[0]->resetHand();
+    vec[1]->resetHand();
 }
 
 void Game::tournamentGame()
