@@ -30,6 +30,49 @@ char ** GetStrategy(std::string name)
     return strategyConfig;
 }
 
+Bot1::Bot1() : Player("Bot1")
+{
+    strategyTable = GetStrategy("bot1");
+}
+
+Bot1::~Bot1()
+{
+    if (strategyTable != nullptr)
+    {
+        for (int i = 0; i < 21; ++i) delete[] strategyTable[i];
+        delete[] strategyTable;
+    }
+}
+
+Bot2::Bot2() : Player("Bot2") 
+{
+    strategyTable = GetStrategy("bot2");
+}
+
+Bot2::~Bot2()
+{
+    if (strategyTable != nullptr)
+    {
+        for (int i = 0; i < 21; ++i) delete[] strategyTable[i];
+        delete[] strategyTable;
+    }
+}
+
+MetaBot::MetaBot() : Player("MetaBot")
+{
+    riskStrategy = GetStrategy("bot1");
+    normStrategy = GetStrategy("bot2");
+}
+
+MetaBot::~MetaBot()
+{
+    for (int i = 0; i < 21; ++i) delete[] riskStrategy[i];
+    delete[] riskStrategy;
+
+    for (int i = 0; i < 21; ++i) delete[] normStrategy[i];
+    delete[] normStrategy;
+}
+
 std::string TrivialBot1::makeAction(Player * enemy)
 {
     if (getScore() < 16) return "g";
