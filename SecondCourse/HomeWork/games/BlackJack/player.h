@@ -15,7 +15,7 @@ public:
     //Getter tournament score
     int getTournamentScore();
     //Choice of action
-    virtual std::string makeAction(Player *);
+    virtual std::string makeAction(Card enemyCard);
     //Get a card from the deck
     Card getCard(Deck &);
     //If Score > 21, start method tryEditAce. If score is good return 1

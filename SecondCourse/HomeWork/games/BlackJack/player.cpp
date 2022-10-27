@@ -58,7 +58,7 @@ void Player::resetHand()
     card.clear();
 }
 
-std::string Player::makeAction(Player * enemy)
+std::string Player::makeAction(Card enemyCard)
 {
     std::cout << name << ": ";
     std::string status;

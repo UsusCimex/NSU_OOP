@@ -12,21 +12,21 @@ class TrivialBot1 : public Player
 {
 public:
     TrivialBot1() : Player("TrivialBot1") {}
-    std::string makeAction(Player * enemy) override;
+    std::string makeAction(Card enemyCard) override;
 };
 
 class TrivialBot2 : public Player 
 {
 public:
     TrivialBot2() : Player("TrivialBot2") {}
-    std::string makeAction(Player * enemy) override;
+    std::string makeAction(Card enemyCard) override;
 };
 
 class TrivialBot3 : public Player 
 {
 public:
     TrivialBot3() : Player("TrivialBot3") {}
-    std::string makeAction(Player * enemy) override;
+    std::string makeAction(Card enemyCard) override;
 };
 
 class Bot1 : public Player 
@@ -34,7 +34,7 @@ class Bot1 : public Player
 public:
     Bot1();
     ~Bot1();
-    std::string makeAction(Player * enemy) override;
+    std::string makeAction(Card enemyCard) override;
 private:
     char ** strategyTable = nullptr;
 };
@@ -44,7 +44,7 @@ class Bot2 : public Player
 public:
     Bot2();
     ~Bot2();
-    std::string makeAction(Player * enemy) override;
+    std::string makeAction(Card enemyCard) override;
 private:
    char ** strategyTable = nullptr;
 };
@@ -54,7 +54,7 @@ class MetaBot : public Player
 public:
     MetaBot();
     ~MetaBot();
-    std::string makeAction(Player * enemy) override;
+    std::string makeAction(Card enemyCard) override;
 private:
     char ** riskStrategy = nullptr;
     char ** normStrategy = nullptr;

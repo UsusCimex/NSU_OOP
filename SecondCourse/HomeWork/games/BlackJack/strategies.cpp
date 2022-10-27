@@ -73,43 +73,43 @@ MetaBot::~MetaBot()
     delete[] normStrategy;
 }
 
-std::string TrivialBot1::makeAction(Player * enemy)
+std::string TrivialBot1::makeAction(Card enemyCard)
 {
     if (getScore() < 16) return "g";
     return "s";
 }
 
-std::string TrivialBot2::makeAction(Player * enemy)
+std::string TrivialBot2::makeAction(Card enemyCard)
 {
     if ((rand() % 100) < (getScore() * 100 / 24)) return "s";
     return "g";
 }
 
-std::string TrivialBot3::makeAction(Player * enemy)
+std::string TrivialBot3::makeAction(Card enemyCard)
 {
     if (rand() % 2) return "g";
     return "s";
 }
 
-std::string Bot1::makeAction(Player * enemy)
+std::string Bot1::makeAction(Card enemyCard)
 {
     std::string a = "";
-    a += strategyTable[getScore()][enemy->seeCard().power];
+    a += strategyTable[getScore()][enemyCard.power];
     return a;
 }
 
-std::string Bot2::makeAction(Player * enemy)
+std::string Bot2::makeAction(Card enemyCard)
 {
     std::string a = "";
-    a += strategyTable[getScore()][enemy->seeCard().power];
+    a += strategyTable[getScore()][enemyCard.power];
     return a;
 }
 
-std::string MetaBot::makeAction(Player * enemy)
+std::string MetaBot::makeAction(Card enemyCard)
 {
     std::string a = "";
-    if (enemy->seeCard().power >= 8) a += riskStrategy[getScore()][enemy->seeCard().power];
-    else a += normStrategy[getScore()][enemy->seeCard().power];
+    if (enemyCard.power >= 8) a += riskStrategy[getScore()][enemyCard.power];
+    else a += normStrategy[getScore()][enemyCard.power];
 
     return a;
 }

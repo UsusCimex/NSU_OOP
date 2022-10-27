@@ -100,7 +100,7 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
     {
         while (true) //successful command enter
         {
-            std::string status = players[curPlayer]->makeAction(players[!curPlayer]);
+            std::string status = players[curPlayer]->makeAction(players[!curPlayer]->seeCard());
 
             if (status == "g" || status == "get")
             {
@@ -154,7 +154,7 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
     size_t curPlayer = 0;
     while (inactivePlayersCount != 2)
     {
-        std::string status = players[curPlayer]->makeAction(players[!curPlayer]);
+        std::string status = players[curPlayer]->makeAction(players[!curPlayer]->seeCard());
 
         if (status == "g")
         {
