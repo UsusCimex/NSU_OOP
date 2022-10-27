@@ -1,5 +1,8 @@
 #include "deck.h"
 
+Card::Card(std::string card, int power) : card(card), power(power) {}
+Deck::Deck(int countDecks) : countDecks(countDecks) {}
+
 Card Deck::PopCard()
 {
     if (deckPointer >= (size_t)(DECKSIZE * countDecks)) throw std::runtime_error("deck is empty");

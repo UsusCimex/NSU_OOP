@@ -6,7 +6,7 @@
 struct Card
 {
     Card() = default;
-    Card(std::string card, int power) : card(card), power(power) {}
+    Card(std::string, int);
 
     std::string card;
     size_t power;
@@ -15,7 +15,7 @@ struct Card
 struct Deck
 {
 public:
-    Deck(int countDecks) : countDecks(countDecks) {}
+    Deck(int);
     void generateDeck();
     Card PopCard();
 private:

@@ -1,5 +1,7 @@
 #include "player.h"
 
+Player::Player(std::string name) : name(name) {}
+
 Card Player::seeCard()
 {
     if (card.size() == 0) throw "Cards is empty";

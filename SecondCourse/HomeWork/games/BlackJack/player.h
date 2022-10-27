@@ -7,7 +7,7 @@
 class Player
 {
 public:
-    Player(std::string name) : name(name) {}
+    Player(std::string name);
     //Remove hand deck. Tournament score remains the same
     void resetHand();
     //Edit tournament score, your score += score
@@ -15,7 +15,7 @@ public:
     //Getter tournament score
     int getTournamentScore();
     //Choice of action
-    virtual std::string makeAction(Player * enemy);
+    virtual std::string makeAction(Player *);
     //Get a card from the deck
     Card getCard(Deck &);
     //If Score > 21, start method tryEditAce. If score is good return 1
