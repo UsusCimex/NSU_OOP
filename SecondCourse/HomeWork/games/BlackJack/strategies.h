@@ -49,12 +49,6 @@ private:
    char ** strategyTable = nullptr;
 };
 
-Player* CreateTrivialBot1();
-Player* CreateTrivialBot2();
-Player* CreateTrivialBot3();
-Player* CreateBot1();
-Player* CreateBot2();
-
 class MetaBot : public Player
 {
 public:
@@ -66,6 +60,11 @@ private:
     char ** normStrategy = nullptr;
 };
 
+Player* CreateTrivialBot1();
+Player* CreateTrivialBot2();
+Player* CreateTrivialBot3();
+Player* CreateBot1();
+Player* CreateBot2();
 Player* CreateMetaBot();
 
 #endif
