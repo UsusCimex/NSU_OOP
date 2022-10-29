@@ -1,0 +1,33 @@
+: see dup . ;
+
+: fac
+dup 1 = if
+else dup 1 - fac *
+endif
+;
+
+: testif
+dup 1 = if ."first" else
+dup 2 = if ."second" else
+dup 3 = if ."third" else ."I don't know"
+endif endif endif
+;
+
+: forr
+0 3 do
+0 3 do
+."forik working"
+loop loop
+;
+
+5 fac .
+
+2 testif .
+
+forr
+
+var x 30
+var y 10
+x y
+x y > if + else - endif
+see
