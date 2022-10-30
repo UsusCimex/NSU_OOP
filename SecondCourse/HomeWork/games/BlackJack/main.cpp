@@ -51,7 +51,7 @@ int main(int argc, char ** argv)
     
     if (rules.decksCount < 1) throw std::invalid_argument("Minimal decks count is 1!");
 
-    Factory fac;
+    Factory<std::string, Player> fac;
     std::vector<Player*> players;
 
     for (auto pl : rules.players)

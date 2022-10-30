@@ -5,13 +5,14 @@
 #include "player.h"
 #include "strategies.h"
 
+template <typename key, typename value>
 class Factory {
 public:
     Factory();
-    Player* CreateBot(const std::string&);
-    void RegisterStrategy(const std::string&, Player * (*)());
+    Player* CreateBot(const key&);
+    void RegisterStrategy(const key&, value * (*)());
 protected:
-    std::map <std::string, Player * (*)()> Strategies_;
+    std::map <key, value * (*)()> Strategies_;
 };
 
 #endif
