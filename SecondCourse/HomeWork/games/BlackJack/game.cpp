@@ -77,7 +77,7 @@ bool InitialDistribution(std::vector<Player*> players, Deck & deck, bool printSc
         for (auto pl : players)
         {
             pl->checkScore();
-            std::cout << pl->name << " has " << pl->getScore() << " score, his openned card: " << pl->seeCard().card << "(" << pl->seeCard().power << ")" << std::endl;
+            std::cout << pl->name << " has " << pl->getScore() << " score, his openned card: " << pl->seeHand().back().card << "(" << pl->seeHand().back().power << ")" << std::endl;
         }
     }
 
@@ -85,6 +85,10 @@ bool InitialDistribution(std::vector<Player*> players, Deck & deck, bool printSc
     {
         if (pl->getScore() == 21) return 1;
     }
+
+    players[0]->enemyCard = players[1]->seeHand().front();
+    players[1]->enemyCard = players[0]->seeHand().front();
+
     return 0;
 }
 
@@ -100,7 +104,7 @@ std::vector<Player*> Game::detailedGame(std::vector<Player*> players)
     {
         while (true) //successful command enter
         {
-            std::string status = players[curPlayer]->makeAction(players[!curPlayer]->seeCard());
+            std::string status = players[curPlayer]->makeAction();
 
             if (status == "g" || status == "get")
             {
@@ -154,7 +158,7 @@ std::vector<Player*> Game::fastGame(std::vector<Player*> players)
     size_t curPlayer = 0;
     while (inactivePlayersCount != 2)
     {
-        std::string status = players[curPlayer]->makeAction(players[!curPlayer]->seeCard());
+        std::string status = players[curPlayer]->makeAction();
 
         if (status == "g")
         {

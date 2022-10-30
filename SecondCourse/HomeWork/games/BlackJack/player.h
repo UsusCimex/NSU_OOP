@@ -15,7 +15,7 @@ public:
     //Getter tournament score
     int getTournamentScore();
     //Choice of action
-    virtual std::string makeAction(Card enemyCard);
+    virtual std::string makeAction();
     //Get a card from the deck
     Card getCard(Deck &);
     //If Score > 21, start method tryEditAce. If score is good return 1
@@ -24,8 +24,9 @@ public:
     bool tryEditAce();
     int getScore();
     //See the first(opened) card.
-    //The method needed for opponents
-    Card seeCard();
+    Card enemyCard;
+    //See cards in your hand
+    std::vector<Card> seeHand();
     std::string name;
 protected:
     int score = 0;

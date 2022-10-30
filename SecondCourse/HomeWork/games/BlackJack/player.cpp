@@ -2,10 +2,9 @@
 
 Player::Player(std::string name) : name(name) {}
 
-Card Player::seeCard()
+std::vector<Card> Player::seeHand()
 {
-    if (card.size() == 0) throw "Cards is empty";
-    return card.at(0);
+    return card;
 }
 
 int Player::getScore()
@@ -58,7 +57,7 @@ void Player::resetHand()
     card.clear();
 }
 
-std::string Player::makeAction(Card enemyCard)
+std::string Player::makeAction()
 {
     std::cout << name << ": ";
     std::string status;
