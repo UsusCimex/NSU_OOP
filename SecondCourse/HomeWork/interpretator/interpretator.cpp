@@ -151,6 +151,7 @@ void Forth::defCommands()
     registerCommand("*", mul);
     registerCommand("/", div);
     registerCommand("dup", dup);
+    registerCommand("over", over);
     registerCommand("swap", swap);
     registerCommand(":", createUserFunc);
     registerCommand("var", createUserVar);
@@ -160,6 +161,7 @@ void Forth::defCommands()
     registerCommand(">", more);
     registerCommand("if", ifCmd);
     registerCommand("do", doloopCmd);
+    registerCommand("drop", drop);
 }
 
 void Forth::registerCommand(std::string command, void (*def)())

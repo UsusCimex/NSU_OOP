@@ -7,6 +7,22 @@ void dup()
     stack.push(stack.top());
 }
 
+void over()
+{
+    if (stack.size() < 2) throw std::runtime_error("Stack is empty!");
+    int tempVal = stack.top();
+    stack.pop();
+    int tempVal2 = stack.top();
+    stack.push(tempVal);
+    stack.push(tempVal2);
+}
+
+void drop()
+{
+    if (stack.empty()) throw std::runtime_error("Stack is empty!");
+    stack.pop();
+}
+
 void swap()
 {
     if (stack.size() < 2) throw std::runtime_error("Stack is empty!");
