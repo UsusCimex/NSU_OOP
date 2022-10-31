@@ -135,7 +135,7 @@ void ifCmd()
     }
 }
 
-void doloopCmd()
+void doCmd()
 {
     if (stack.size() < 2) throw std::runtime_error("Stack is empty!");
     int to = stack.top();
@@ -149,35 +149,21 @@ void doloopCmd()
     commands.push_back("0");
 
     std::string value;
-    value = GetCommand();
-    std::string lowerValue = value;
-    std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), tolower);
-    commands.push_back(value);
-
+    std::string lowerValue;
     signed doCounter = 1;
     signed loopCounter = 0;
     while (doCounter != loopCounter)
     {
-        while (lowerValue != "loop") 
+        do
         {
-            // std::cerr << "[\033[36m DEBUG \033[0m] DO readed: " << value << std::endl;
             value = GetCommand();
             commands.push_back(value);
             lowerValue = value;
             std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), tolower);
             if (lowerValue == "do") doCounter++;
-        }
+        } while (lowerValue != "loop");
         loopCounter++;
-        if (doCounter != loopCounter)
-        {
-            value = GetCommand();
-            commands.push_back(value);
-            lowerValue = value;
-            std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), tolower);
-            if (lowerValue == "do") doCounter++;
-        }
     }
-    commands.pop_back();
     if (from < to)
     {
         for (int i = from; i < to; ++i)
@@ -202,6 +188,11 @@ void doloopCmd()
             }
         }
     }
+}
+
+void loopCmd()
+{
+    forth.userVariables.erase("i");
 }
 
 void createUserVar()

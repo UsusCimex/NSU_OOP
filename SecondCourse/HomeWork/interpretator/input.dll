@@ -31,3 +31,5 @@ var y 10
 x y
 x y > if + else - endif
 see
+
+3 0 3 do dup i * . loop

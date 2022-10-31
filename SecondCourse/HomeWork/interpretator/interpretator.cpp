@@ -160,7 +160,8 @@ void Forth::defCommands()
     registerCommand("<", less);
     registerCommand(">", more);
     registerCommand("if", ifCmd);
-    registerCommand("do", doloopCmd);
+    registerCommand("do", doCmd);
+    registerCommand("loop", loopCmd);
     registerCommand("drop", drop);
 }
 
