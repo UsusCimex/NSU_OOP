@@ -1,6 +1,8 @@
 #ifndef DIFFCOMMANDS_H
 #define DIFFCOMMANDS_H
 
+#include <string>
+
 void dup()
 {
     if (stack.empty()) throw std::runtime_error("Stack is empty!");
@@ -141,8 +143,12 @@ void doloopCmd()
     int from = stack.top();
     stack.pop();
 
-    std::string value;
     std::vector<std::string> commands;
+    commands.push_back("var");
+    commands.push_back("i");
+    commands.push_back("0");
+
+    std::string value;
     value = GetCommand();
     std::string lowerValue = value;
     std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), tolower);
@@ -172,12 +178,28 @@ void doloopCmd()
         }
     }
     commands.pop_back();
-    if (from > to) std::swap(from, to);
-    for (int i = from; i < to; ++i)
+    if (from < to)
     {
-        for (int j = 0; j < commands.size(); ++j)
+        for (int i = from; i < to; ++i)
         {
-            commander.insert(commander.begin() + (i - from)*commands.size() + j, commands[j]);
+            commands.erase(commands.begin() + 2);
+            commands.insert(commands.begin() + 2, std::to_string(i));
+            for (int j = 0; j < commands.size(); ++j)
+            {
+                commander.insert(commander.begin() + (i - from)*commands.size() + j, commands[j]);
+            }
+        }
+    }
+    else
+    {
+        for (int i = from; i > to; --i)
+        {
+            commands.erase(commands.begin() + 2);
+            commands.insert(commands.begin() + 2, std::to_string(i));
+            for (int j = 0; j < commands.size(); ++j)
+            {
+                commander.insert(commander.begin() + (from - i)*commands.size() + j, commands[j]);
+            }
         }
     }
 }
