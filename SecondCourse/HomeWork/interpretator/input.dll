@@ -20,16 +20,18 @@ endif endif endif
 loop loop
 ;
 
-5 fac .
+5 fac . cr
 
-2 testif .
+2 testif . cr
 
-forr
+forr cr
 
 var x 30
 var y 10
 x y
 x y > if + else - endif
-see
+see . cr
 
-3 0 3 do dup i * . loop
+0 6 do i 3 < if i . ."< 3" cr
+else i . .">= 3" cr
+endif loop

@@ -3,6 +3,11 @@
 
 #include <string>
 
+void newLine()
+{
+    std::cout << std::endl;
+}
+
 void dup()
 {
     if (stack.empty()) throw std::runtime_error("Stack is empty!");

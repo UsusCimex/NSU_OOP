@@ -64,7 +64,7 @@ bool dotCommand(std::string cmd)
     if (cmd == ".")
     {
         if (stack.empty()) throw std::runtime_error("Stack is empty");
-        std::cout << stack.top() << std::endl;
+        std::cout << stack.top() << " ";
         stack.pop();
         return 1;
     }
@@ -84,7 +84,7 @@ bool dotCommand(std::string cmd)
             }
         }
         cmd = cmd.substr(0, cmd.length() - 1);
-        std::cout << cmd << std::endl;
+        std::cout << cmd << " ";
         return 1;
     }
     if (cmd == ".S" || cmd == ".s")
@@ -95,7 +95,6 @@ bool dotCommand(std::string cmd)
             std::cout << stack.top() << " ";
             stack.pop();
         }
-        std::cout << std::endl;
         return 1;
     }
 
@@ -146,6 +145,7 @@ void Forth::executeCommands()
 
 void Forth::defCommands()
 {
+    registerCommand("cr", newLine);
     registerCommand("+", sum);
     registerCommand("-", sub);
     registerCommand("*", mul);
