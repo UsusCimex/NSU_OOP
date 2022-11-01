@@ -111,21 +111,21 @@ void ifCmd()
         std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), tolower);
         do
         {
-            while (lowerValue != "else" && lowerValue != "than" && lowerValue != "endif")
+            while (lowerValue != "else" && lowerValue != "then" && lowerValue != "endif")
             {
                 value = GetCommand();
                 lowerValue = value;
                 std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), tolower);
                 if (lowerValue == "if") ifCounter++;
             }
-            if (lowerValue == "than" || lowerValue == "endif") endifCounter++;
+            if (lowerValue == "then" || lowerValue == "endif") endifCounter++;
         } while (ifCounter != endifCounter);
         if (lowerValue == "else")
         {
             value = GetCommand();
             lowerValue = value;
             std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), tolower);
-            while (lowerValue != "than" && lowerValue != "endif")
+            while (lowerValue != "then" && lowerValue != "endif")
             {
                 forth.executeCommand(value);
                 value = GetCommand();
