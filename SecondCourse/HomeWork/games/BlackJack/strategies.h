@@ -6,7 +6,7 @@
 #include "fstream"
 
 //Load CSV file from patch
-char ** GetStrategy(std::string name);
+char ** GetStrategy(std::string && name, std::string & configFile);
 
 class Player
 {
@@ -16,6 +16,7 @@ public:
     //Choice of action
     virtual std::string makeAction();
     Card enemyCard;
+    std::string configFile;
 
     //There is no point in changing the following variables, because they are updated in the game.
     //And only needed for execution makeAction.
@@ -47,8 +48,9 @@ public:
 class Bot1 : public Player 
 {
 public:
-    Bot1();
+    Bot1() : Player("Bot1") {}
     ~Bot1();
+    void generateStrategyTable();
     std::string makeAction() override;
 private:
     char ** strategyTable = nullptr;
@@ -57,8 +59,9 @@ private:
 class Bot2 : public Player
 {
 public:
-    Bot2();
+    Bot2() : Player("Bot2") {}
     ~Bot2();
+    void generateStrategyTable();
     std::string makeAction() override;
 private:
    char ** strategyTable = nullptr;
@@ -67,8 +70,9 @@ private:
 class MetaBot : public Player
 {
 public:
-    MetaBot();
+    MetaBot() : Player("Meta") {}
     ~MetaBot();
+    void generateStrategyTable();
     std::string makeAction() override;
 private:
     char ** riskStrategy = nullptr;

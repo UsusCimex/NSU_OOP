@@ -2,12 +2,6 @@
 
 #define CHANGEPLAYER( A ) ( ( A ) ^= 1 )
 
-Game::Game(std::vector<Player*> & playerList)
-{
-    players.resize(playerList.size());
-    for (int i = 0; i < playerList.size(); ++i) players[i].player = playerList[i];
-}
-
 //Selects the winner from two players, by points
 void PrintWinner(std::vector<playerCharacters> & vec)
 {
@@ -38,31 +32,38 @@ void PrintWinner(std::vector<playerCharacters> & vec)
     }
 }
 
-void Game::start()
+void Game::start(std::vector<Player*> & playerList)
 {
     // std::cout << "### BLACKJACK ###" << std::endl;
     // std::cout << "Control:\ng - get card\ns - stop get card\nq - quit" << std::endl;
-    if (rules.mode == DETAILED)
+    // std::cerr << playerList.size() << " : SIZE ||||| FILECONFIG : " << configFile << std::endl;
+    players.resize(playerList.size());
+    for (int i = 0; i < playerList.size(); ++i) 
+    {
+        players[i].player = playerList[i];
+        players[i].player->configFile = configFile;
+    }
+    if (gameMode == DETAILED)
     {
         std::vector<playerCharacters> result = detailedGame(players);
         PrintWinner(result);
     }
-    else if (rules.mode == FAST) 
+    else if (gameMode == FAST)
     {
         std::vector<playerCharacters> result = fastGame(players);
         PrintWinner(result);
     }
-    else if (rules.mode == TOURNAMENT) 
+    else if (gameMode == TOURNAMENT) 
     {
         tournamentGame();
     }
-    else if (rules.mode == TOURNAMENTFAST)
+    else if (gameMode == TOURNAMENTFAST)
     {
         tournamentfastGame();
     }
     else
     {
-        throw std::runtime_error("mode isn't available...");
+        throw std::runtime_error("gameMode isn't available...");
     }
 }
 
@@ -100,7 +101,7 @@ bool InitialDistribution(std::vector<playerCharacters> & players, Deck & deck, b
 
 std::vector<playerCharacters> Game::detailedGame(std::vector<playerCharacters> & players)
 {
-    Deck deck(rules.decksCount);
+    Deck deck(decksCount);
     deck.generateDeck();
     if (InitialDistribution(players, deck, true)) return players;
     size_t inactivePlayersCount = 0;
@@ -154,9 +155,9 @@ std::vector<playerCharacters> Game::detailedGame(std::vector<playerCharacters> &
 
 std::vector<playerCharacters> Game::fastGame(std::vector<playerCharacters> & players)
 {
-    Deck deck(rules.decksCount);
+    Deck deck(decksCount);
     deck.generateDeck();
-    // std::cerr << rules.decksCount << std::endl;
+    // std::cerr << decksCount << std::endl;
     if (InitialDistribution(players, deck, false)) return players;
 
     size_t inactivePlayersCount = 0;
@@ -196,16 +197,16 @@ std::vector<playerCharacters> Game::fastGame(std::vector<playerCharacters> & pla
 }
 
 //Selects the winner from two players, by points
-void Game::UpgradeScore(std::vector<playerCharacters> & vec)
+void Game::UpgradeScore(std::vector<playerCharacters> & vec, size_t & a, size_t & b)
 {
-    if (vec[0].score > 21 || vec[1].score == 21) vec[1].tournamentScore += 2;
-    else if (vec[1].score > 21 || vec[0].score == 21) vec[0].tournamentScore += 2;
-    else if (vec[0].score > vec[1].score) vec[0].tournamentScore += 2;
-    else if (vec[0].score < vec[1].score) vec[1].tournamentScore += 2;
-    else { vec[0].tournamentScore += 1; vec[1].tournamentScore += 1; }
+    if (vec[0].score > 21 || vec[1].score == 21) players[b].tournamentScore += 2;
+    else if (vec[1].score > 21 || vec[0].score == 21) vec[a].tournamentScore += 2;
+    else if (vec[0].score > vec[1].score) players[a].tournamentScore += 2;
+    else if (vec[0].score < vec[1].score) players[b].tournamentScore += 2;
+    else { players[a].tournamentScore += 1; players[b].tournamentScore += 1; }
 
-    vec[0].resetHand();
-    vec[1].resetHand();
+    players[a].resetHand();
+    players[b].resetHand();
 }
 
 void Game::tournamentGame()
@@ -218,11 +219,11 @@ void Game::tournamentGame()
             std::vector<playerCharacters> match = {players[playerA], players[playerB]};
             std::vector<playerCharacters> res = detailedGame(match);
             PrintWinner(res);
-            UpgradeScore(res);
+            UpgradeScore(res, playerA, playerB);
         }
     }
 
-    std::sort(players.begin(), players.end(), [this](auto a, auto b){ return a.tournamentScore > b.tournamentScore; });
+    std::sort(players.begin(), players.end(), [](auto a, auto b){ return a.tournamentScore > b.tournamentScore; });
     std::cout << "\nRESULTS!" << std::endl;
     for (size_t i = 0; i < players.size(); ++i)
     {
@@ -250,11 +251,11 @@ void Game::tournamentfastGame()
         {
             std::vector<playerCharacters> match = {players[playerA], players[playerB]};
             std::vector<playerCharacters> res = fastGame(match);
-            UpgradeScore(res);
+            UpgradeScore(res, playerA, playerB);
         }
     }
 
-    std::sort(players.begin(), players.end(), [this](auto a, auto b){ return a.tournamentScore > b.tournamentScore; });
+    std::sort(players.begin(), players.end(), [](auto a, auto b){ return a.tournamentScore > b.tournamentScore; });
     for (size_t i = 0; i < players.size(); ++i)
     {
         if (players[i].tournamentScore == players[0].tournamentScore)

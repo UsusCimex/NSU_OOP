@@ -20,16 +20,4 @@ enum Mode
     TOURNAMENTFAST
 };
 
-struct Rules
-{
-    std::vector<std::string> players;
-    Mode mode = NONE;
-    std::string configFile;
-    int decksCount = 1;
-
-    int playerCount = 0;
-};
-
-extern Rules rules;
-
 #endif

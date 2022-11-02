@@ -9,9 +9,14 @@
 class Game
 {
 public:
-    Game(std::vector<Player*> & playerList);
     //Default function, start the desired game
-    void start();
+    void start(std::vector<Player*> & playerList);
+
+    Mode gameMode = NONE;
+    std::string configFile = "";
+    int decksCount = 1;
+
+    int playerCount = 0;
 private:
     //A game with a full description of the actions
     std::vector<playerCharacters> detailedGame(std::vector<playerCharacters> &);
@@ -22,7 +27,7 @@ private:
     //Start fast games with combinations of players
     void tournamentfastGame();
 
-    void UpgradeScore(std::vector<playerCharacters> &);
+    void UpgradeScore(std::vector<playerCharacters> &, size_t &, size_t &);
 
     std::vector<playerCharacters> players;
 };
