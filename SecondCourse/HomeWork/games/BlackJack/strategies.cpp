@@ -1,5 +1,16 @@
 #include "strategies.h"
 
+Player::Player(std::string name) : name(name) {}
+
+std::string Player::makeAction()
+{
+    std::cout << name << ": ";
+    std::string status;
+    std::cin >> status;
+
+    return status;
+}
+
 char ** GetStrategy(std::string name)
 {
     std::string patch = rules.configFile;
@@ -75,13 +86,13 @@ MetaBot::~MetaBot()
 
 std::string TrivialBot1::makeAction()
 {
-    if (getScore() < 16) return "g";
+    if (score < 16) return "g";
     return "s";
 }
 
 std::string TrivialBot2::makeAction()
 {
-    if ((rand() % 100) < (getScore() * 100 / 24)) return "s";
+    if ((rand() % 100) < (score * 100 / 24)) return "s";
     return "g";
 }
 
@@ -94,22 +105,22 @@ std::string TrivialBot3::makeAction()
 std::string Bot1::makeAction()
 {
     std::string a = "";
-    a += strategyTable[getScore()][enemyCard.power];
+    a += strategyTable[score][enemyCard.power];
     return a;
 }
 
 std::string Bot2::makeAction()
 {
     std::string a = "";
-    a += strategyTable[getScore()][enemyCard.power];
+    a += strategyTable[score][enemyCard.power];
     return a;
 }
 
 std::string MetaBot::makeAction()
 {
     std::string a = "";
-    if (enemyCard.power >= 8) a += riskStrategy[getScore()][enemyCard.power];
-    else a += normStrategy[getScore()][enemyCard.power];
+    if (enemyCard.power >= 8) a += riskStrategy[score][enemyCard.power];
+    else a += normStrategy[score][enemyCard.power];
 
     return a;
 }

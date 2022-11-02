@@ -1,6 +1,6 @@
 #include "blackjack.h"
 #include "deck.h"
-#include "player.h"
+#include "strategies.h"
 #include "game.h"
 #include "factory.h"
 

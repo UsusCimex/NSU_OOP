@@ -9,19 +9,22 @@
 class Game
 {
 public:
-    Game(std::vector<Player*> & players) : players(players) {}
+    Game(std::vector<Player*> & playerList);
     //Default function, start the desired game
     void start();
+private:
     //A game with a full description of the actions
-    std::vector<Player*> detailedGame(std::vector<Player*>);
+    std::vector<playerCharacters> detailedGame(std::vector<playerCharacters> &);
     //A game with a deduced result (Only bots)
-    std::vector<Player*> fastGame(std::vector<Player*>);
+    std::vector<playerCharacters> fastGame(std::vector<playerCharacters> &);
     //Start detailed games with combinations of players
     void tournamentGame();
     //Start fast games with combinations of players
     void tournamentfastGame();
-private:
-    std::vector<Player*> players;
+
+    void UpgradeScore(std::vector<playerCharacters> &);
+
+    std::vector<playerCharacters> players;
 };
 
 #endif

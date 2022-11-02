@@ -2,36 +2,28 @@
 #define PLAYER_H
 
 #include "blackjack.h"
+#include "strategies.h"
 #include "deck.h"
 
-class Player
+struct playerCharacters
 {
-public:
-    Player(std::string name);
-    //Remove hand deck. Tournament score remains the same
-    void resetHand();
+    Player* player;
+    std::vector<Card> hand;
+    int score = 0;
+    int tournamentScore = 0;
+
+    void syncWithPlayer();
+
     //Edit tournament score, your score += score
     void addTournamentScore(int score);
-    //Getter tournament score
-    int getTournamentScore();
-    //Choice of action
-    virtual std::string makeAction();
-    //Get a card from the deck
-    Card getCard(Deck &);
+    //Remove hand deck. Tournament score remains the same
+    void resetHand();
     //If Score > 21, start method tryEditAce. If score is good return 1
     bool checkScore();
     //Power Ace = 1, return 0 if don't searched
     bool tryEditAce();
-    int getScore();
-    //See the first(opened) card.
-    Card enemyCard;
-    //See cards in your hand
-    std::vector<Card> seeHand();
-    std::string name;
-protected:
-    int score = 0;
-    int tournamentScore = 0;
-    std::vector<Card> card;
+    //Get a card from the deck
+    Card getCard(Deck &);
 };
 
 #endif

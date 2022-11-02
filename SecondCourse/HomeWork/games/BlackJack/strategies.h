@@ -2,11 +2,26 @@
 #define STRATEGIES_H
 
 #include "blackjack.h"
-#include "player.h"
+#include "deck.h"
 #include "fstream"
 
 //Load CSV file from patch
 char ** GetStrategy(std::string name);
+
+class Player
+{
+public:
+    Player(std::string name);
+    std::string name;
+    //Choice of action
+    virtual std::string makeAction();
+    Card enemyCard;
+
+    //There is no point in changing the following variables, because they are updated in the game.
+    //And only needed for execution makeAction.
+    std::vector<Card> hand;
+    int score = 0;
+};
 
 class TrivialBot1 : public Player 
 {

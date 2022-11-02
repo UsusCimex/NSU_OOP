@@ -2,7 +2,6 @@
 #define FACTORY_H
 
 #include "blackjack.h"
-#include "player.h"
 #include "strategies.h"
 
 template <typename key, typename value>
