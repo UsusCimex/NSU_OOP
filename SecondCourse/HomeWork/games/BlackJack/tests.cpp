@@ -27,8 +27,7 @@ TEST(BlackJack, TestTrivialBot)
 TEST(BlackJack, TestBot)
 {
     char * input[] = {"null", "-bot1", "-bot2", "--config=config"};
-    std::cerr << "Start hard test" << std::endl;
-    StartSetting(4, input);
+    EXPECT_NO_THROW(StartSetting(4, input));
     char * input2[] = {"null", "-bot2", "-bot1", "--config=config", "--mode=fast"};
     EXPECT_NO_THROW(StartSetting(5, input2));
     char * input3[] = {"null", "-metabot", "-bot1", "--config=config", "--mode=detailed"};
@@ -40,7 +39,7 @@ TEST(BlackJack, TestTournament)
     EXPECT_NO_THROW(StartSetting(4, input));
     char * input2[] = {"null", "-trivialbot3", "-trivialbot2", "-trivialbot1", "--mode=tournament"};
     EXPECT_NO_THROW(StartSetting(5, input2));
-    char * input3[] = {"null", "-trivialbot1", "-bot1", "-bot2", "--config=config", "--mode==fasttournament"};
+    char * input3[] = {"null", "-trivialbot1", "-bot1", "-bot2", "--mode=fasttournament", "--config=config"};
     EXPECT_NO_THROW(StartSetting(6, input3));
     char * input4[] = {"null", "-bot1", "-trivialbot1", "-trivialbot2", "--config=config", "--mode=fast"};
     EXPECT_NO_THROW(StartSetting(5, input4));
@@ -50,4 +49,6 @@ int main(int argc, char * argv[])
 {
     ::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
+
+    // StartSetting(argc, argv);
 }

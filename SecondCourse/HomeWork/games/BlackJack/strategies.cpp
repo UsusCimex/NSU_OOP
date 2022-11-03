@@ -11,16 +11,18 @@ std::string Player::makeAction()
     return status;
 }
 
+void generateStrategyTable() {}
+
 char ** GetStrategy(std::string && name, std::string & configFile)
 {
     std::string patch = configFile;
-    if (patch.back() != '\\') patch += '\\';
+    if (patch.back() != '/') patch += '/'; //In linux / , in Windows '\\'
     patch += name + ".csv";
     std::ifstream config;
     config.open(patch);
     if (!config.is_open()) 
     {
-        std::cerr << name << " " << patch << std::endl;
+        std::cerr << patch << " isn't available!" << std::endl;
         throw std::runtime_error("Strategies file isn't available...");
     }
 
@@ -29,11 +31,11 @@ char ** GetStrategy(std::string && name, std::string & configFile)
     char ** strategyConfig = new char* [21];
     for (int i = 0; i <21; ++i) strategyConfig[i] = new char[12];
 
+    char value;
     for (int i = 4; i <= 20; ++i)
     {
         for (int j = 2; j <= 11; j++)
         {
-            static char value;
             config >> value;
             if (value == ',') config >> value;
             strategyConfig[i][j] = value;

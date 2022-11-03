@@ -70,7 +70,7 @@ void Game::start(std::vector<Player*> & playerList)
 //Initial deal of cards
 //If one of players get 21, return 1
 bool InitialDistribution(std::vector<playerCharacters> & players, Deck & deck, bool printScore)
-{
+{   
     for (size_t i = 0; i < 2; ++i) //defaul 2 cards in start game
     {
         for (auto &pl : players)
@@ -200,7 +200,7 @@ std::vector<playerCharacters> Game::fastGame(std::vector<playerCharacters> & pla
 void Game::UpgradeScore(std::vector<playerCharacters> & vec, size_t & a, size_t & b)
 {
     if (vec[0].score > 21 || vec[1].score == 21) players[b].tournamentScore += 2;
-    else if (vec[1].score > 21 || vec[0].score == 21) vec[a].tournamentScore += 2;
+    else if (vec[1].score > 21 || vec[0].score == 21) players[a].tournamentScore += 2;
     else if (vec[0].score > vec[1].score) players[a].tournamentScore += 2;
     else if (vec[0].score < vec[1].score) players[b].tournamentScore += 2;
     else { players[a].tournamentScore += 1; players[b].tournamentScore += 1; }
