@@ -31,6 +31,9 @@ public:
     }
 private:
     std::map <key, value * (*)()> Strategies_;
+
+    Factory(const Factory &) = delete;
+	Factory & operator=(const Factory &) = delete;
 };
 
 #endif

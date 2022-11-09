@@ -65,6 +65,16 @@ void Game::start(std::vector<Player*> & playerList)
     {
         throw std::runtime_error("gameMode isn't available...");
     }
+
+    DeletePlayers(playerList);
+}
+
+void Game::DeletePlayers(std::vector<Player*> & playerList)
+{
+    for (int i = 0; i < playerList.size(); ++i)
+    {
+        delete playerList[i];
+    }
 }
 
 //Initial deal of cards

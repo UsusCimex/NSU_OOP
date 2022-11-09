@@ -29,7 +29,7 @@ char ** GetStrategy(std::string && name, std::string & configFile)
     //config file file must be of type: 17 rows, 10 columns.
     //columns : enemy card(2 - 11), rows : your score (4 - 20)
     char ** strategyConfig = new char* [21];
-    for (int i = 0; i <21; ++i) strategyConfig[i] = new char[12];
+    for (int i = 0; i < 21; ++i) strategyConfig[i] = new char[12];
 
     char value;
     for (int i = 4; i <= 20; ++i)

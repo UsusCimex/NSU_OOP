@@ -12,6 +12,7 @@ class Player
 {
 public:
     Player(std::string name);
+    virtual ~Player() = default;
     std::string name;
     //Choice of action
     virtual std::string makeAction();
@@ -49,7 +50,7 @@ class Bot1 : public Player
 {
 public:
     Bot1() : Player("Bot1") {}
-    ~Bot1();
+    ~Bot1() override;
     void generateStrategyTable();
     std::string makeAction() override;
 private:
@@ -60,7 +61,7 @@ class Bot2 : public Player
 {
 public:
     Bot2() : Player("Bot2") {}
-    ~Bot2();
+    ~Bot2() override;
     void generateStrategyTable();
     std::string makeAction() override;
 private:
@@ -71,7 +72,7 @@ class MetaBot : public Player
 {
 public:
     MetaBot() : Player("Meta") {}
-    ~MetaBot();
+    ~MetaBot() override;
     void generateStrategyTable();
     std::string makeAction() override;
 private:

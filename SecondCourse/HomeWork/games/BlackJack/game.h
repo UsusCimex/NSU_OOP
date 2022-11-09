@@ -29,6 +29,8 @@ private:
 
     void UpgradeScore(std::vector<playerCharacters> &, size_t &, size_t &);
 
+    void DeletePlayers(std::vector<Player*> & playerList);
+
     std::vector<playerCharacters> players;
 };
 
