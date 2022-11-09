@@ -45,6 +45,20 @@ TEST(BlackJack, TestTournament)
     EXPECT_NO_THROW(StartSetting(5, input4));
 }
 
+TEST(BlackJack, TestMetaBots)
+{
+    char * input[] = {"null", "-metabot", "-trivialbot1", "--config=config", "--mode=fast"};
+    EXPECT_NO_THROW(StartSetting(5, input));
+    char * input2[] = {"null", "-metabot", "-trivialbot2", "--config=config", "--mode=fast"};
+    EXPECT_NO_THROW(StartSetting(5, input2));
+    char * input3[] = {"null", "-metabot", "-trivialbot3", "--config=config", "--mode=fast"};
+    EXPECT_NO_THROW(StartSetting(5, input3));
+    char * input4[] = {"null", "-metabot", "-bot1", "--config=config", "--mode=fast"};
+    EXPECT_NO_THROW(StartSetting(5, input4));
+    char * input5[] = {"null", "-metabot", "-bot2", "--config=config", "--mode=fast"};
+    EXPECT_NO_THROW(StartSetting(5, input5));
+}
+
 int main(int argc, char * argv[])
 {
     ::testing::InitGoogleTest(&argc, argv);
