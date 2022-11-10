@@ -17,7 +17,7 @@ namespace{
         else { playerList.push_back(arg); game.playerCount++; }
     }
 
-    void StartSetting(int argc, char * argv[])
+    void StartSetting(int argc, const char * argv[])
     {
         srand(time(0));
         Game game;
