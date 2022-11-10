@@ -1,21 +1,19 @@
 #ifndef STRATEGIES_H
 #define STRATEGIES_H
 
-#include "blackjack.h"
 #include "deck.h"
 #include "fstream"
+#include "factory.h"
+#include "blackjack.h"
 
 //Load CSV file from patch
-char ** GetStrategy(std::string && name, std::string & configFile);
+std::vector<std::vector<std::string>> GetStrategy(std::string && name, std::string & configFile);
 
 class Player
 {
 public:
-    Player(std::string name);
-    virtual ~Player() = default;
-    std::string name;
     //Choice of action
-    virtual std::string makeAction();
+    virtual Action makeAction();
     Card enemyCard;
     std::string configFile;
 
@@ -23,61 +21,50 @@ public:
     //And only needed for execution makeAction.
     std::vector<Card> hand;
     int score = 0;
+protected:
+    std::vector <std::vector<std::string>> strategyTable;
 };
 
 class TrivialBot1 : public Player 
 {
 public:
-    TrivialBot1() : Player("TrivialBot1") {}
-    std::string makeAction() override;
+    Action makeAction() override;
 };
 
 class TrivialBot2 : public Player 
 {
 public:
-    TrivialBot2() : Player("TrivialBot2") {}
-    std::string makeAction() override;
+    Action makeAction() override;
 };
 
 class TrivialBot3 : public Player 
 {
 public:
-    TrivialBot3() : Player("TrivialBot3") {}
-    std::string makeAction() override;
+    Action makeAction() override;
 };
 
 class Bot1 : public Player 
 {
 public:
-    Bot1() : Player("Bot1") {}
-    ~Bot1() override;
     void generateStrategyTable();
-    std::string makeAction() override;
-private:
-    char ** strategyTable = nullptr;
+    Action makeAction() override;
 };
 
 class Bot2 : public Player
 {
 public:
-    Bot2() : Player("Bot2") {}
-    ~Bot2() override;
     void generateStrategyTable();
-    std::string makeAction() override;
-private:
-   char ** strategyTable = nullptr;
+    Action makeAction() override;
 };
 
 class MetaBot : public Player
 {
 public:
-    MetaBot() : Player("Meta") {}
-    ~MetaBot() override;
     void generateStrategyTable();
-    std::string makeAction() override;
+    Action makeAction() override;
 private:
-    char ** riskStrategy = nullptr;
-    char ** normStrategy = nullptr;
+    std::vector <std::vector<std::string>> riskStrategy;
+    std::vector <std::vector<std::string>> normStrategy;
 };
 
 Player* CreateTrivialBot1();

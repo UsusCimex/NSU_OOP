@@ -1,39 +1,48 @@
 #ifndef FACTORY_H
 #define FACTORY_H
 
-#include "blackjack.h"
-#include "strategies.h"
+#include <map>
 
-template <typename key, typename value>
+template 
+<
+typename AbstractProduct, 
+typename IdentifierType,
+typename ProductCreator
+>
 class Factory
 {
 public:
-    Factory()
-    {
-        RegisterStrategy("-trivialBot1", CreateTrivialBot1);
-        RegisterStrategy("-trivialbot1", CreateTrivialBot1);
-        RegisterStrategy("-trivialBot2", CreateTrivialBot2);
-        RegisterStrategy("-trivialbot2", CreateTrivialBot2);
-        RegisterStrategy("-trivialBot3", CreateTrivialBot3);
-        RegisterStrategy("-trivialbot3", CreateTrivialBot3);
-        RegisterStrategy("-bot1", CreateBot1);
-        RegisterStrategy("-bot2", CreateBot2);
-        RegisterStrategy("-metabot", CreateMetaBot);
-    }
-    Player* CreateBot(const key& name)
-    {
-        if (Strategies_.count(name) == 0) return nullptr;
-        return Strategies_[name]();
-    }
-    void RegisterStrategy(const key& name, value * (*creator)())
-    {
-        Strategies_[name] = creator;
-    }
-private:
-    std::map <key, value * (*)()> Strategies_;
-
+    Factory() = default;
     Factory(const Factory &) = delete;
 	Factory & operator=(const Factory &) = delete;
+    
+    bool Register(const IdentifierType& id, ProductCreator creator)
+    {
+        return associations_.insert(make_pair(id, creator)).second;
+    }
+    bool Unregister(const IdentifierType& id)
+    {
+        return associations_.erase(id) == 1;
+    }
+    AbstractProduct* CreateObject(const IdentifierType& id)
+    {
+        auto it = associations_.find(id);
+        if (it != associations_.end())
+        {
+            return (it->second)();
+        }
+        else
+        {
+            throw std::runtime_error("Undefined object, failed!");
+        }
+    }
+    static Factory * getInstance()
+    {
+        static Factory factory;
+        return &factory;
+    }
+private:
+    std::map <IdentifierType, ProductCreator> associations_;
 };
 
 #endif

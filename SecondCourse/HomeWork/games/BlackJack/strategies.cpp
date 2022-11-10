@@ -1,26 +1,24 @@
 #include "strategies.h"
-
-Player::Player(std::string name) : name(name) {}
-
-std::string Player::makeAction()
+Action Player::makeAction()
 {
-    std::cout << name << ": ";
+    std::cout << "Enter something: ";
     std::string status;
     std::cin >> status;
-
-    return status;
+    if (status == "hit" || status == "h" || status == "g") return Action::HIT;
+    if (status == "stand" || status == "s") return Action::STAND;
+    return Action::NOACTION;
 }
 
 void generateStrategyTable() {}
 
-char ** GetStrategy(std::string && name, std::string & configFile)
+std::vector <std::vector<std::string>> GetStrategy(std::string && name, std::string & configFile)
 {
     std::string patch = configFile;
     if (patch.back() != '/') patch += '/'; //In linux / , in Windows '\\'
     patch += name + ".csv";
     std::ifstream config;
     config.open(patch);
-    if (!config.is_open()) 
+    if (!config.is_open())
     {
         std::cerr << patch << " isn't available!" << std::endl;
         throw std::runtime_error("Strategies file isn't available...");
@@ -28,8 +26,7 @@ char ** GetStrategy(std::string && name, std::string & configFile)
 
     //config file file must be of type: 17 rows, 10 columns.
     //columns : enemy card(2 - 11), rows : your score (4 - 20)
-    char ** strategyConfig = new char* [21];
-    for (int i = 0; i < 21; ++i) strategyConfig[i] = new char[12];
+    std::vector <std::vector<std::string>> strategyConfig(21, std::vector<std::string>(12)); 
 
     char value;
     for (int i = 4; i <= 20; ++i)
@@ -52,27 +49,9 @@ void Bot1::generateStrategyTable()
     strategyTable = GetStrategy("bot1", configFile);
 }
 
-Bot1::~Bot1()
-{
-    if (strategyTable != nullptr)
-    {
-        for (int i = 0; i < 21; ++i) delete[] strategyTable[i];
-        delete[] strategyTable;
-    }
-}
-
 void Bot2::generateStrategyTable() 
 {
     strategyTable = GetStrategy("bot2", configFile);
-}
-
-Bot2::~Bot2()
-{
-    if (strategyTable != nullptr)
-    {
-        for (int i = 0; i < 21; ++i) delete[] strategyTable[i];
-        delete[] strategyTable;
-    }
 }
 
 void MetaBot::generateStrategyTable()
@@ -81,63 +60,58 @@ void MetaBot::generateStrategyTable()
     normStrategy = GetStrategy("bot2", configFile);
 }
 
-MetaBot::~MetaBot()
+Action TrivialBot1::makeAction()
 {
-    if (riskStrategy != nullptr) 
-    {
-        for (int i = 0; i < 21; ++i) delete[] riskStrategy[i];
-        delete[] riskStrategy;
-    }
-
-    if (normStrategy != nullptr)
-    {
-        for (int i = 0; i < 21; ++i) delete[] normStrategy[i];
-        delete[] normStrategy;
-    }
+    if (score < 16) return Action::HIT;
+    return Action::STAND;
 }
 
-std::string TrivialBot1::makeAction()
+Action TrivialBot2::makeAction()
 {
-    if (score < 16) return "g";
-    return "s";
+    if (score >= 21) return Action::STAND;
+    if ((rand() % 100) < (score * 100 / 24)) return Action::STAND;
+    return Action::HIT;
 }
 
-std::string TrivialBot2::makeAction()
+Action TrivialBot3::makeAction()
 {
-    if ((rand() % 100) < (score * 100 / 24)) return "s";
-    return "g";
+    if (score >= 21) return Action::STAND;
+    if (rand() % 2) return Action::HIT;
+    return Action::STAND;
 }
 
-std::string TrivialBot3::makeAction()
+Action Bot1::makeAction()
 {
-    if (rand() % 2) return "g";
-    return "s";
+    if (strategyTable.empty()) generateStrategyTable();
+    if (score >= 21) return Action::STAND;
+    std::string a = strategyTable[score][enemyCard.power];
+    if (a == "g") return Action::HIT;
+    else if (a == "s") return Action::STAND;
+    return Action::NOACTION;
 }
 
-std::string Bot1::makeAction()
+Action Bot2::makeAction()
 {
-    if (strategyTable == nullptr) generateStrategyTable();
-    std::string a = "";
-    a += strategyTable[score][enemyCard.power];
-    return a;
+    if (strategyTable.empty()) generateStrategyTable();
+    if (score >= 21) return Action::STAND;
+    std::string a = strategyTable[score][enemyCard.power];
+    if (a == "g") return Action::HIT;
+    else if (a == "s") return Action::STAND;
+    return Action::NOACTION;
 }
 
-std::string Bot2::makeAction()
+Action MetaBot::makeAction()
 {
-    if (strategyTable == nullptr) generateStrategyTable();
-    std::string a = "";
-    a += strategyTable[score][enemyCard.power];
-    return a;
-}
+    if (riskStrategy.empty() || normStrategy.empty()) generateStrategyTable();
+    if (score >= 21) return Action::STAND;
+    
+    std::string a;
+    if (enemyCard.power >= 8) a = riskStrategy[score][enemyCard.power];
+    else a = normStrategy[score][enemyCard.power];
 
-std::string MetaBot::makeAction()
-{
-    if (riskStrategy == nullptr || normStrategy == nullptr) generateStrategyTable();
-    std::string a = "";
-    if (enemyCard.power >= 8) a += riskStrategy[score][enemyCard.power];
-    else a += normStrategy[score][enemyCard.power];
-
-    return a;
+    if (a == "g") return Action::HIT;
+    else if (a == "s") return Action::STAND;
+    return Action::NOACTION;
 }
 
 Player* CreateTrivialBot1()
@@ -169,3 +143,13 @@ Player* CreateMetaBot()
 {
     return new MetaBot();
 }
+
+auto tBot1 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialBot1", CreateTrivialBot1);
+auto tBot11 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialbot1", CreateTrivialBot1);
+auto tBot2 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialBot2", CreateTrivialBot2);
+auto tBot21 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialbot2", CreateTrivialBot2);
+auto tBot3 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialBot3", CreateTrivialBot3);
+auto tBot31 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialbot3", CreateTrivialBot3);
+auto bot1 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-bot1", CreateBot1);
+auto bot2 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-bot2", CreateBot2);
+auto bot3 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-metabot", CreateMetaBot);

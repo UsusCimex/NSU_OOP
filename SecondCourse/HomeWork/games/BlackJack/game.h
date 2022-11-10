@@ -1,37 +1,35 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "blackjack.h"
 #include "player.h"
 #include "deck.h"
 #include "factory.h"
+#include "blackjack.h"
+
+#include <iomanip>
 
 class Game
 {
 public:
     //Default function, start the desired game
-    void start(std::vector<Player*> & playerList);
+    void start(std::vector<PlayerCharacters> & playerList);
 
-    Mode gameMode = NONE;
+    Mode gameMode = Mode::NONE;
     std::string configFile = "";
     int decksCount = 1;
 
     int playerCount = 0;
 private:
     //A game with a full description of the actions
-    std::vector<playerCharacters> detailedGame(std::vector<playerCharacters> &);
+    std::vector<PlayerCharacters> detailedGame(std::vector<PlayerCharacters> &);
     //A game with a deduced result (Only bots)
-    std::vector<playerCharacters> fastGame(std::vector<playerCharacters> &);
+    std::vector<PlayerCharacters> fastGame(std::vector<PlayerCharacters> &);
     //Start detailed games with combinations of players
-    void tournamentGame();
+    std::vector<PlayerCharacters> tournamentGame(std::vector<PlayerCharacters> &);
     //Start fast games with combinations of players
-    void tournamentfastGame();
+    std::vector<PlayerCharacters> tournamentfastGame(std::vector<PlayerCharacters> &);
 
-    void UpgradeScore(std::vector<playerCharacters> &, size_t &, size_t &);
-
-    void DeletePlayers(std::vector<Player*> & playerList);
-
-    std::vector<playerCharacters> players;
+    void UpgradeTournamentScore(std::vector<PlayerCharacters> &, std::vector<PlayerCharacters> &, size_t &, size_t &);
 };
 
 #endif

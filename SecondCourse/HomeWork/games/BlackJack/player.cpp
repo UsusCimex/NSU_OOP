@@ -1,12 +1,12 @@
 #include "player.h"
 
-void playerCharacters::syncWithPlayer()
+void PlayerCharacters::syncWithPlayer()
 {
     player->score = score;
     player->hand = hand;
 }
 
-Card playerCharacters::getCard(Deck & deck)
+Card PlayerCharacters::getCard(Deck & deck)
 {
     Card curCard = deck.PopCard();
     hand.push_back(curCard);
@@ -18,7 +18,7 @@ Card playerCharacters::getCard(Deck & deck)
     return curCard;
 }
 
-bool playerCharacters::tryEditAce()
+bool PlayerCharacters::tryEditAce()
 {
     for (size_t i = 0; i < hand.size(); ++i)
     {
@@ -35,16 +35,8 @@ bool playerCharacters::tryEditAce()
     return 0;
 }
 
-bool playerCharacters::checkScore()
+bool PlayerCharacters::checkScore()
 {
     if (score > 21) return tryEditAce();
     return 1;
-}
-
-void playerCharacters::resetHand()
-{
-    score = 0;
-    hand.clear();
-
-    syncWithPlayer();
 }

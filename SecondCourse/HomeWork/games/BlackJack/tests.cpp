@@ -61,8 +61,8 @@ TEST(BlackJack, TestMetaBots)
 
 int main(int argc, char * argv[])
 {
-    ::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+    // ::testing::InitGoogleTest(&argc, argv);
+	// return RUN_ALL_TESTS();
 
-    // StartSetting(argc, argv);
+    StartSetting(argc, (const char **)argv);
 }

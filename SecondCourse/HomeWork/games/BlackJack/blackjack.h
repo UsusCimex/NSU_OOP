@@ -20,4 +20,11 @@ enum Mode
     TOURNAMENTFAST
 };
 
+enum Action
+{
+    NOACTION,
+    HIT,
+    STAND
+};
+
 #endif

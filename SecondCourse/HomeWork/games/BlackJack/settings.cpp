@@ -1,17 +1,17 @@
-#include "blackjack.h"
+#include "factory.h"
 #include "deck.h"
 #include "strategies.h"
 #include "game.h"
-#include "factory.h"
+#include "blackjack.h"
 
-namespace{
+namespace {
     //Parameter handler
     void SettingRules(std::string arg, Game & game, std::vector<std::string> & playerList)
     {
-        if (arg.compare("--mode=detailed") == 0) game.gameMode = DETAILED;
-        else if (arg.compare("--mode=fast") == 0) game.gameMode = FAST;
-        else if (arg.compare("--mode=tournament") == 0) game.gameMode = TOURNAMENT;
-        else if (arg.compare("--mode=tournamentfast") == 0 || arg.compare("--mode=fasttournament") == 0) game.gameMode = TOURNAMENTFAST; 
+        if (arg.compare("--mode=detailed") == 0) game.gameMode = Mode::DETAILED;
+        else if (arg.compare("--mode=fast") == 0) game.gameMode = Mode::FAST;
+        else if (arg.compare("--mode=tournament") == 0) game.gameMode = Mode::TOURNAMENT;
+        else if (arg.compare("--mode=tournamentfast") == 0 || arg.compare("--mode=fasttournament") == 0) game.gameMode = Mode::TOURNAMENTFAST; 
         else if (arg.compare(0, 9, "--config=") == 0 || arg.compare(0, 13, "--configfile=") == 0) game.configFile = arg.substr(arg.find('=') + 1);
         else if (arg.compare(0, 13, "--countdecks=") == 0 || arg.compare(0, 13, "--deckscount=") == 0) game.decksCount = stoi(arg.substr(arg.find('=') + 1));
         else { playerList.push_back(arg); game.playerCount++; }
@@ -27,38 +27,48 @@ namespace{
         for (int i = 1; i < argc; ++i) SettingRules(std::string(argv[i]), game, playerList);
         
         if (game.playerCount < 2) throw std::invalid_argument("Enter some players...");
-        if (game.gameMode == NONE)
+        if (game.gameMode == Mode::NONE)
         {
             if (game.playerCount == 2)
             {
-                game.gameMode = DETAILED;
+                game.gameMode = Mode::DETAILED;
             }
             else
             {
-                game.gameMode = TOURNAMENT;
+                game.gameMode = Mode::TOURNAMENT;
             }
         }
-        if ((game.gameMode == DETAILED || game.gameMode == FAST) && game.playerCount > 2)
+        if ((game.gameMode == Mode::DETAILED || game.gameMode == Mode::FAST) && game.playerCount > 2)
         {
             std::cerr << "mode changed to tournament" << std::endl;
-            game.gameMode = TOURNAMENT;
+            game.gameMode = Mode::TOURNAMENT;
         }
 
-        if (game.gameMode == FAST || game.gameMode == TOURNAMENTFAST)
+        if (game.gameMode == Mode::FAST || game.gameMode == Mode::TOURNAMENTFAST)
             for (auto pl : playerList)
                 if (pl[0] != '-')
                     throw std::invalid_argument("Only bots can participate in Fast and TournamentFast modes!");
         
         if (game.decksCount < 1) throw std::invalid_argument("Minimal decks count is 1!");
-
-        Factory<std::string, Player> fac;
-        std::vector<Player*> players;
-
-        for (auto pl : playerList)
+        
+        std::vector<PlayerCharacters> players;
+        auto factory = Factory<Player, std::string, Player *(*)()>::getInstance();
+        for (auto& pl : playerList)
         {
-            auto newPlayer = fac.CreateBot(pl);
-            if (newPlayer == nullptr && pl[0] == '-') throw std::invalid_argument("Strategy not found...");
-            if (newPlayer == nullptr) newPlayer = new Player(pl);
+            PlayerCharacters newPlayer;
+            if (pl.find("=") == std::string::npos) 
+            {
+                newPlayer.name = pl;
+            }
+            else 
+            {
+                newPlayer.name = pl.substr(pl.find('=') + 1);
+                pl = pl.substr(0, pl.find('='));
+            }
+            newPlayer.player = std::shared_ptr<Player>(factory->CreateObject(pl));
+            newPlayer.player->configFile = game.configFile;
+
+            if (newPlayer.player == nullptr) newPlayer.player = std::shared_ptr<Player>(new Player);
             players.push_back(newPlayer);
         }
         game.start(players);
