@@ -1,7 +1,7 @@
 #include "strategies.h"
 Action Player::makeAction()
 {
-    std::cout << "Enter something: ";
+    std::cout << "Enter something(h - hit, s - stand): ";
     std::string status;
     std::cin >> status;
     if (status == "hit" || status == "h" || status == "g") return Action::HIT;

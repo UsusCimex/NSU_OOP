@@ -65,12 +65,28 @@ namespace {
                 newPlayer.name = pl.substr(pl.find('=') + 1);
                 pl = pl.substr(0, pl.find('='));
             }
-            newPlayer.player = std::shared_ptr<Player>(factory->CreateObject(pl));
-            newPlayer.player->configFile = game.configFile;
 
-            if (newPlayer.player == nullptr) newPlayer.player = std::shared_ptr<Player>(new Player);
+            if (factory->CheckObject(pl))
+                newPlayer.player = std::shared_ptr<Player>(factory->CreateObject(pl));
+            else
+                newPlayer.player = std::shared_ptr<Player>(new Player());
+            
+            newPlayer.player->configFile = game.configFile;
             players.push_back(newPlayer);
         }
+
+        for (size_t checkerA = 0; checkerA < players.size() - 1; ++checkerA)
+        {
+            for (size_t checkerB = checkerA + 1; checkerB < players.size(); ++checkerB)
+            {
+                if (players[checkerA].name == players[checkerB].name)
+                {
+                    std::cerr << "Nickname: " << players[checkerA].name << ", reapeats" << std::endl;
+                    throw std::invalid_argument("You can only play with different nicknames");
+                }
+            }
+        }
+
         game.start(players);
     }
 }

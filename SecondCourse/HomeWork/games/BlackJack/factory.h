@@ -24,6 +24,10 @@ public:
     {
         return associations_.erase(id) == 1;
     }
+    bool CheckObject(const IdentifierType& id)
+    {
+        return associations_.count(id) != 0;
+    }
     AbstractProduct* CreateObject(const IdentifierType& id)
     {
         auto it = associations_.find(id);
