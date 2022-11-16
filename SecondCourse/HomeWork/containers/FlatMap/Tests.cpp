@@ -159,6 +159,15 @@ TEST_F(FlatMapTest, CheckOperatorIndex)
 	EXPECT_EQ(a.size(), 0);
 }
 
+TEST_F(FlatMapTest, checkConstMap)
+{
+	EXPECT_TRUE(a.insert("test1", 1));
+	EXPECT_TRUE(a.insert("test2", 2));
+	const FlatMap<std::string, int> fMap = a;
+	EXPECT_EQ(fMap.at("test1"), 1);
+	EXPECT_EQ(fMap.at("test2"), 2);
+}
+
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);
