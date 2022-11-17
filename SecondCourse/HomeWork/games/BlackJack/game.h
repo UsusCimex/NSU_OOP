@@ -12,7 +12,7 @@ class Game
 {
 public:
     //Default function, start the desired game
-    void start(std::vector<PlayerCharacters> & playerList);
+    void start(std::vector<Player> & playerList);
 
     Mode gameMode = Mode::NONE;
     std::string configFile = "";
@@ -21,15 +21,15 @@ public:
     int playerCount = 0;
 private:
     //A game with a full description of the actions
-    std::vector<PlayerCharacters> detailedGame(std::vector<PlayerCharacters> &);
+    std::vector<Player> detailedGame(std::vector<Player> &);
     //A game with a deduced result (Only bots)
-    std::vector<PlayerCharacters> fastGame(std::vector<PlayerCharacters> &);
+    std::vector<Player> fastGame(std::vector<Player> &);
     //Start detailed games with combinations of players
-    std::vector<PlayerCharacters> tournamentGame(std::vector<PlayerCharacters> &);
+    std::vector<Player> tournamentGame(std::vector<Player> &);
     //Start fast games with combinations of players
-    std::vector<PlayerCharacters> tournamentfastGame(std::vector<PlayerCharacters> &);
+    std::vector<Player> tournamentfastGame(std::vector<Player> &);
 
-    void UpgradeTournamentScore(std::vector<PlayerCharacters> &, std::vector<PlayerCharacters> &, size_t &, size_t &);
+    void UpgradeTournamentScore(std::vector<Player> &, std::vector<Player> &, size_t &, size_t &);
 };
 
 #endif

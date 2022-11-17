@@ -12,7 +12,7 @@ struct Card
     size_t power;
 };
 
-struct Deck
+class Deck
 {
 public:
     Deck(int);

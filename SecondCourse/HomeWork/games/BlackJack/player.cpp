@@ -1,12 +1,32 @@
 #include "player.h"
 
-void PlayerCharacters::syncWithPlayer()
+void Player::syncWithPlayer()
 {
-    player->score = score;
-    player->hand = hand;
+    player->setScore(score);
+    player->setHand(hand);
 }
 
-Card PlayerCharacters::getCard(Deck & deck)
+std::string Player::getName()
+{
+    return name;
+}
+
+int Player::getScore()
+{
+    return score;
+}
+
+int Player::getTournamentScore()
+{
+    return tournamentScore;
+}
+
+void Player::changeTournamentScore(int value)
+{
+    tournamentScore += value;
+}
+
+Card Player::getCard(Deck & deck)
 {
     Card curCard = deck.PopCard();
     hand.push_back(curCard);
@@ -18,7 +38,12 @@ Card PlayerCharacters::getCard(Deck & deck)
     return curCard;
 }
 
-bool PlayerCharacters::tryEditAce()
+std::vector<Card> Player::getHand()
+{
+    return hand;
+}
+
+bool Player::tryEditAce()
 {
     for (size_t i = 0; i < hand.size(); ++i)
     {
@@ -35,7 +60,7 @@ bool PlayerCharacters::tryEditAce()
     return 0;
 }
 
-bool PlayerCharacters::checkScore()
+bool Player::checkScore()
 {
     if (score > 21) return tryEditAce();
     return 1;

@@ -51,27 +51,27 @@ namespace {
         
         if (game.decksCount < 1) throw std::invalid_argument("Minimal decks count is 1!");
         
-        std::vector<PlayerCharacters> players;
-        auto factory = Factory<Player, std::string, Player *(*)()>::getInstance();
+        std::vector<Player> players;
+        auto factory = Factory<Strategies, std::string, Strategies *(*)()>::getInstance();
         for (auto& pl : playerList)
         {
-            PlayerCharacters newPlayer;
+            Player newPlayer;
             if (pl.find("=") == std::string::npos) 
             {
-                newPlayer.name = pl;
+                newPlayer.getName() = pl;
             }
             else 
             {
-                newPlayer.name = pl.substr(pl.find('=') + 1);
+                newPlayer.getName() = pl.substr(pl.find('=') + 1);
                 pl = pl.substr(0, pl.find('='));
             }
 
             if (factory->CheckObject(pl))
-                newPlayer.player = std::shared_ptr<Player>(factory->CreateObject(pl));
+                newPlayer.player = std::shared_ptr<Strategies>(factory->CreateObject(pl));
             else
-                newPlayer.player = std::shared_ptr<Player>(new Player());
+                newPlayer.player = std::shared_ptr<Strategies>(factory->CreateObject("human"));
             
-            newPlayer.player->configFile = game.configFile;
+            newPlayer.player->setConfigFile(game.configFile);
             players.push_back(newPlayer);
         }
 
@@ -79,9 +79,9 @@ namespace {
         {
             for (size_t checkerB = checkerA + 1; checkerB < players.size(); ++checkerB)
             {
-                if (players[checkerA].name == players[checkerB].name)
+                if (players[checkerA].getName() == players[checkerB].getName())
                 {
-                    std::cerr << "Nickname: " << players[checkerA].name << ", reapeats" << std::endl;
+                    std::cerr << "Nickname: " << players[checkerA].getName() << ", reapeats" << std::endl;
                     throw std::invalid_argument("You can only play with different nicknames");
                 }
             }

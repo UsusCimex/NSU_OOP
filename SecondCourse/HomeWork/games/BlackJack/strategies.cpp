@@ -1,5 +1,31 @@
 #include "strategies.h"
-Action Player::makeAction()
+
+void Strategies::setConfigFile(std::string patch)
+{
+    configFile = patch;
+}
+
+void Strategies::setScore(int newScore)
+{
+    score = newScore;
+}
+
+void Strategies::setEnemyCard(Card card)
+{
+    enemyCard = card;
+}
+
+Card Strategies::getEnemyCard()
+{
+    return enemyCard;
+}
+
+void Strategies::setHand(std::vector<Card> newHand)
+{
+    hand = newHand;
+}
+
+Action Human::makeAction()
 {
     std::cout << "Enter something(h - hit, s - stand): ";
     std::string status;
@@ -9,9 +35,7 @@ Action Player::makeAction()
     return Action::NOACTION;
 }
 
-void generateStrategyTable() {}
-
-std::vector <std::vector<std::string>> GetStrategy(std::string && name, std::string & configFile)
+std::vector <std::vector<std::string>> GetStrategy(std::string name, std::string & configFile)
 {
     std::string patch = configFile;
     if (patch.back() != '/') patch += '/'; //In linux / , in Windows '\\'
@@ -114,42 +138,48 @@ Action MetaBot::makeAction()
     return Action::NOACTION;
 }
 
-Player* CreateTrivialBot1()
+Strategies* CreateHuman()
+{
+    return new Human;
+}
+
+Strategies* CreateTrivialBot1()
 {
     return new TrivialBot1;
 }
 
-Player* CreateTrivialBot2()
+Strategies* CreateTrivialBot2()
 {
     return new TrivialBot2;
 }
 
-Player* CreateTrivialBot3()
+Strategies* CreateTrivialBot3()
 {
     return new TrivialBot3;
 }
 
-Player* CreateBot1()
+Strategies* CreateBot1()
 {
-    return new Bot1();
+    return new Bot1;
 }
 
-Player* CreateBot2()
+Strategies* CreateBot2()
 {
-    return new Bot2();
+    return new Bot2;
 }
 
-Player* CreateMetaBot()
+Strategies* CreateMetaBot()
 {
-    return new MetaBot();
+    return new MetaBot;
 }
 
-auto tBot1 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialBot1", CreateTrivialBot1);
-auto tBot11 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialbot1", CreateTrivialBot1);
-auto tBot2 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialBot2", CreateTrivialBot2);
-auto tBot21 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialbot2", CreateTrivialBot2);
-auto tBot3 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialBot3", CreateTrivialBot3);
-auto tBot31 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-trivialbot3", CreateTrivialBot3);
-auto bot1 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-bot1", CreateBot1);
-auto bot2 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-bot2", CreateBot2);
-auto bot3 = Factory<Player, std::string, Player *(*)()>::getInstance()->Register("-metabot", CreateMetaBot);
+auto human = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("human", CreateHuman);
+auto tBot1 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-trivialBot1", CreateTrivialBot1);
+auto tBot11 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-trivialbot1", CreateTrivialBot1);
+auto tBot2 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-trivialBot2", CreateTrivialBot2);
+auto tBot21 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-trivialbot2", CreateTrivialBot2);
+auto tBot3 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-trivialBot3", CreateTrivialBot3);
+auto tBot31 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-trivialbot3", CreateTrivialBot3);
+auto bot1 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-bot1", CreateBot1);
+auto bot2 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-bot2", CreateBot2);
+auto bot3 = Factory<Strategies, std::string, Strategies *(*)()>::getInstance()->Register("-metabot", CreateMetaBot);

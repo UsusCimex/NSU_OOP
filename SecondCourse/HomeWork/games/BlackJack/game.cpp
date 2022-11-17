@@ -1,23 +1,23 @@
 #include "game.h"
 
 //Selects the winner from two players, by points
-void PrintMatchWinner(std::vector<PlayerCharacters> & vec)
+void PrintMatchWinner(std::vector<Player> & vec)
 {
-    unsigned alignment = std::max(vec[0].name.length(), vec[1].name.length());
+    unsigned alignment = std::max(vec[0].getName().length(), vec[1].getName().length());
     std::string printStr;
-    printStr = vec[0].name + " scored " + "\033[32m" + std::to_string(vec[0].score) + "\033[0m";
+    printStr = vec[0].getName() + " scored " + "\033[32m" + std::to_string(vec[0].getScore()) + "\033[0m";
     std::cout << "/" << std::setfill('=') << std::setw(alignment / 2) << "=" << std::setw(12) << "\033[1m\033[35mMATCH RESULT\033[0m" << std::setfill('=') << std::setw(alignment / 2 + 1) << "=\\" << std::setfill(' ') << std::endl;
     std::cout << std::setw(printStr.length() + 9 + (alignment + 14 - printStr.length() - 9) / 2) << printStr << std::endl;
-    printStr = vec[1].name + " scored " + "\033[32m" + std::to_string(vec[1].score) + "\033[0m";
+    printStr = vec[1].getName() + " scored " + "\033[32m" + std::to_string(vec[1].getScore()) + "\033[0m";
     std::cout << std::setw(printStr.length() + 9 + (alignment + 14 - printStr.length() - 9) / 2) << printStr << std::endl;
     
-    if ((vec[0].score > 21 && vec[1].score <= 21) || (vec[0].score <= 21 && vec[1].score <= 21 && vec[1].score > vec[0].score) || (vec[0].score > 21 && vec[1].score > 21 && vec[1].score < vec[0].score))
+    if ((vec[0].getScore() > 21 && vec[1].getScore() <= 21) || (vec[0].getScore() <= 21 && vec[1].getScore() <= 21 && vec[1].getScore() > vec[0].getScore()) || (vec[0].getScore() > 21 && vec[1].getScore() > 21 && vec[1].getScore() < vec[0].getScore()))
     {
-        std::cout << std::setw(vec[1].name.length() + (alignment + 14 - vec[1].name.length() - 4) / 2) << vec[1].name << " \033[34mWIN!\033[0m" << std::endl;
+        std::cout << std::setw(vec[1].getName().length() + (alignment + 14 - vec[1].getName().length() - 4) / 2) << vec[1].getName() << " \033[34mWIN!\033[0m" << std::endl;
     }
-    else if ((vec[0].score <= 21 && vec[1].score > 21) || (vec[0].score <= 21 && vec[1].score <= 21 && vec[1].score < vec[0].score) || (vec[0].score > 21 && vec[1].score > 21 && vec[1].score > vec[0].score))
+    else if ((vec[0].getScore() <= 21 && vec[1].getScore() > 21) || (vec[0].getScore() <= 21 && vec[1].getScore() <= 21 && vec[1].getScore() < vec[0].getScore()) || (vec[0].getScore() > 21 && vec[1].getScore() > 21 && vec[1].getScore() > vec[0].getScore()))
     {
-        std::cout << std::setw(vec[0].name.length() + (alignment + 14 - vec[0].name.length() - 4) / 2) << vec[0].name << " \033[34mWIN!\033[0m" << std::endl;
+        std::cout << std::setw(vec[0].getName().length() + (alignment + 14 - vec[0].getName().length() - 4) / 2) << vec[0].getName() << " \033[34mWIN!\033[0m" << std::endl;
     }
     else
     {
@@ -27,24 +27,24 @@ void PrintMatchWinner(std::vector<PlayerCharacters> & vec)
     std::cout << "\\" << std::setfill('=') << std::setw(alignment + 13 + alignment % 2) << "=/" << std::setfill(' ') << std::endl;
 }
 
-void PrintTournamentWinner(std::vector<PlayerCharacters> & vec)
+void PrintTournamentWinner(std::vector<Player> & vec)
 {
     std::cout << std::endl;
 
-    std::sort(vec.begin(), vec.end(), [](auto a, auto b){ return a.tournamentScore > b.tournamentScore; });
+    std::sort(vec.begin(), vec.end(), [](auto a, auto b){ return a.getTournamentScore() > b.getTournamentScore(); });
     size_t countWinner = 0;
     unsigned maxLength = 0;
     for (size_t i = 0; i < vec.size(); ++i)
     {
-        if (vec[i].tournamentScore == vec[0].tournamentScore)
+        if (vec[i].getTournamentScore() == vec[0].getTournamentScore())
         {
             countWinner++;
         }
-        if (vec[i].name.length() > maxLength) maxLength = vec[i].name.length();
+        if (vec[i].getName().length() > maxLength) maxLength = vec[i].getName().length();
     }
     maxLength += 11;
     unsigned alignmentWinner = 0;
-    for (size_t i = 0; i < countWinner; ++i) alignmentWinner += vec[i].name.length();
+    for (size_t i = 0; i < countWinner; ++i) alignmentWinner += vec[i].getName().length();
     alignmentWinner += countWinner + 4;
     unsigned alignment = std::max(maxLength, alignmentWinner);
 
@@ -52,37 +52,37 @@ void PrintTournamentWinner(std::vector<PlayerCharacters> & vec)
 
     for (size_t i = 0; i < vec.size(); ++i)
     {
-        std::cout << "\033[1m" << "\033[1m" << std::setw(vec[i].name.length() + (alignment + 13 - vec[i].name.length() - 9) / 2) << vec[i].name << " scored " << "\033[32m" << std::to_string(vec[i].tournamentScore) << "\033[0m" << std::endl;
+        std::cout << "\033[1m" << "\033[1m" << std::setw(vec[i].getName().length() + (alignment + 13 - vec[i].getName().length() - 9) / 2) << vec[i].getName() << " scored " << "\033[32m" << std::to_string(vec[i].getTournamentScore()) << "\033[0m" << std::endl;
     }
-    std::cout << std::setw(vec[0].name.length() + (alignment + 13 - alignmentWinner) / 2);
-    for (size_t i = 0; i < countWinner; ++i) std::cout << vec[i].name << " ";
+    std::cout << std::setw(vec[0].getName().length() + (alignment + 13 - alignmentWinner) / 2);
+    for (size_t i = 0; i < countWinner; ++i) std::cout << vec[i].getName() << " ";
     std::cout << "\033[1m" << "\033[34mWIN!\033[0m" << std::endl;
 
     std::cout << "\033[1m" << "\\" << std::setfill('=') << std::setw(alignment + 12 + 1 - alignment % 2) << "/" << std::setfill(' ') << std::endl;
 }
 
-void Game::start(std::vector<PlayerCharacters> & players)
+void Game::start(std::vector<Player> & players)
 {
     // std::cout << "### BLACKJACK ###" << std::endl;
     // std::cout << "Control:\ng - get card\ns - stop get card\nq - quit" << std::endl;
     if (gameMode == Mode::DETAILED)
     {
-        std::vector<PlayerCharacters> result = detailedGame(players);
+        std::vector<Player> result = detailedGame(players);
         PrintMatchWinner(result);
     }
     else if (gameMode == Mode::FAST)
     {
-        std::vector<PlayerCharacters> result = fastGame(players);
+        std::vector<Player> result = fastGame(players);
         PrintMatchWinner(result);
     }
     else if (gameMode == Mode::TOURNAMENT) 
     {
-        std::vector<PlayerCharacters> result = tournamentGame(players);
+        std::vector<Player> result = tournamentGame(players);
         PrintTournamentWinner(result);
     }
     else if (gameMode == Mode::TOURNAMENTFAST)
     {
-        std::vector<PlayerCharacters> result = tournamentfastGame(players);
+        std::vector<Player> result = tournamentfastGame(players);
         PrintTournamentWinner(result);
     }
     else
@@ -92,7 +92,7 @@ void Game::start(std::vector<PlayerCharacters> & players)
 }
 
 //Initial deal of cards
-void InitialDistribution(std::vector<PlayerCharacters> & players, Deck & deck)
+void InitialDistribution(std::vector<Player> & players, Deck & deck)
 {
     for (size_t i = 0; i < 2; ++i) //defaul 2 cards in start game
     {
@@ -102,20 +102,20 @@ void InitialDistribution(std::vector<PlayerCharacters> & players, Deck & deck)
         }
     }
 
-    players[0].player->enemyCard = players[1].hand.front();
-    players[1].player->enemyCard = players[0].hand.front();
+    players[0].player->getEnemyCard() = players[1].getHand().front();
+    players[1].player->getEnemyCard() = players[0].getHand().front();
 }
 
-void PrintInitialDistr(std::vector<PlayerCharacters> & players)
+void PrintInitialDistr(std::vector<Player> & players)
 {
     for (auto &pl : players)
     {
-        if (pl.score > 21) pl.checkScore();
-        std::cout << pl.name << " has " << pl.score << " score, his openned card: " << pl.hand.back().card << "(" << pl.hand.back().power << ")" << std::endl;
+        if (pl.getScore() > 21) pl.checkScore();
+        std::cout << pl.getName() << " has " << pl.getScore() << " score, his openned card: " << pl.getHand().back().card << "(" << pl.getHand().back().power << ")" << std::endl;
     }
 }
 
-std::vector<PlayerCharacters> Game::detailedGame(std::vector<PlayerCharacters> & players)
+std::vector<Player> Game::detailedGame(std::vector<Player> & players)
 {
     if (players.size() != 2) throw std::runtime_error("In detailed game play only 2 players");
     Deck deck(decksCount);
@@ -132,16 +132,16 @@ std::vector<PlayerCharacters> Game::detailedGame(std::vector<PlayerCharacters> &
         {
             Card curCard = players[playerPtr].getCard(deck);
             bool playerStatus = players[playerPtr].checkScore();
-            std::cout << players[playerPtr].name << " took " << curCard.card << "(" << curCard.power << ")" << ". His score: " << players[playerPtr].score << std::endl;
+            std::cout << players[playerPtr].getName() << " took " << curCard.card << "(" << curCard.power << ")" << ". His score: " << players[playerPtr].getScore() << std::endl;
             if (!playerStatus)
             {
-                std::cout << "\033[31m" << players[playerPtr].name << " oops... enumeration!\033[0m" << std::endl;
+                std::cout << "\033[31m" << players[playerPtr].getName() << " oops... enumeration!\033[0m" << std::endl;
                 playerPtr++;
             }
         }
         else if (action == Action::STAND) 
         {
-            std::cout << players[playerPtr].name << " stop getting card! His score: " << players[playerPtr].score << std::endl;
+            std::cout << players[playerPtr].getName() << " stop getting card! His score: " << players[playerPtr].getScore() << std::endl;
             playerPtr++;
         }
     }
@@ -149,7 +149,7 @@ std::vector<PlayerCharacters> Game::detailedGame(std::vector<PlayerCharacters> &
     return players;
 }
 
-std::vector<PlayerCharacters> Game::fastGame(std::vector<PlayerCharacters> & players)
+std::vector<Player> Game::fastGame(std::vector<Player> & players)
 {
     if (players.size() != 2) throw std::runtime_error("In fast game play only 2 players");
     Deck deck(decksCount);
@@ -184,33 +184,33 @@ std::vector<PlayerCharacters> Game::fastGame(std::vector<PlayerCharacters> & pla
 }
 
 //Selects the winner from two players, by points
-void Game::UpgradeTournamentScore(std::vector<PlayerCharacters> & vec, std::vector<PlayerCharacters> & players,size_t & a, size_t & b)
+void Game::UpgradeTournamentScore(std::vector<Player> & vec, std::vector<Player> & players,size_t & a, size_t & b)
 {
 
-    if ((vec[0].score > 21 && vec[1].score <= 21) || (vec[0].score <= 21 && vec[1].score <= 21 && vec[1].score > vec[0].score) || (vec[0].score > 21 && vec[1].score > 21 && vec[1].score < vec[0].score))
+    if ((vec[0].getScore() > 21 && vec[1].getScore() <= 21) || (vec[0].getScore() <= 21 && vec[1].getScore() <= 21 && vec[1].getScore() > vec[0].getScore()) || (vec[0].getScore() > 21 && vec[1].getScore() > 21 && vec[1].getScore() < vec[0].getScore()))
     {
-        players[b].tournamentScore += 2;
+        players[b].changeTournamentScore(2);
     }
-    else if ((vec[0].score <= 21 && vec[1].score > 21) || (vec[0].score <= 21 && vec[1].score <= 21 && vec[1].score < vec[0].score) || (vec[0].score > 21 && vec[1].score > 21 && vec[1].score > vec[0].score))
+    else if ((vec[0].getScore() <= 21 && vec[1].getScore() > 21) || (vec[0].getScore() <= 21 && vec[1].getScore() <= 21 && vec[1].getScore() < vec[0].getScore()) || (vec[0].getScore() > 21 && vec[1].getScore() > 21 && vec[1].getScore() > vec[0].getScore()))
     {
-        players[a].tournamentScore += 2;
+        players[a].changeTournamentScore(2);
     }
     else
     {
-        players[a].tournamentScore += 1;
-        players[b].tournamentScore += 1;
+        players[a].changeTournamentScore(1);
+        players[b].changeTournamentScore(1);
     }
 }
 
-std::vector<PlayerCharacters> Game::tournamentGame(std::vector<PlayerCharacters> & players)
+std::vector<Player> Game::tournamentGame(std::vector<Player> & players)
 {
     for (size_t playerA = 0; playerA < players.size() - 1; ++playerA)
     {
         for (size_t playerB = playerA + 1; playerB < players.size(); ++playerB)
         {
-            std::cout << std::endl << "   \033[1m" << players[playerA].name << " \033[31mVS\033[0m \033[1m" << players[playerB].name << "\033[0m" << std::endl;
-            std::vector<PlayerCharacters> match = {players[playerA], players[playerB]};
-            std::vector<PlayerCharacters> res = detailedGame(match);
+            std::cout << std::endl << "   \033[1m" << players[playerA].getName() << " \033[31mVS\033[0m \033[1m" << players[playerB].getName() << "\033[0m" << std::endl;
+            std::vector<Player> match = {players[playerA], players[playerB]};
+            std::vector<Player> res = detailedGame(match);
             PrintMatchWinner(res);
             UpgradeTournamentScore(res, players, playerA, playerB);
         }
@@ -219,14 +219,14 @@ std::vector<PlayerCharacters> Game::tournamentGame(std::vector<PlayerCharacters>
     return players;
 }
 
-std::vector<PlayerCharacters> Game::tournamentfastGame(std::vector<PlayerCharacters> & players)
+std::vector<Player> Game::tournamentfastGame(std::vector<Player> & players)
 {
     for (size_t playerA = 0; playerA < players.size() - 1; ++playerA)
     {
         for (size_t playerB = playerA + 1; playerB < players.size(); ++playerB)
         {
-            std::vector<PlayerCharacters> match = {players[playerA], players[playerB]};
-            std::vector<PlayerCharacters> res = fastGame(match);
+            std::vector<Player> match = {players[playerA], players[playerB]};
+            std::vector<Player> res = fastGame(match);
             UpgradeTournamentScore(res, players, playerA, playerB);
         }
     }
