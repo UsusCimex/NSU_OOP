@@ -3,13 +3,17 @@
 
 #include "blackjack.h"
 
+#include <vector>
+#include <string>
+#include <iostream>
+
 struct Card
 {
     Card() = default;
     Card(std::string, int);
 
     std::string card;
-    size_t power;
+    int power;
 };
 
 class Deck

@@ -5,8 +5,7 @@
 #include "deck.h"
 #include "factory.h"
 #include "blackjack.h"
-
-#include <iomanip>
+#include "gui.h"
 
 class Game
 {

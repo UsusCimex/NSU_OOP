@@ -4,6 +4,8 @@
 #include "game.h"
 #include "blackjack.h"
 
+#include <iostream>
+
 namespace {
     //Parameter handler
     void SettingRules(std::string arg, Game & game, std::vector<std::string> & playerList)

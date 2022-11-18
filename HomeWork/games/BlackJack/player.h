@@ -5,7 +5,6 @@
 
 #include "strategies.h"
 #include "deck.h"
-#include "blackjack.h"
 
 
 class Player
