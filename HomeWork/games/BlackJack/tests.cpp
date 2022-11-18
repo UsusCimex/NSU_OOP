@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "settings.cpp"
+#include "settings.h"
 
 TEST(InputData, BadInput)
 {

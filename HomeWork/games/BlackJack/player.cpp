@@ -11,6 +11,11 @@ std::string Player::getName()
     return name;
 }
 
+void Player::setName(std::string newName)
+{
+    name=newName;
+}
+
 int Player::getScore()
 {
     return score;

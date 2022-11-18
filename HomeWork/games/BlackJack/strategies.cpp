@@ -25,6 +25,11 @@ void Strategies::setHand(std::vector<Card> newHand)
     hand = newHand;
 }
 
+Action Strategies::makeAction()
+{
+    return Action::NOACTION;
+}
+
 std::vector <std::vector<std::string>> GetStrategy(std::string name, std::string & configFile)
 {
     std::string patch = configFile;

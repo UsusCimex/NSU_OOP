@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <algorithm>
 
+namespace {
 //Selects the winner from two players, by points
 void PrintMatchWinner(std::vector<Player> & vec)
 {
@@ -76,6 +77,7 @@ void PrintInitialDistr(std::vector<Player> & players)
         if (pl.getScore() > 21) pl.checkScore();
         std::cout << pl.getName() << " has " << pl.getScore() << " score, his openned card: " << pl.getHand().back().card << "(" << pl.getHand().back().power << ")" << std::endl;
     }
+}
 }
 
 #endif

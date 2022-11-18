@@ -10,4 +10,5 @@ public:
 };
 
 Strategies* CreateTrivialBot2();
+
 #endif

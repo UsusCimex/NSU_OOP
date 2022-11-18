@@ -13,6 +13,7 @@ public:
     std::shared_ptr<Strategies> player;
     void syncWithPlayer();
     std::string getName();
+    void setName(std::string);
     int getScore();
     int getTournamentScore();
     void changeTournamentScore(int);

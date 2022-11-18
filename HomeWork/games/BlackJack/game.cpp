@@ -41,8 +41,8 @@ void InitialDistribution(std::vector<Player> & players, Deck & deck)
         }
     }
 
-    players[0].player->getEnemyCard() = players[1].getHand().front();
-    players[1].player->getEnemyCard() = players[0].getHand().front();
+    players[0].player->setEnemyCard(players[1].getHand().back());
+    players[1].player->setEnemyCard(players[0].getHand().back());
 }
 
 std::vector<Player> Game::detailedGame(std::vector<Player> & players)

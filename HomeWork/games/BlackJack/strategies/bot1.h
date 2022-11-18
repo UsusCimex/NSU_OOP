@@ -2,6 +2,7 @@
 #define BOT1_H
 
 #include "../strategies.h"
+#include <iostream>
 
 class Bot1 : public Strategies 
 {

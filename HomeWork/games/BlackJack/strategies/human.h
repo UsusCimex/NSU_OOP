@@ -2,6 +2,7 @@
 #define HUMAN_H
 
 #include "../strategies.h"
+#include <iostream>
 
 class Human : public Strategies
 {
