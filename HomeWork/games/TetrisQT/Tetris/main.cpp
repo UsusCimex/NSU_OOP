@@ -6,8 +6,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    srand(time(0));
-
     Tetris w;
     w.show();
 
