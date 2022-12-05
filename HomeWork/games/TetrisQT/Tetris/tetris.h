@@ -24,7 +24,7 @@ private:
     static constexpr int DOT_HEIGHT = 20;
 
     static constexpr int FIELD_WIDTH = 15;
-    static constexpr int FIELD_HEIGHT = 30;
+    static constexpr int FIELD_HEIGHT = 20;
 
     static constexpr int DETAIL_SIZE = 4;
 
@@ -43,7 +43,7 @@ private:
     void checkLines();
 
     void rotate();
-    bool moveDetail();
+    bool checkMoveDetail();
 
     void initGame();
     void createDetail();

@@ -24,24 +24,29 @@ Tetris::~Tetris()
 void Tetris::timerEvent(QTimerEvent * event)
 {
     Q_UNUSED(event);
-
-    for (int i = 0; i < DETAIL_SIZE; ++i)
-    {
-        qDebug() << detail[i].rx() << " " << detail[i].ry() << " \\ ";
-    }
-    qDebug() << "\n";
-
     if (_inGame)
     {
-        if (!moveDetail())
+        if (!checkMoveDetail())
         {
             for (int i = 0; i < DETAIL_SIZE; ++i)
             {
                 field[detail[i].rx()][detail[i].ry()] = 1;
             }
             checkLines();
+            killTimer(timerID);
             createDetail();
         }
+        else
+        {
+            for (int i = 0; i < DETAIL_SIZE; ++i)
+            {
+                detail[i] = movedDetail[i];
+            }
+        }
+    }
+    else
+    {
+        killTimer(timerID);
     }
 
     this->repaint();
@@ -49,25 +54,46 @@ void Tetris::timerEvent(QTimerEvent * event)
 
 void Tetris::keyPressEvent(QKeyEvent * event)
 {
+    int key = event->key();
     if (_inGame)
     {
-        int key = event->key();
         switch (key)
         {
         case Qt::Key_Left:
-            for (int i = 0; i < DETAIL_SIZE; ++i) movedDetail[i].rx() -= 1;
-            if (!checkDetail()) for (int i = 0; i < DETAIL_SIZE; ++i) detail[i] = movedDetail[i];
+            for (int i = 0; i < DETAIL_SIZE; ++i)
+            {
+                movedDetail[i].rx() = detail[i].rx() - 1;
+                movedDetail[i].ry() = detail[i].ry();
+            }
+            if (checkDetail())
+                for (int i = 0; i < DETAIL_SIZE; ++i)
+                    detail[i] = movedDetail[i];
             break;
         case Qt::Key_Right:
-            for (int i = 0; i < DETAIL_SIZE; ++i) movedDetail[i].rx() += 1;
-            if (!checkDetail()) for (int i = 0; i < DETAIL_SIZE; ++i) detail[i] = movedDetail[i];
+            for (int i = 0; i < DETAIL_SIZE; ++i)
+            {
+                movedDetail[i].rx() = detail[i].rx() + 1;
+                movedDetail[i].ry() = detail[i].ry();
+            }
+            if (checkDetail())
+                for (int i = 0; i < DETAIL_SIZE; ++i)
+                    detail[i] = movedDetail[i];
             break;
         case Qt::Key_Up:
             rotate();
             break;
         case Qt::Key_Down:
-            _delay = 50;
+            killTimer(timerID);
+            timerID = startTimer(_delay / 10);
             break;
+        }
+        this->repaint();
+    }
+    else
+    {
+        if (key == Qt::Key_Space)
+        {
+            initGame();
         }
     }
 }
@@ -109,12 +135,12 @@ bool Tetris::checkDetail()
 {
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (movedDetail[i].rx() < 0 || movedDetail[i].rx() > FIELD_WIDTH || movedDetail[i].ry() > FIELD_HEIGHT || field[movedDetail[i].rx()][movedDetail[i].ry()] != 0)
+        if (movedDetail[i].rx() < 0 || movedDetail[i].rx() >= FIELD_WIDTH || movedDetail[i].ry() >= FIELD_HEIGHT || field[movedDetail[i].rx()][movedDetail[i].ry()] != 0)
         {
-            return true;
+            return false;
         }
     }
-    return false;
+    return true;
 }
 
 void Tetris::checkLines()
@@ -125,11 +151,18 @@ void Tetris::checkLines()
         int count = 0;
         for (int j = 0; j < FIELD_WIDTH; ++j)
         {
-            if (field[i][j]) count++;
-            field[posLine][j] = field[i][j];
+            if (field[j][i]) count++;
+            field[j][posLine] = field[j][i];
         }
-        if (count < FIELD_WIDTH) posLine--;
-        else score++;
+        if (count < FIELD_WIDTH)
+        {
+            posLine--;
+        }
+        else
+        {
+            _delay *= 0.95;
+            score++;
+        }
     }
 }
 
@@ -143,30 +176,30 @@ void Tetris::rotate()
         movedDetail[i].rx() = detail[i].rx() - x;
         movedDetail[i].ry() = detail[i].ry() - y;
     }
-    if (!checkDetail()) for (int i = 0; i < DETAIL_SIZE; ++i) detail[i] = movedDetail[i];
+    if (checkDetail())
+        for (int i = 0; i < DETAIL_SIZE; ++i)
+            detail[i] = movedDetail[i];
+        this->repaint();
 }
 
-bool Tetris::moveDetail()
+bool Tetris::checkMoveDetail()
 {
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
+        movedDetail[i].rx() = detail[i].rx();
         movedDetail[i].ry() = detail[i].ry() + 1;
     }
     if (!checkDetail())
     {
-        for (int i = 0; i < DETAIL_SIZE; ++i) detail[i] = movedDetail[i];
-    }
-    else
-    {
         for (int i = 0; i < DETAIL_SIZE; ++i)
         {
-            if (movedDetail[i].ry() > FIELD_HEIGHT || field[movedDetail[i].rx()][movedDetail[i].ry()])
+            if (movedDetail[i].ry() >= FIELD_HEIGHT || field[movedDetail[i].rx()][movedDetail[i].ry()])
             {
-                return true;
+                return false;
             }
         }
     }
-    return false;
+    return true;
 }
 
 void Tetris::initGame() {
@@ -180,20 +213,27 @@ void Tetris::initGame() {
     }
 
     _inGame = true;
-    _delay = 500;
+    _delay = 3000 / FIELD_HEIGHT;
+    score = 0;
 
     createDetail();
 
-    timerID = startTimer(_delay);
+    this->repaint();
 }
 
 void Tetris::createDetail()
 {
+    timerID = startTimer(_delay);
     int randDetail = qrand() % 7;
 
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        detail[i].rx() = figures[randDetail][i] % 2;
+        if (field[figures[randDetail][i] % 2 + FIELD_WIDTH / 2][figures[randDetail][i] / 2])
+        {
+            _inGame = false;
+            break;
+        }
+        detail[i].rx() = figures[randDetail][i] % 2 + FIELD_WIDTH / 2;
         detail[i].ry() = figures[randDetail][i] / 2;
     }
 }
