@@ -1,2 +1,6 @@
-<!DOCTYPE RCC>
-<RCC version="1.0"/>
+<RCC>
+    <qresource prefix="/image">
+        <file>img/tiles.png</file>
+        <file>img/background.png</file>
+    </qresource>
+</RCC>
