@@ -1,6 +1,7 @@
 #include "tetris.h"
 
 #include <QDebug>
+#include <QPixmap>
 #include <QPainter>
 #include <time.h>
 

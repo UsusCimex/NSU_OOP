@@ -20,11 +20,12 @@ protected:
     void paintEvent(QPaintEvent *) override;
 
 private:
-    static constexpr int DOT_WIDTH = 20;
-    static constexpr int DOT_HEIGHT = 20;
+    //Game: 40/47 410/47 410/457 40/457
+    static constexpr int FIELD_WIDTH = 10;
+    static constexpr int FIELD_HEIGHT = 11;
 
-    static constexpr int FIELD_WIDTH = 15;
-    static constexpr int FIELD_HEIGHT = 20;
+    static constexpr int DOT_WIDTH = 37;
+    static constexpr int DOT_HEIGHT = 37;
 
     static constexpr int DETAIL_SIZE = 4;
 
@@ -37,7 +38,7 @@ private:
     QPoint detail[DETAIL_SIZE];
     QPoint movedDetail[DETAIL_SIZE];
 
-    int score = 0;
+    int score;
 
     bool checkDetail();
     void checkLines();
