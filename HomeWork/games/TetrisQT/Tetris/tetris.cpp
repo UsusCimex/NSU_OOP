@@ -125,10 +125,6 @@ void Tetris::paintEvent(QPaintEvent * event)
             qp.drawRect(detail[i].rx() * DOT_WIDTH, detail[i].ry() * DOT_HEIGHT, DOT_WIDTH, DOT_HEIGHT);
         }
     }
-    else
-    {
-//        gameOver();
-    }
 }
 
 bool Tetris::checkDetail()
@@ -173,13 +169,15 @@ void Tetris::rotate()
     {
         int x = detail[i].ry() - p.ry();
         int y = detail[i].rx() - p.rx();
-        movedDetail[i].rx() = detail[i].rx() - x;
-        movedDetail[i].ry() = detail[i].ry() - y;
+        movedDetail[i].rx() = p.rx() - x;
+        movedDetail[i].ry() = p.ry() + y;
     }
     if (checkDetail())
+    {
         for (int i = 0; i < DETAIL_SIZE; ++i)
             detail[i] = movedDetail[i];
         this->repaint();
+    }
 }
 
 bool Tetris::checkMoveDetail()
@@ -203,7 +201,6 @@ bool Tetris::checkMoveDetail()
 }
 
 void Tetris::initGame() {
-
     for (int i = 0; i < FIELD_WIDTH; ++i)
     {
         for (int j = 0; j < FIELD_HEIGHT; ++j)
@@ -213,12 +210,10 @@ void Tetris::initGame() {
     }
 
     _inGame = true;
-    _delay = 3000 / FIELD_HEIGHT;
+    _delay = 4000 / FIELD_HEIGHT;
     score = 0;
 
     createDetail();
-
-    this->repaint();
 }
 
 void Tetris::createDetail()
@@ -228,12 +223,13 @@ void Tetris::createDetail()
 
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (field[figures[randDetail][i] % 2 + FIELD_WIDTH / 2][figures[randDetail][i] / 2])
+        if (field[figures[randDetail][i] % 2 + FIELD_WIDTH / 2 - 1][figures[randDetail][i] / 2])
         {
             _inGame = false;
             break;
         }
-        detail[i].rx() = figures[randDetail][i] % 2 + FIELD_WIDTH / 2;
+        detail[i].rx() = figures[randDetail][i] % 2 + FIELD_WIDTH / 2 - 1;
         detail[i].ry() = figures[randDetail][i] / 2;
     }
+    this->repaint();
 }
