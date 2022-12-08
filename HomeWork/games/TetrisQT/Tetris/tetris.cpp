@@ -8,10 +8,17 @@
 Tetris::Tetris(QWidget *parent)
     : QWidget(parent)
 {
-    this->setWindowTitle("Tetris game");
+    QImage background(":/img/background.png");
+    brush = new QBrush;
+    palette = new QPalette;
+    brush->setTextureImage(background);
+    palette->setBrush(QPalette::Window, *brush);
+    this->setPalette(*palette);
 
-    this->resize(DOT_WIDTH * FIELD_WIDTH, DOT_HEIGHT * FIELD_HEIGHT);
-    this->setFixedSize(DOT_WIDTH * FIELD_WIDTH, DOT_HEIGHT * FIELD_HEIGHT);
+    this->resize(background.width(), background.height());
+    this->setFixedSize(background.width(), background.height());
+
+    this->setWindowTitle("Tetris game");
 
     qsrand((uint)time(0));
     initGame();
@@ -19,7 +26,8 @@ Tetris::Tetris(QWidget *parent)
 
 Tetris::~Tetris()
 {
-
+    delete brush;
+    delete palette;
 }
 
 void Tetris::timerEvent(QTimerEvent * event)
@@ -116,14 +124,14 @@ void Tetris::paintEvent(QPaintEvent * event)
             for(int j = 0; j < FIELD_HEIGHT; ++j)
             {
                 if (field[i][j] == 0) continue;
-                qp.drawRect(i * DOT_WIDTH, j * DOT_HEIGHT, DOT_WIDTH, DOT_HEIGHT);
+                qp.drawRect(40 + i * DOT_WIDTH, 3 + j * DOT_HEIGHT, DOT_WIDTH, DOT_HEIGHT);
             }
         }
 
         qp.setBrush(Qt::red);
         for (int i = 0; i < DETAIL_SIZE; ++i)
         {
-            qp.drawRect(detail[i].rx() * DOT_WIDTH, detail[i].ry() * DOT_HEIGHT, DOT_WIDTH, DOT_HEIGHT);
+            qp.drawRect(40 + detail[i].rx() * DOT_WIDTH, 3 + detail[i].ry() * DOT_HEIGHT, DOT_WIDTH, DOT_HEIGHT);
         }
     }
 }
@@ -211,7 +219,7 @@ void Tetris::initGame() {
     }
 
     _inGame = true;
-    _delay = 4000 / FIELD_HEIGHT;
+    _delay = 5000 / FIELD_HEIGHT;
     score = 0;
 
     createDetail();

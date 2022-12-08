@@ -10,9 +10,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-//    Tetris w;
-//    w.show();
-
     StartWindow w;
     w.show();
 

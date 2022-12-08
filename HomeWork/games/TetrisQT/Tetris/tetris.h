@@ -5,6 +5,8 @@
 #include <QPoint>
 #include <QKeyEvent>
 #include <QPixmap>
+#include <QBrush>
+#include <QPalette>
 
 class Tetris : public QWidget
 {
@@ -12,7 +14,7 @@ class Tetris : public QWidget
 
 public:
     Tetris(QWidget *parent = nullptr);
-    ~Tetris();
+    ~Tetris() override;
 
 protected:
     void timerEvent(QTimerEvent *) override;
@@ -22,12 +24,15 @@ protected:
 private:
     //Game: 40/47 410/47 410/457 40/457
     static constexpr int FIELD_WIDTH = 10;
-    static constexpr int FIELD_HEIGHT = 11;
+    static constexpr int FIELD_HEIGHT = 12;
 
     static constexpr int DOT_WIDTH = 37;
     static constexpr int DOT_HEIGHT = 37;
 
     static constexpr int DETAIL_SIZE = 4;
+
+    QBrush* brush;
+    QPalette* palette;
 
     int _delay;
     int timerID;
