@@ -40,7 +40,7 @@ StartWindow::~StartWindow()
 
 void StartWindow::onPushButton()
 {
+    close();
     Tetris* game = new Tetris();
     game->show();
-    close();
 }

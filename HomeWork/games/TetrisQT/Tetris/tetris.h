@@ -8,6 +8,8 @@
 #include <QBrush>
 #include <QPalette>
 
+#include "detail.h"
+
 class Tetris : public QWidget
 {
     Q_OBJECT
@@ -22,14 +24,24 @@ protected:
     void paintEvent(QPaintEvent *) override;
 
 private:
-    //Game: 40/47 410/47 410/457 40/457
     static constexpr int FIELD_WIDTH = 10;
-    static constexpr int FIELD_HEIGHT = 12;
+    static constexpr int FIELD_HEIGHT = 20;
 
-    static constexpr int DOT_WIDTH = 37;
-    static constexpr int DOT_HEIGHT = 37;
+    static constexpr int DOT_WIDTH = 40;
+    static constexpr int DOT_HEIGHT = 40;
 
-    static constexpr int DETAIL_SIZE = 4;
+    static constexpr int SHIFT_X = 44;
+    static constexpr int SHIFT_Y = 43;
+
+    static constexpr int SHIFT_X_NEXT = 300;
+    static constexpr int SHIFT_Y_NEXT = 110;
+
+    static constexpr double MOVE_SPEED = 0.96;
+
+    int** field;
+
+    Detail* detail;
+    Detail* nextDetail;
 
     QBrush* brush;
     QPalette* palette;
@@ -38,32 +50,14 @@ private:
     int timerID;
 
     bool _inGame;
-    int field[FIELD_WIDTH][FIELD_HEIGHT];
-
-    QPoint detail[DETAIL_SIZE];
-    QPoint movedDetail[DETAIL_SIZE];
 
     int score;
 
-    bool checkDetail();
     void checkLines();
-
-    void rotate();
-    bool checkMoveDetail();
-
     void initGame();
-    void createDetail();
-
-    int figures[7][4] =
-    {
-        1,3,5,7, //I
-        2,4,5,7, //Z
-        3,5,4,6, // S
-        3,5,4,7, // T
-        2,3,5,7, // L
-        3,5,7,6, // J
-        2,3,4,5, // O
-    };
+    void drawField(QPainter& qp);
+    void drawDetail(QPainter& qp);
+    void drawNextDetail(QPainter& qp);
 };
 
 #endif // TETRIS_H
