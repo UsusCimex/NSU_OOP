@@ -4,6 +4,9 @@
 #include <QPixmap>
 #include <QPainter>
 #include <time.h>
+#include <QMessageBox>
+#include <string>
+#include <QFont>
 
 Tetris::Tetris(QWidget *parent)
     : QWidget(parent)
@@ -29,6 +32,19 @@ Tetris::Tetris(QWidget *parent)
     detail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
     nextDetail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
 
+    fScore.open("bestScore.dll");
+    if (!fScore.is_open())
+    {
+        std::ofstream ost("bestScore.dll");
+        ost << 0;
+        ost.close();
+        fScore.open("bestScore.dll");
+    }
+
+    fScore >> bestScore;
+    qDebug() << bestScore;
+    fScore << bestScore;
+
     qsrand((uint)time(0));
     initGame();
 }
@@ -46,6 +62,8 @@ Tetris::~Tetris()
 
     delete brush;
     delete palette;
+
+    fScore.close();
 }
 
 void Tetris::timerEvent(QTimerEvent * event)
@@ -87,7 +105,7 @@ void Tetris::keyPressEvent(QKeyEvent * event)
             break;
         case Qt::Key_Down:
             killTimer(timerID);
-            timerID = startTimer(_delay / 10);
+            timerID = startTimer(25);
             break;
         }
         this->repaint();
@@ -117,6 +135,9 @@ void Tetris::paintEvent(QPaintEvent * event)
         drawDetail(qp);
         drawNextDetail(qp);
     }
+
+    drawScore(qp);
+    drawBestScore(qp);
 }
 
 bool Tetris::checkLines()
@@ -159,7 +180,7 @@ void Tetris::initGame()
 
     detail->create();
     nextDetail->create();
-    _delay = 800;
+    _delay = 750;
     timerID = startTimer(_delay);
     this->repaint();
 }
@@ -195,8 +216,44 @@ void Tetris::drawNextDetail(QPainter& qp)
     }
 }
 
+void Tetris::drawScore(QPainter &qp)
+{
+    std::string sScore(std::to_string(score));
+    QFont font;
+    font.setBold(true);
+    font.setPixelSize(50);
+    QPen pen;
+    pen.setColor(Qt::white);
+    qp.setFont(font);
+    qp.setPen(pen);
+    qp.drawText(600, 550, sScore.c_str());
+}
+
+void Tetris::drawBestScore(QPainter &qp)
+{
+    std::string sScore(std::to_string(bestScore));
+    QFont font;
+    font.setBold(true);
+    font.setPixelSize(50);
+    QPen pen;
+    pen.setColor(Qt::white);
+    qp.setFont(font);
+    qp.setPen(pen);
+    qp.drawText(600, 790, sScore.c_str());
+}
+
 void Tetris::stopGame()
 {
     _inGame = 0;
-    qDebug() << score;
+    std::string sScore("Your score: ");
+    sScore += std::to_string(score);
+    QMessageBox::information(this, "WOW!", sScore.c_str());
+
+    fScore << 11;
+    int readScore = 0;
+    fScore >> readScore;
+    qDebug() << readScore;
+    if (readScore < score) readScore = score;
+    bestScore = readScore;
+    fScore << readScore;
 }
