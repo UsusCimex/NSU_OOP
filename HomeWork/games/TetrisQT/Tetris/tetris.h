@@ -36,7 +36,7 @@ private:
     static constexpr int SHIFT_X_NEXT = 300;
     static constexpr int SHIFT_Y_NEXT = 110;
 
-    static constexpr double MOVE_SPEED = 0.96;
+    static constexpr double MOVE_SPEED = 0.94;
 
     int** field;
 
@@ -53,11 +53,14 @@ private:
 
     int score;
 
-    void checkLines();
+    //If search line, delete him, and return true;
+    bool checkLines();
     void initGame();
     void drawField(QPainter& qp);
     void drawDetail(QPainter& qp);
     void drawNextDetail(QPainter& qp);
+
+    void stopGame();
 };
 
 #endif // TETRIS_H

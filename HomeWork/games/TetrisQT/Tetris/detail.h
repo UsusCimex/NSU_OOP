@@ -30,7 +30,7 @@ public:
     int size();
     int getColor();
 
-    Detail* operator=(Detail* detail2);
+    Detail* operator=(Detail detail2);
     QPoint& operator[](int index);
 private:
     static constexpr int DETAIL_SIZE = 4;

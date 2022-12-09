@@ -59,17 +59,12 @@ void Tetris::timerEvent(QTimerEvent * event)
             {
                 field[(*detail)[i].rx()][(*detail)[i].ry()] = detail->getColor();
             }
-            checkLines();
+            if (checkLines()) _delay *= MOVE_SPEED;
+            (*detail) = (*nextDetail);
             killTimer(timerID);
-            detail = nextDetail;
-            nextDetail->create();
+            if (!nextDetail->create()) stopGame();
             timerID = startTimer(_delay);
         }
-        else
-        {
-            killTimer(timerID);
-        }
-
     }
     this->repaint();
 }
@@ -97,12 +92,13 @@ void Tetris::keyPressEvent(QKeyEvent * event)
         }
         this->repaint();
     }
+    else if (key == Qt::Key_Escape)
+    {
+        close();
+    }
     else
     {
-        if (key == Qt::Key_Space)
-        {
-            initGame();
-        }
+        initGame();
     }
 }
 
@@ -123,9 +119,10 @@ void Tetris::paintEvent(QPaintEvent * event)
     }
 }
 
-void Tetris::checkLines()
+bool Tetris::checkLines()
 {
     int posLine = FIELD_HEIGHT - 1;
+    bool flag = false;
     for (int i = FIELD_HEIGHT - 1; i > 0; --i)
     {
         int count = 0;
@@ -140,10 +137,11 @@ void Tetris::checkLines()
         }
         else
         {
-            _delay *= MOVE_SPEED;
             score++;
+            flag = true;
         }
     }
+    return flag;
 }
 
 void Tetris::initGame()
@@ -195,4 +193,10 @@ void Tetris::drawNextDetail(QPainter& qp)
     {
         qp.drawRect(SHIFT_X_NEXT + (*nextDetail)[i].rx() * DOT_WIDTH * 1.5, SHIFT_Y_NEXT + (*nextDetail)[i].ry() * DOT_HEIGHT * 1.5, DOT_WIDTH * 1.5, DOT_HEIGHT * 1.5);
     }
+}
+
+void Tetris::stopGame()
+{
+    _inGame = 0;
+    qDebug() << score;
 }

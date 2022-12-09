@@ -81,11 +81,11 @@ int Detail::getColor()
     return color;
 }
 
-Detail* Detail::operator=(Detail *detail2)
+Detail* Detail::operator=(Detail detail2)
 {
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        this->detail[i] = detail2->detail[i];
+        this->detail[i] = detail2.detail[i];
     }
     return this;
 }
