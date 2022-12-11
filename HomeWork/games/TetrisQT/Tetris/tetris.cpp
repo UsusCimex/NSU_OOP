@@ -32,18 +32,17 @@ Tetris::Tetris(QWidget *parent)
     detail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
     nextDetail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
 
-    fScore.open("bestScore.dll");
-    if (!fScore.is_open())
+    readScore.open("bestScore.dll");
+    if (!readScore.is_open())
     {
-        std::ofstream ost("bestScore.dll");
-        ost << 0;
-        ost.close();
-        fScore.open("bestScore.dll");
+        writeScore.open("bestScore.dll");
+        writeScore << 0;
+        writeScore.close();
+        readScore.open("bestScore.dll");
     }
 
-    fScore >> bestScore;
-    qDebug() << bestScore;
-    fScore << bestScore;
+    readScore >> bestScore;
+    readScore.close();
 
     qsrand((uint)time(0));
     initGame();
@@ -62,8 +61,6 @@ Tetris::~Tetris()
 
     delete brush;
     delete palette;
-
-    fScore.close();
 }
 
 void Tetris::timerEvent(QTimerEvent * event)
@@ -249,11 +246,8 @@ void Tetris::stopGame()
     sScore += std::to_string(score);
     QMessageBox::information(this, "WOW!", sScore.c_str());
 
-    fScore << 11;
-    int readScore = 0;
-    fScore >> readScore;
-    qDebug() << readScore;
-    if (readScore < score) readScore = score;
-    bestScore = readScore;
-    fScore << readScore;
+    if (bestScore < score) bestScore = score;
+    writeScore.open("bestScore.dll");
+    writeScore << bestScore;
+    writeScore.close();
 }

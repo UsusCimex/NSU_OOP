@@ -40,7 +40,8 @@ private:
 
     static constexpr double MOVE_SPEED = 0.94;
 
-    std::fstream fScore;
+    std::ifstream readScore;
+    std::ofstream writeScore;
 
     int** field;
 
