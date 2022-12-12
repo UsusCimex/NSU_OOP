@@ -16,6 +16,7 @@ Tetris::Tetris(QWidget *parent)
     this->resize(background.width(), background.height());
     this->setFixedSize(background.width(), background.height());
 
+    tiles = new QPixmap(":/img/tiles.png");
     brush = new QBrush;
     palette = new QPalette;
     brush->setTextureImage(background);
@@ -123,9 +124,6 @@ void Tetris::paintEvent(QPaintEvent * event)
 
     QPainter qp(this);
 
-//    QPixmap tiles;
-//    tiles.load(":img/tiles.png");
-
     if (_inGame)
     {
         drawField(qp);
@@ -184,32 +182,29 @@ void Tetris::initGame()
 
 void Tetris::drawField(QPainter& qp)
 {
-    qp.setBrush(Qt::blue);
     for (int i = 0; i < FIELD_WIDTH; ++i)
     {
         for(int j = 0; j < FIELD_HEIGHT; ++j)
         {
             if (field[i][j] == 0) continue;
-            qp.drawRect(SHIFT_X + i * DOT_WIDTH, SHIFT_Y + j * DOT_HEIGHT, DOT_WIDTH, DOT_HEIGHT);
+            qp.drawPixmap(SHIFT_X + i * DOT_WIDTH, SHIFT_Y + j * DOT_HEIGHT, *tiles, field[i][j] * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
         }
     }
 }
 
 void Tetris::drawDetail(QPainter& qp)
 {
-    qp.setBrush(Qt::red);
     for (int i = 0; i < detail->size(); ++i)
     {
-        qp.drawRect(SHIFT_X + (*detail)[i].rx() * DOT_WIDTH, SHIFT_Y + (*detail)[i].ry() * DOT_HEIGHT, DOT_WIDTH, DOT_HEIGHT);
+        qp.drawPixmap(SHIFT_X + (*detail)[i].rx() * DOT_WIDTH, SHIFT_Y + (*detail)[i].ry() * DOT_HEIGHT, *tiles, detail->getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
     }
 }
 
 void Tetris::drawNextDetail(QPainter& qp)
 {
-    qp.setBrush(Qt::green);
     for (int i = 0; i < nextDetail->size(); ++i)
     {
-        qp.drawRect(SHIFT_X_NEXT + (*nextDetail)[i].rx() * DOT_WIDTH * 1.5, SHIFT_Y_NEXT + (*nextDetail)[i].ry() * DOT_HEIGHT * 1.5, DOT_WIDTH * 1.5, DOT_HEIGHT * 1.5);
+        qp.drawPixmap(SHIFT_X_NEXT + (*nextDetail)[i].rx() * DOT_WIDTH, SHIFT_Y_NEXT + (*nextDetail)[i].ry() * DOT_HEIGHT, *tiles, nextDetail->getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
     }
 }
 

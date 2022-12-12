@@ -32,10 +32,10 @@ private:
     static constexpr int DOT_WIDTH = 40;
     static constexpr int DOT_HEIGHT = 40;
 
-    static constexpr int SHIFT_X = 44;
-    static constexpr int SHIFT_Y = 43;
+    static constexpr int SHIFT_X = 45;
+    static constexpr int SHIFT_Y = 45;
 
-    static constexpr int SHIFT_X_NEXT = 300;
+    static constexpr int SHIFT_X_NEXT = 400;
     static constexpr int SHIFT_Y_NEXT = 110;
 
     static constexpr double MOVE_SPEED = 0.94;
@@ -50,6 +50,7 @@ private:
 
     QBrush* brush;
     QPalette* palette;
+    QPixmap* tiles;
 
     int _delay;
     int timerID;

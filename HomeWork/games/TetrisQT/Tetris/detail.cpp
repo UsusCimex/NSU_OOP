@@ -7,6 +7,11 @@ Detail::Detail(int** field, int field_width, int field_height)
     this->field_height = field_height;
 }
 
+Detail::~Detail()
+{
+
+}
+
 bool Detail::move(Detail::movement arg)
 {
     if (arg == LEFT)
@@ -56,7 +61,7 @@ bool Detail::move(Detail::movement arg)
 bool Detail::create()
 {
     int randDetail = qrand() % 7;
-    color = randDetail + 1;
+    color = qrand() % 7 + 1;
 
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
@@ -87,6 +92,7 @@ Detail* Detail::operator=(Detail detail2)
     {
         this->detail[i] = detail2.detail[i];
     }
+    this->color = detail2.getColor();
     return this;
 }
 

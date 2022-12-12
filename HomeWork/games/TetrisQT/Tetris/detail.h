@@ -2,6 +2,7 @@
 #define DETAIL_H
 
 #include <QPoint>
+#include <QPixmap>
 
 class Detail
 {
@@ -14,6 +15,7 @@ public:
     };
 
     Detail(int** field, int field_width, int field_height);
+    ~Detail();
 
     //Rotate detail
     void rotate();
