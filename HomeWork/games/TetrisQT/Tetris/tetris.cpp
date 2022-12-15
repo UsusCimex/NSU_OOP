@@ -79,7 +79,7 @@ void Tetris::timerEvent(QTimerEvent * event)
             (*detail) = (*nextDetail);
             killTimer(timerID);
             if (!nextDetail->create()) stopGame();
-            timerID = startTimer(_delay);
+            else timerID = startTimer(_delay);
         }
     }
     this->repaint();
