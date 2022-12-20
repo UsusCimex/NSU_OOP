@@ -79,9 +79,19 @@ void StartSetting(int argc, const char * argv[])
         }
 
         if (factory->CheckObject(pl))
+        {
             newPlayer.player = std::shared_ptr<Strategies>(factory->CreateObject(pl));
+        }
         else
+        {
+            if (pl.front() == '-') 
+            {
+                std::string abort(pl);
+                abort += " strategies not found";
+                throw std::runtime_error(abort);
+            }
             newPlayer.player = std::shared_ptr<Strategies>(factory->CreateObject("human"));
+        }
         
         newPlayer.player->setConfigFile(game.configFile);
         players.push_back(newPlayer);
