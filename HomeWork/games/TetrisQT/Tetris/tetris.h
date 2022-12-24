@@ -8,8 +8,6 @@
 #include <QBrush>
 #include <QPalette>
 
-#include <fstream>
-
 #include "detail.h"
 
 class Tetris : public QWidget
@@ -20,12 +18,12 @@ public:
     Tetris(QWidget *parent = nullptr);
     ~Tetris() override;
 
-protected:
+protected slots:
     void timerEvent(QTimerEvent *) override;
     void keyPressEvent(QKeyEvent *) override;
     void paintEvent(QPaintEvent *) override;
 
-private:
+protected:
     static constexpr int FIELD_WIDTH = 10;
     static constexpr int FIELD_HEIGHT = 20;
 
@@ -38,11 +36,9 @@ private:
     static constexpr int SHIFT_X_NEXT = 400;
     static constexpr int SHIFT_Y_NEXT = 110;
 
-    static constexpr double MOVE_SPEED = 0.94;
+    static constexpr double MOVE_SPEED = 0.95;
 
-    std::ifstream readScore;
-    std::ofstream writeScore;
-
+    QString name;
     int** field;
 
     Detail* detail;
@@ -58,7 +54,6 @@ private:
     bool _inGame;
 
     int score;
-    int bestScore;
 
     //If search line, delete him, and return true;
     bool checkLines();
@@ -67,7 +62,6 @@ private:
     void drawDetail(QPainter& qp);
     void drawNextDetail(QPainter& qp);
     void drawScore(QPainter& qp);
-    void drawBestScore(QPainter& qp);
 
     void stopGame();
 };

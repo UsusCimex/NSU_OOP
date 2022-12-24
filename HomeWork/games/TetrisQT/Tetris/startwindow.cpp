@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QApplication>
 #include <QDebug>
+#include "score.h"
 
 StartWindow::StartWindow(QWidget* parent)
     : QWidget(parent)
@@ -18,14 +19,21 @@ StartWindow::StartWindow(QWidget* parent)
     this->setPalette(*palette);
 
     startButton = new QPushButton(this);
-    startButton->setFixedSize(250, 75);
-    startButton->move(115, 240);
+    startButton->setFixedSize(322, 104);
+    startButton->move(221, 295);
     startButton->setStyleSheet("QPushButton{background: transparent;}");
     connect(startButton, &QPushButton::clicked, this, &StartWindow::onPushButton);
 
+    leaderButton = new QPushButton(this);
+    leaderButton->setFixedSize(645, 98);
+    leaderButton->move(58, 409);
+    leaderButton->setStyleSheet("QPushButton{background: transparent;}");
+    connect(leaderButton, &QPushButton::clicked, this, &StartWindow::onPushButton2);
+
+
     quitButton = new QPushButton(this);
-    quitButton->setFixedSize(200, 75);
-    quitButton->move(150, 345);
+    quitButton->setFixedSize(256, 109);
+    quitButton->move(250, 516);
     quitButton->setStyleSheet("QPushButton{background: transparent;}");
     connect(quitButton, &QPushButton::clicked, this, &QApplication::quit);
 }
@@ -43,4 +51,11 @@ void StartWindow::onPushButton()
     close();
     Tetris* game = new Tetris();
     game->show();
+}
+
+void StartWindow::onPushButton2()
+{
+    close();
+    ScoreTable newWindow;
+    newWindow.show();
 }

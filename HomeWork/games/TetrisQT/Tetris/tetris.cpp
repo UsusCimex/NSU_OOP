@@ -1,5 +1,7 @@
 #include "tetris.h"
 
+#include "score.h"
+
 #include <QDebug>
 #include <QPixmap>
 #include <QPainter>
@@ -32,18 +34,6 @@ Tetris::Tetris(QWidget *parent)
 
     detail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
     nextDetail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
-
-    readScore.open("bestScore.dll");
-    if (!readScore.is_open())
-    {
-        writeScore.open("bestScore.dll");
-        writeScore << 0;
-        writeScore.close();
-        readScore.open("bestScore.dll");
-    }
-
-    readScore >> bestScore;
-    readScore.close();
 
     qsrand((uint)time(0));
     initGame();
@@ -132,13 +122,14 @@ void Tetris::paintEvent(QPaintEvent * event)
     }
 
     drawScore(qp);
-    drawBestScore(qp);
 }
 
 bool Tetris::checkLines()
 {
     int posLine = FIELD_HEIGHT - 1;
     bool flag = false;
+    double multiply = 1;
+    int counter = 0;
     for (int i = FIELD_HEIGHT - 1; i > 0; --i)
     {
         int count = 0;
@@ -147,16 +138,19 @@ bool Tetris::checkLines()
             if (field[j][i]) count++;
             field[j][posLine] = field[j][i];
         }
+
         if (count < FIELD_WIDTH)
         {
             posLine--;
         }
         else
         {
-            score++;
-            flag = true;
+            counter++;
+            if (flag) multiply += 0.25;
+            else flag = true;
         }
     }
+    score += counter*100*multiply;
     return flag;
 }
 
@@ -221,19 +215,6 @@ void Tetris::drawScore(QPainter &qp)
     qp.drawText(600, 550, sScore.c_str());
 }
 
-void Tetris::drawBestScore(QPainter &qp)
-{
-    std::string sScore(std::to_string(bestScore));
-    QFont font;
-    font.setBold(true);
-    font.setPixelSize(50);
-    QPen pen;
-    pen.setColor(Qt::white);
-    qp.setFont(font);
-    qp.setPen(pen);
-    qp.drawText(600, 790, sScore.c_str());
-}
-
 void Tetris::stopGame()
 {
     _inGame = 0;
@@ -241,8 +222,6 @@ void Tetris::stopGame()
     sScore += std::to_string(score);
     QMessageBox::information(this, "WOW!", sScore.c_str());
 
-    if (bestScore < score) bestScore = score;
-    writeScore.open("bestScore.dll");
-    writeScore << bestScore;
-    writeScore.close();
+    Score bestScore;
+    bestScore.UpdateScore(name, score);
 }

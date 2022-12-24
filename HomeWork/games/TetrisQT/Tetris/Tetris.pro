@@ -28,12 +28,16 @@ SOURCES += \
         main.cpp \
         tetris.cpp \
     startwindow.cpp \
-    detail.cpp
+    detail.cpp \
+    scoretable.cpp \
+    score.cpp
 
 HEADERS += \
         tetris.h \
     startwindow.h \
-    detail.h
+    detail.h \
+    scoretable.h \
+    score.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -42,3 +46,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     img.qrc
+
+FORMS +=
