@@ -68,6 +68,7 @@ void StartSetting(int argc, const char * argv[])
     for (auto& pl : playerList)
     {
         Player newPlayer;
+        //Get nicknames
         if (pl.find("=") == std::string::npos) 
         {
             newPlayer.setName(pl);
@@ -78,15 +79,27 @@ void StartSetting(int argc, const char * argv[])
             pl = pl.substr(0, pl.find('='));
         }
 
+        //Factory object
         if (factory->CheckObject(pl))
+        {
             newPlayer.player = std::shared_ptr<Strategies>(factory->CreateObject(pl));
+        }
         else
+        {
+            if (pl.front() == '-') 
+            {
+                std::string abort(pl);
+                abort += " strategies not found";
+                throw std::runtime_error(abort);
+            }
             newPlayer.player = std::shared_ptr<Strategies>(factory->CreateObject("human"));
+        }
         
         newPlayer.player->setConfigFile(game.configFile);
         players.push_back(newPlayer);
     }
 
+    //Check universal name
     for (size_t checkerA = 0; checkerA < players.size() - 1; ++checkerA)
     {
         for (size_t checkerB = checkerA + 1; checkerB < players.size(); ++checkerB)

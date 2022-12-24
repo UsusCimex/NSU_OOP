@@ -21,6 +21,7 @@ public:
     void setEnemyCard(Card);
     Card getEnemyCard();
     void setHand(std::vector<Card>);
+    
 protected:
     Card enemyCard;
     std::string configFile;
