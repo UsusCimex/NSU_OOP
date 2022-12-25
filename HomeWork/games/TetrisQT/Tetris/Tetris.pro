@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,14 +31,16 @@ SOURCES += \
     startwindow.cpp \
     detail.cpp \
     scoretable.cpp \
-    score.cpp
+    score.cpp \
+    field.cpp
 
 HEADERS += \
         tetris.h \
     startwindow.h \
     detail.h \
     scoretable.h \
-    score.h
+    score.h \
+    field.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -45,6 +48,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    img.qrc
+    img.qrc \
+    music.qrc
 
 FORMS +=

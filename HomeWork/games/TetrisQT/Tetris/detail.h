@@ -4,6 +4,8 @@
 #include <QPoint>
 #include <QPixmap>
 
+#include "field.h"
+
 class Detail
 {
 public:
@@ -14,7 +16,7 @@ public:
         DOWN
     };
 
-    Detail(int** field, int field_width, int field_height);
+    Detail(Field* field, int field_width, int field_height);
     ~Detail();
 
     //Rotate detail
@@ -36,7 +38,7 @@ public:
     QPoint& operator[](int index);
 private:
     static constexpr int DETAIL_SIZE = 4;
-    int** field;
+    Field* field;
     int field_width;
     int field_height;
 

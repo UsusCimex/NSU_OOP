@@ -14,7 +14,9 @@ Tetris::Tetris(QString name, QWidget *parent)
     : QWidget(parent)
 {
     this->name = name.toStdString();
-    QImage background(":/img/background.png");
+    music = new QMediaPlayer(this);
+    _inGame = false;
+    QImage background(":/img/level1.png");
 
     this->resize(background.width(), background.height());
     this->setFixedSize(background.width(), background.height());
@@ -25,34 +27,29 @@ Tetris::Tetris(QString name, QWidget *parent)
     brush->setTextureImage(background);
     palette->setBrush(QPalette::Window, *brush);
     this->setPalette(*palette);
-    this->setWindowTitle("Tetris game");
-
-    field = new int*[FIELD_WIDTH];
-    for (int i = 0; i < FIELD_WIDTH; ++i)
-    {
-        field[i] = new int[FIELD_HEIGHT];
-    }
+    this->setWindowTitle("Tetris game");    
 
     detail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
     nextDetail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
 
     qsrand((uint)time(0));
-    initGame();
 }
 
 Tetris::~Tetris()
 {
-    for (int i = 0; i < FIELD_WIDTH; ++i)
-    {
-        delete[] field[i];
-    }
-    delete[] field;
+    delete field;
 
     delete detail;
     delete nextDetail;
 
     delete brush;
     delete palette;
+    delete music;
+}
+
+void Tetris::setName(std::string name)
+{
+    this->name = name;
 }
 
 void Tetris::timerEvent(QTimerEvent * event)
@@ -64,9 +61,39 @@ void Tetris::timerEvent(QTimerEvent * event)
         {
             for (int i = 0; i < detail->size(); ++i)
             {
-                field[(*detail)[i].rx()][(*detail)[i].ry()] = detail->getColor();
+                (*field)[(*detail)[i].rx()][(*detail)[i].ry()] = detail->getColor();
             }
-            if (checkLines()) _delay *= MOVE_SPEED;
+            double multiply = field->checkLines();
+            if (multiply > 0)
+            {
+                if (multiply > 1.2) score += 400 * multiply * (multiply - 1);
+                else score += 100;
+
+                if (level == 1 && score >= 500)
+                {
+                    level = 2;
+                    QImage background(":/img/level2.png");
+                    brush->setTextureImage(background);
+                    palette->setBrush(QPalette::Window, *brush);
+                    this->setPalette(*palette);
+
+                    music->setMedia(QUrl("qrc:/music/level2.mp3"));
+                    music->play();
+                }
+                else if (level == 2 && score >= 1000)
+                {
+                    level = 3;
+                    QImage background(":/img/level3.png");
+                    brush->setTextureImage(background);
+                    palette->setBrush(QPalette::Window, *brush);
+                    this->setPalette(*palette);
+
+                    music->setMedia(QUrl("qrc:/music/level3.mp3"));
+                    music->play();
+                }
+
+                _delay *= MOVE_SPEED;
+            }
             (*detail) = (*nextDetail);
             killTimer(timerID);
             if (!nextDetail->create()) stopGame();
@@ -104,9 +131,10 @@ void Tetris::keyPressEvent(QKeyEvent * event)
     }
     else if (key == Qt::Key_Escape)
     {
-        close();
+        this->close();
+        emit sTetris();
     }
-    else
+    else if (key == Qt::Key_Enter || key == Qt::Key_Space)
     {
         initGame();
     }
@@ -128,46 +156,27 @@ void Tetris::paintEvent(QPaintEvent * event)
     drawScore(qp);
 }
 
-bool Tetris::checkLines()
-{
-    int posLine = FIELD_HEIGHT - 1;
-    bool flag = false;
-    double multiply = 1;
-    int counter = 0;
-    for (int i = FIELD_HEIGHT - 1; i > 0; --i)
-    {
-        int count = 0;
-        for (int j = 0; j < FIELD_WIDTH; ++j)
-        {
-            if (field[j][i]) count++;
-            field[j][posLine] = field[j][i];
-        }
-
-        if (count < FIELD_WIDTH)
-        {
-            posLine--;
-        }
-        else
-        {
-            counter++;
-            if (flag) multiply += 0.25;
-            else flag = true;
-        }
-    }
-    score += counter*100*multiply;
-    return flag;
-}
-
 void Tetris::initGame()
 {
     _inGame = true;
     score = 0;
+    if (level != 1)
+    {
+        level = 1;
+        QImage background(":/img/level1.png");
+        brush->setTextureImage(background);
+        palette->setBrush(QPalette::Window, *brush);
+        this->setPalette(*palette);
+    }
+
+    music->setMedia(QUrl("qrc:/music/level1.mp3"));
+    music->play();
 
     for (int i = 0; i < FIELD_WIDTH; ++i)
     {
         for (int j = 0; j < FIELD_HEIGHT; ++j)
         {
-            field[i][j] = 0;
+            (*field)[i][j] = 0;
         }
     }
 
@@ -184,8 +193,8 @@ void Tetris::drawField(QPainter& qp)
     {
         for(int j = 0; j < FIELD_HEIGHT; ++j)
         {
-            if (field[i][j] == 0) continue;
-            qp.drawPixmap(SHIFT_X + i * DOT_WIDTH, SHIFT_Y + j * DOT_HEIGHT, *tiles, field[i][j] * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
+            if ((*field)[i][j] == 0) continue;
+            qp.drawPixmap(SHIFT_X + i * DOT_WIDTH, SHIFT_Y + j * DOT_HEIGHT, *tiles, (*field)[i][j] * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
         }
     }
 }
@@ -221,6 +230,7 @@ void Tetris::drawScore(QPainter &qp)
 
 void Tetris::stopGame()
 {
+    music->stop();
     _inGame = 0;
     std::string sScore("Your score: ");
     sScore += std::to_string(score);

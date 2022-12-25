@@ -1,6 +1,6 @@
 #include "detail.h"
 
-Detail::Detail(int** field, int field_width, int field_height)
+Detail::Detail(Field* field, int field_width, int field_height)
 {
     this->field = field;
     this->field_width = field_width;
@@ -65,7 +65,7 @@ bool Detail::create()
 
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (field[figures[randDetail][i] % 2 + field_width / 2 - 1][figures[randDetail][i] / 2])
+        if ((*field)[figures[randDetail][i] % 2 + field_width / 2 - 1][figures[randDetail][i] / 2])
         {
             return false;
         }
@@ -126,7 +126,7 @@ bool Detail::checkMove()
     {
         for (int i = 0; i < DETAIL_SIZE; ++i)
         {
-            if (movedDetail[i].ry() >= field_height || field[movedDetail[i].rx()][movedDetail[i].ry()])
+            if (movedDetail[i].ry() >= field_height || (*field)[movedDetail[i].rx()][movedDetail[i].ry()])
             {
                 return false;
             }
@@ -139,7 +139,7 @@ bool Detail::check()
 {
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (movedDetail[i].rx() < 0 || movedDetail[i].rx() >= field_width || movedDetail[i].ry() >= field_height || field[movedDetail[i].rx()][movedDetail[i].ry()] != 0)
+        if (movedDetail[i].rx() < 0 || movedDetail[i].rx() >= field_width || movedDetail[i].ry() >= field_height || (*field)[movedDetail[i].rx()][movedDetail[i].ry()] != 0)
         {
             return false;
         }

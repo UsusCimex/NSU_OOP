@@ -2,6 +2,9 @@
     <qresource prefix="/">
         <file>img/tiles.png</file>
         <file>img/menuBackground.png</file>
-        <file>img/background.png</file>
+        <file>img/bestScore.jpg</file>
+        <file>img/level1.png</file>
+        <file>img/level2.png</file>
+        <file>img/level3.png</file>
     </qresource>
 </RCC>

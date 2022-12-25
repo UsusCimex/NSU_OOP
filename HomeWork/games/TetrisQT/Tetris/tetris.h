@@ -7,8 +7,10 @@
 #include <QPixmap>
 #include <QBrush>
 #include <QPalette>
+#include <QMediaPlayer>
 
 #include "detail.h"
+#include "field.h"
 
 class Tetris : public QWidget
 {
@@ -17,6 +19,12 @@ class Tetris : public QWidget
 public:
     Tetris(QString name, QWidget *parent = nullptr);
     ~Tetris() override;
+
+    void setName(std::string name);
+    void initGame();
+
+signals:
+    void sTetris();
 
 protected slots:
     void timerEvent(QTimerEvent *) override;
@@ -38,8 +46,12 @@ protected:
 
     static constexpr double MOVE_SPEED = 0.95;
 
+    int level = 1;
+
+    QMediaPlayer* music;
+
     std::string name;
-    int** field;
+    Field* field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
 
     Detail* detail;
     Detail* nextDetail;
@@ -56,8 +68,6 @@ protected:
     int score;
 
     //If search line, delete him, and return true;
-    bool checkLines();
-    void initGame();
     void drawField(QPainter& qp);
     void drawDetail(QPainter& qp);
     void drawNextDetail(QPainter& qp);

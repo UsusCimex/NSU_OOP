@@ -47,6 +47,12 @@ StartWindow::StartWindow(QWidget* parent)
     quitButton->move(250, 516);
     quitButton->setStyleSheet("QPushButton{background: transparent;}");
     connect(quitButton, &QPushButton::clicked, this, &QApplication::quit);
+
+    game = new Tetris(nameEnter->text());
+    connect(game, &Tetris::sTetris, this, &StartWindow::show);
+
+    scoreBoard = new ScoreTable();
+    connect(scoreBoard, &ScoreTable::sTable, this, &StartWindow::show);
 }
 
 StartWindow::~StartWindow()
@@ -56,6 +62,8 @@ StartWindow::~StartWindow()
     delete startButton;
     delete leaderButton;
     delete quitButton;
+    delete game;
+    delete scoreBoard;
 }
 
 void StartWindow::onPushButton()
@@ -80,13 +88,12 @@ void StartWindow::onPushButton()
     }
 
     this->hide();
-    Tetris* game = new Tetris(nameEnter->text());
     game->show();
+    game->setName(nameEnter->text().toStdString());
 }
 
 void StartWindow::onPushButton2()
 {
     this->hide();
-    ScoreTable* newWindow = new ScoreTable();
-    newWindow->show();
+    scoreBoard->show();
 }

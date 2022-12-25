@@ -9,14 +9,27 @@
 ScoreTable::ScoreTable(QWidget* parent)
     : QWidget(parent)
 {
-    this->resize(500,500);
-    this->setFixedSize(500,500);
+    this->setWindowTitle("Score table");
+    QImage backGround(":/img/bestScore.jpg");
+    this->resize(backGround.width(),backGround.height());
+    this->setFixedSize(backGround.width(),backGround.height());
+
+    brush = new QBrush;
+    palette = new QPalette;
+    brush->setTextureImage(backGround);
+    palette->setBrush(QPalette::Window, *brush);
+    this->setPalette(*palette);
+
     layout = new QVBoxLayout;
+    QFont font;
+    font.setPointSize(15);
+    font.setBold(true);
     QVector<PlayerStats> players = score.getPlayers();
     for (int i = 0; i < players.size(); ++i)
     {
         std::string res = players[i].name + " " + std::to_string(players[i].score);
         QLabel* label = new QLabel(res.c_str());
+        label->setFont(font);
         layout->addWidget(label);
     }
     layout->setAlignment(Qt::AlignCenter);
@@ -26,4 +39,14 @@ ScoreTable::ScoreTable(QWidget* parent)
 ScoreTable::~ScoreTable()
 {
     delete layout;
+}
+
+void ScoreTable::keyPressEvent(QKeyEvent * event)
+{
+    int key = event->key();
+    if (key == Qt::Key_Escape)
+    {
+        this->close();
+        emit sTable();
+    }
 }

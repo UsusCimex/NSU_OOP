@@ -16,12 +16,17 @@ public:
     StartWindow(QWidget* parent = nullptr);
     ~StartWindow() override;
 private:
+    Tetris* game;
+    ScoreTable* scoreBoard;
+
     QLineEdit* nameEnter;
     QPushButton* startButton;
     QPushButton* quitButton;
     QPushButton* leaderButton;
     QBrush* brush;
     QPalette* palette;
+signals:
+    void sMenu();
 private slots:
     void onPushButton();
     void onPushButton2();
