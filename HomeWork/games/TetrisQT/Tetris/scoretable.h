@@ -13,8 +13,9 @@ class ScoreTable : public QWidget
     Q_OBJECT
 public:
     ScoreTable(QWidget* parent = nullptr);
+    ~ScoreTable() override;
 private:
-    QBoxLayout* layout;
+    QVBoxLayout* layout;
     Score score;
 };
 

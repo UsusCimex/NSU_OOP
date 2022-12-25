@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QBrush>
+#include <QLineEdit>
 #include <QPalette>
 
 class StartWindow : public QWidget
@@ -15,6 +16,7 @@ public:
     StartWindow(QWidget* parent = nullptr);
     ~StartWindow() override;
 private:
+    QLineEdit* nameEnter;
     QPushButton* startButton;
     QPushButton* quitButton;
     QPushButton* leaderButton;

@@ -10,9 +10,10 @@
 #include <string>
 #include <QFont>
 
-Tetris::Tetris(QWidget *parent)
+Tetris::Tetris(QString name, QWidget *parent)
     : QWidget(parent)
 {
+    this->name = name.toStdString();
     QImage background(":/img/background.png");
 
     this->resize(background.width(), background.height());
@@ -92,8 +93,11 @@ void Tetris::keyPressEvent(QKeyEvent * event)
             detail->rotate();
             break;
         case Qt::Key_Down:
+            detail->move(Detail::DOWN);
+            break;
+        case Qt::Key_Space:
             killTimer(timerID);
-            timerID = startTimer(25);
+            timerID = startTimer(1);
             break;
         }
         this->repaint();
@@ -212,7 +216,7 @@ void Tetris::drawScore(QPainter &qp)
     pen.setColor(Qt::white);
     qp.setFont(font);
     qp.setPen(pen);
-    qp.drawText(600, 550, sScore.c_str());
+    qp.drawText(525, 555, sScore.c_str());
 }
 
 void Tetris::stopGame()

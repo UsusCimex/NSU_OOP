@@ -15,7 +15,7 @@ class Tetris : public QWidget
     Q_OBJECT
 
 public:
-    Tetris(QWidget *parent = nullptr);
+    Tetris(QString name, QWidget *parent = nullptr);
     ~Tetris() override;
 
 protected slots:
@@ -38,7 +38,7 @@ protected:
 
     static constexpr double MOVE_SPEED = 0.95;
 
-    QString name;
+    std::string name;
     int** field;
 
     Detail* detail;
