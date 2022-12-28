@@ -95,5 +95,6 @@ void StartWindow::onPushButton()
 void StartWindow::onPushButton2()
 {
     this->hide();
+    scoreBoard->updateScore();
     scoreBoard->show();
 }

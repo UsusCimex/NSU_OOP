@@ -5,7 +5,10 @@
 #include <QPoint>
 #include <QKeyEvent>
 #include <QPixmap>
+#include <QFont>
+#include <QPen>
 #include <QBrush>
+#include <QPainter>
 #include <QPalette>
 #include <QMediaPlayer>
 
@@ -68,10 +71,10 @@ protected:
     int score;
 
     //If search line, delete him, and return true;
-    void drawField(QPainter& qp);
-    void drawDetail(QPainter& qp);
-    void drawNextDetail(QPainter& qp);
-    void drawScore(QPainter& qp);
+    void drawField();
+    void drawDetail();
+    void drawNextDetail();
+    void drawScore();
 
     void stopGame();
 };

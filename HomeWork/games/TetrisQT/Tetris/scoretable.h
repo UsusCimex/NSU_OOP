@@ -7,6 +7,8 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QVector>
+#include <QLabel>
 #include <QBoxLayout>
 
 class ScoreTable : public QWidget
@@ -15,13 +17,17 @@ class ScoreTable : public QWidget
 public:
     ScoreTable(QWidget* parent = nullptr);
     ~ScoreTable() override;
+    void updateScore();
+
 signals:
     void sTable();
+
 private slots:
     void keyPressEvent(QKeyEvent *) override;
+
 private:
     QVBoxLayout* layout;
-    Score score;
+    QVector<QLabel*> topList;
 
     QBrush* brush;
     QPalette* palette;

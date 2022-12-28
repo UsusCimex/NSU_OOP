@@ -30,7 +30,7 @@ QVector<PlayerStats> Score::getPlayers()
     return players;
 }
 
-void Score::UpdateScore(std::string name, int score)
+void Score::newScore(std::string name, int score)
 {
     if (players.back().score < score)
     {

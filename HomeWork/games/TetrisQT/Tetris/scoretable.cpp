@@ -1,9 +1,7 @@
 #include "scoretable.h"
 
 #include <fstream>
-#include <QLabel>
 #include <string>
-#include <QVector>
 #include <QDebug>
 
 ScoreTable::ScoreTable(QWidget* parent)
@@ -24,6 +22,7 @@ ScoreTable::ScoreTable(QWidget* parent)
     QFont font;
     font.setPointSize(15);
     font.setBold(true);
+    Score score;
     QVector<PlayerStats> players = score.getPlayers();
     for (int i = 0; i < players.size(); ++i)
     {
@@ -31,6 +30,7 @@ ScoreTable::ScoreTable(QWidget* parent)
         QLabel* label = new QLabel(res.c_str());
         label->setFont(font);
         layout->addWidget(label);
+        topList.push_back(label);
     }
     layout->setAlignment(Qt::AlignCenter);
     setLayout(layout);
@@ -39,6 +39,21 @@ ScoreTable::ScoreTable(QWidget* parent)
 ScoreTable::~ScoreTable()
 {
     delete layout;
+    for (int i = 0; i < topList.size(); ++i)
+    {
+        delete topList[i];
+    }
+}
+
+void ScoreTable::updateScore()
+{
+    Score score;
+    QVector<PlayerStats> players = score.getPlayers();
+    for (int i = 0; i < topList.size(); ++i)
+    {
+        std::string res = players[i].name + " " + std::to_string(players[i].score);
+        topList[i]->setText(res.c_str());
+    }
 }
 
 void ScoreTable::keyPressEvent(QKeyEvent * event)

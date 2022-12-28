@@ -4,11 +4,9 @@
 
 #include <QDebug>
 #include <QPixmap>
-#include <QPainter>
 #include <time.h>
 #include <QMessageBox>
 #include <string>
-#include <QFont>
 
 Tetris::Tetris(QString name, QWidget *parent)
     : QWidget(parent)
@@ -144,16 +142,14 @@ void Tetris::paintEvent(QPaintEvent * event)
 {
     Q_UNUSED(event);
 
-    QPainter qp(this);
-
     if (_inGame)
     {
-        drawField(qp);
-        drawDetail(qp);
-        drawNextDetail(qp);
+        drawField();
+        drawDetail();
+        drawNextDetail();
     }
 
-    drawScore(qp);
+    drawScore();
 }
 
 void Tetris::initGame()
@@ -187,8 +183,9 @@ void Tetris::initGame()
     this->repaint();
 }
 
-void Tetris::drawField(QPainter& qp)
+void Tetris::drawField()
 {
+    QPainter qp(this);
     for (int i = 0; i < FIELD_WIDTH; ++i)
     {
         for(int j = 0; j < FIELD_HEIGHT; ++j)
@@ -199,29 +196,32 @@ void Tetris::drawField(QPainter& qp)
     }
 }
 
-void Tetris::drawDetail(QPainter& qp)
+void Tetris::drawDetail()
 {
+    QPainter qp(this);
     for (int i = 0; i < detail->size(); ++i)
     {
         qp.drawPixmap(SHIFT_X + (*detail)[i].rx() * DOT_WIDTH, SHIFT_Y + (*detail)[i].ry() * DOT_HEIGHT, *tiles, detail->getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
     }
 }
 
-void Tetris::drawNextDetail(QPainter& qp)
+void Tetris::drawNextDetail()
 {
+    QPainter qp(this);
     for (int i = 0; i < nextDetail->size(); ++i)
     {
         qp.drawPixmap(SHIFT_X_NEXT + (*nextDetail)[i].rx() * DOT_WIDTH, SHIFT_Y_NEXT + (*nextDetail)[i].ry() * DOT_HEIGHT, *tiles, nextDetail->getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
     }
 }
 
-void Tetris::drawScore(QPainter &qp)
+void Tetris::drawScore()
 {
     std::string sScore(std::to_string(score));
+    QPainter qp(this);
     QFont font;
+    QPen pen;
     font.setBold(true);
     font.setPixelSize(50);
-    QPen pen;
     pen.setColor(Qt::white);
     qp.setFont(font);
     qp.setPen(pen);
@@ -237,5 +237,5 @@ void Tetris::stopGame()
     QMessageBox::information(this, "WOW!", sScore.c_str());
 
     Score bestScore;
-    bestScore.UpdateScore(name, score);
+    bestScore.newScore(name, score);
 }

@@ -15,9 +15,10 @@ class Score
 public:
     Score();
     QVector<PlayerStats> getPlayers();
-    void UpdateScore(std::string name, int score);
+    void newScore(std::string name, int score);
 private:
     QVector<PlayerStats> players;
+
 
     std::ifstream readScore;
     std::ofstream writeScore;
