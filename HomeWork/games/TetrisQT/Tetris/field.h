@@ -1,20 +1,26 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include <vector>
 
 class Field
 {
 public:
-    Field(int width, int height);
+    Field(size_t width, size_t height);
+    Field(Field& fld) = delete;
     ~Field();
 
-    int *operator[](int);
-    //If search full lines, return multiply booster
-    double checkLines();
+    //If search full lines, return count lines
+    int checkLines();
+    void resetField();
+    int getColor(size_t x, size_t y) const;
+    void setColor(size_t x, size_t y, int color);
+    std::pair<size_t, size_t> sizeField() const;
+
 private:
-    int** field;
-    int width;
-    int height;
+    std::vector<std::vector<int>> field;
+    size_t width;
+    size_t height;
 };
 
 #endif // FIELD_H

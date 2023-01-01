@@ -16,11 +16,12 @@ public:
         DOWN
     };
 
-    Detail(Field* field, int field_width, int field_height);
+    Detail(Field* field, unsigned int field_width, unsigned int field_height);
+    Detail(Detail& detail2);
     ~Detail();
 
     //Rotate detail
-    void rotate();
+    void rotate(size_t center);
 
     //Move detail
     //return false, if stopped
@@ -31,16 +32,16 @@ public:
     //return false, if don't search place
     bool create();
 
-    int size();
-    int getColor();
+    unsigned int size() const;
+    int getColor() const;
+    QPoint& getCube(size_t index);
 
-    Detail* operator=(Detail detail2);
-    QPoint& operator[](int index);
+    Detail& operator=(const Detail& detail2);
 private:
     static constexpr int DETAIL_SIZE = 4;
     Field* field;
-    int field_width;
-    int field_height;
+    unsigned int field_width;
+    unsigned int field_height;
 
     QPoint detail[DETAIL_SIZE];
     QPoint movedDetail[DETAIL_SIZE];
@@ -48,11 +49,11 @@ private:
     int color;
 
     //Check movedDetail position
-    bool check();
+    bool check() const;
     //Check stop position
-    bool checkMove();
+    bool checkMove() const;
 
-    int figures[7][4] =
+    size_t figures[7][4] =
     {
         {1,3,5,7}, //I
         {2,4,5,7}, //Z

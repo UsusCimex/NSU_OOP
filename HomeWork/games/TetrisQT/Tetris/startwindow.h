@@ -1,7 +1,7 @@
 #ifndef STARTWINDOW_H
 #define STARTWINDOW_H
 
-#include "tetris.h"
+#include "tetrisqt.h"
 #include "scoretable.h"
 
 #include <QWidget>
@@ -16,7 +16,7 @@ public:
     StartWindow(QWidget* parent = nullptr);
     ~StartWindow() override;
 private:
-    Tetris* game;
+    TetrisQT* game;
     ScoreTable* scoreBoard;
 
     QLineEdit* nameEnter;

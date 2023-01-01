@@ -27,20 +27,22 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        tetris.cpp \
     startwindow.cpp \
     detail.cpp \
     scoretable.cpp \
     score.cpp \
-    field.cpp
+    field.cpp \
+    tetrisqt.cpp \
+    tetriscore.cpp
 
 HEADERS += \
-        tetris.h \
     startwindow.h \
     detail.h \
     scoretable.h \
     score.h \
-    field.h
+    field.h \
+    tetrisqt.h \
+    tetriscore.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -1,5 +1,5 @@
-#ifndef TETRIS_H
-#define TETRIS_H
+#ifndef TETRISQT_H
+#define TETRISQT_H
 
 #include <QWidget>
 #include <QPoint>
@@ -12,16 +12,15 @@
 #include <QPalette>
 #include <QMediaPlayer>
 
-#include "detail.h"
-#include "field.h"
+#include "tetriscore.h"
 
-class Tetris : public QWidget
+class TetrisQT : public QWidget
 {
     Q_OBJECT
 
 public:
-    Tetris(QString name, QWidget *parent = nullptr);
-    ~Tetris() override;
+    TetrisQT(QString name, QWidget *parent = nullptr);
+    ~TetrisQT() override;
 
     void setName(std::string name);
     void initGame();
@@ -35,40 +34,27 @@ protected slots:
     void paintEvent(QPaintEvent *) override;
 
 protected:
-    static constexpr int FIELD_WIDTH = 10;
-    static constexpr int FIELD_HEIGHT = 20;
-
-    static constexpr int DOT_WIDTH = 40;
-    static constexpr int DOT_HEIGHT = 40;
-
     static constexpr int SHIFT_X = 45;
     static constexpr int SHIFT_Y = 45;
 
     static constexpr int SHIFT_X_NEXT = 400;
     static constexpr int SHIFT_Y_NEXT = 110;
 
-    static constexpr double MOVE_SPEED = 0.95;
+    static constexpr int DOT_WIDTH = 40;
+    static constexpr int DOT_HEIGHT = 40;
 
-    int level = 1;
+    TetrisCore* tetris;
 
     QMediaPlayer* music;
 
     std::string name;
-    Field* field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
-
-    Detail* detail;
-    Detail* nextDetail;
 
     QBrush* brush;
     QPalette* palette;
     QPixmap* tiles;
 
-    int _delay;
     int timerID;
-
     bool _inGame;
-
-    int score;
 
     //If search line, delete him, and return true;
     void drawField();
@@ -76,7 +62,8 @@ protected:
     void drawNextDetail();
     void drawScore();
 
+    void reloadTimer();
     void stopGame();
 };
 
-#endif // TETRIS_H
+#endif // TETRISQT_H

@@ -1,38 +1,29 @@
 #include "field.h"
+#include <algorithm>
 
-Field::Field(int width, int height) : width(width), height(height)
+Field::Field(size_t width, size_t height) : width(width), height(height)
 {
-    field = new int*[width];
-    for (int i = 0; i < width; ++i)
+    std::vector<int> hght;
+    for (size_t j = 0; j < height; ++j)
     {
-        field[i] = new int[height];
+        hght.push_back(0);
+    }
+    for (size_t i = 0; i < width; ++i)
+    {
+        field.push_back(hght);
     }
 }
 
-Field::~Field()
-{
-    for (int i = 0; i < width; ++i)
-    {
-        delete[] field[i];
-    }
-    delete[] field;
-}
+Field::~Field() = default;
 
-int *Field::operator[](int width)
+int Field::checkLines()
 {
-    return field[width];
-}
-
-double Field::checkLines()
-{
-    int posLine = height - 1;
-    bool flag = false;
-    double multiply = 0;
+    size_t posLine = height - 1;
     int counter = 0;
-    for (int i = height - 1; i > 0; --i)
+    for (size_t i = height - 1; i < height; --i)
     {
-        int count = 0;
-        for (int j = 0; j < width; ++j)
+        unsigned int count = 0;
+        for (size_t j = 0; j < width; ++j)
         {
             if (field[j][i]) count++;
             field[j][posLine] = field[j][i];
@@ -45,16 +36,30 @@ double Field::checkLines()
         else
         {
             counter++;
-            if (flag)
-            {
-                multiply += 0.25;
-            }
-            else
-            {
-                flag = true;
-                multiply = 1;
-            }
         }
     }
-    return multiply;
+    return counter;
+}
+
+void Field::resetField()
+{
+    for (size_t i = 0; i < width; ++i)
+    {
+        std::fill(field[i].begin(), field[i].end(), 0);
+    }
+}
+
+int Field::getColor(size_t x, size_t y) const
+{
+    return field[x][y];
+}
+
+void Field::setColor(size_t x, size_t y, int color)
+{
+    field[x][y] = color;
+}
+
+std::pair<size_t, size_t> Field::sizeField() const
+{
+    return std::make_pair(width, height);
 }

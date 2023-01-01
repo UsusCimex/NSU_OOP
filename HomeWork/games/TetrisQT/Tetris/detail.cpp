@@ -1,16 +1,17 @@
 #include "detail.h"
 
-Detail::Detail(Field* field, int field_width, int field_height)
+Detail::Detail(Field* field, unsigned int field_width, unsigned int field_height) : field(field), field_width(field_width), field_height(field_height) {}
+
+Detail::Detail(Detail &detail2)
 {
-    this->field = field;
-    this->field_width = field_width;
-    this->field_height = field_height;
+    for (int i = 0; i < DETAIL_SIZE; ++i)
+    {
+        this->detail[i] = detail2.detail[i];
+    }
+    color = detail2.color;
 }
 
-Detail::~Detail()
-{
-
-}
+Detail::~Detail() = default;
 
 bool Detail::move(Detail::movement arg)
 {
@@ -65,7 +66,7 @@ bool Detail::create()
 
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if ((*field)[figures[randDetail][i] % 2 + field_width / 2 - 1][figures[randDetail][i] / 2])
+        if (field->getColor(figures[randDetail][i] % 2 + field_width / 2 - 1, figures[randDetail][i] / 2) != 0)
         {
             return false;
         }
@@ -76,57 +77,62 @@ bool Detail::create()
     return true;
 }
 
-int Detail::size()
+unsigned int Detail::size() const
 {
     return DETAIL_SIZE;
 }
 
-int Detail::getColor()
+int Detail::getColor() const
 {
     return color;
 }
 
-Detail* Detail::operator=(Detail detail2)
-{
-    for (int i = 0; i < DETAIL_SIZE; ++i)
-    {
-        this->detail[i] = detail2.detail[i];
-    }
-    this->color = detail2.getColor();
-    return this;
-}
-
-QPoint& Detail::operator[](int index)
+QPoint &Detail::getCube(size_t index)
 {
     if (index > DETAIL_SIZE) throw std::exception();
 
     return detail[index];
 }
 
-void Detail::rotate()
+Detail& Detail::operator=(const Detail& detail2)
 {
-    QPoint p = detail[1]; //center of rotation
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        int x = detail[i].ry() - p.ry();
-        int y = detail[i].rx() - p.rx();
-        movedDetail[i].rx() = p.rx() - x;
-        movedDetail[i].ry() = p.ry() + y;
+        this->detail[i] = detail2.detail[i];
+    }
+    color = detail2.color;
+    return *this;
+}
+
+void Detail::rotate(size_t center)
+{
+    if (center >= DETAIL_SIZE) throw std::runtime_error("center rotation error...");
+    QPoint p = detail[center]; //center of rotation
+    for (int i = 0; i < DETAIL_SIZE; ++i)
+    {
+        int x = detail[i].y() - p.y();
+        int y = detail[i].x() - p.x();
+        movedDetail[i].rx() = p.x() - x;
+        movedDetail[i].ry() = p.y() + y;
     }
     if (check())
     {
         for (int i = 0; i < DETAIL_SIZE; ++i)
             detail[i] = movedDetail[i];
     }
+    else
+    {
+        if (center != 3) rotate(center + 1);
+    }
 }
 
-bool Detail::checkMove()
+bool Detail::checkMove() const
 {
     if (!check())
     {
         for (int i = 0; i < DETAIL_SIZE; ++i)
         {
-            if (movedDetail[i].ry() >= field_height || (*field)[movedDetail[i].rx()][movedDetail[i].ry()])
+            if (movedDetail[i].y() >= field_height || field->getColor(movedDetail[i].x(), movedDetail[i].y()))
             {
                 return false;
             }
@@ -135,11 +141,11 @@ bool Detail::checkMove()
     return true;
 }
 
-bool Detail::check()
+bool Detail::check() const
 {
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (movedDetail[i].rx() < 0 || movedDetail[i].rx() >= field_width || movedDetail[i].ry() >= field_height || (*field)[movedDetail[i].rx()][movedDetail[i].ry()] != 0)
+        if (movedDetail[i].x() < 0 || movedDetail[i].x() >= field_width || movedDetail[i].y() >= field_height || field->getColor(movedDetail[i].x(), movedDetail[i].y()) != 0)
         {
             return false;
         }

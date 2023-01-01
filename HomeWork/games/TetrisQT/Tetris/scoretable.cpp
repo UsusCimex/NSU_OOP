@@ -36,14 +36,7 @@ ScoreTable::ScoreTable(QWidget* parent)
     setLayout(layout);
 }
 
-ScoreTable::~ScoreTable()
-{
-    delete layout;
-    for (int i = 0; i < topList.size(); ++i)
-    {
-        delete topList[i];
-    }
-}
+ScoreTable::~ScoreTable() = default;
 
 void ScoreTable::updateScore()
 {

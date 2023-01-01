@@ -48,23 +48,14 @@ StartWindow::StartWindow(QWidget* parent)
     quitButton->setStyleSheet("QPushButton{background: transparent;}");
     connect(quitButton, &QPushButton::clicked, this, &QApplication::quit);
 
-    game = new Tetris(nameEnter->text());
-    connect(game, &Tetris::sTetris, this, &StartWindow::show);
+    game = new TetrisQT(nameEnter->text());
+    connect(game, &TetrisQT::sTetris, this, &StartWindow::show);
 
     scoreBoard = new ScoreTable();
     connect(scoreBoard, &ScoreTable::sTable, this, &StartWindow::show);
 }
 
-StartWindow::~StartWindow()
-{
-    delete brush;
-    delete palette;
-    delete startButton;
-    delete leaderButton;
-    delete quitButton;
-    delete game;
-    delete scoreBoard;
-}
+StartWindow::~StartWindow() = default;
 
 void StartWindow::onPushButton()
 {
@@ -77,12 +68,9 @@ void StartWindow::onPushButton()
     for (int i = 0; i < nameEnter->text().size(); ++i)
     {
         QChar sym = nameEnter->text()[i];
-        if (sym == ' ' || sym == '.' || sym == ',' || sym == '-' || sym == '/' ||
-            sym == '\\' || sym == '\'' || sym == '\"' || sym == '!' || sym == '@' ||
-            sym == '#' || sym == '$' || sym == '%' || sym == '^' || sym == '&' ||
-            sym == '*' || sym == '(' || sym == ')' || sym == '+' || sym == '=')
+        if (!std::isalpha(sym.toLatin1()) && !(sym.toLatin1() >= '0' && sym.toLatin1() <= '9'))
         {
-            QMessageBox::critical(this, "Warning", "Use only a-zA-z!");
+            QMessageBox::critical(this, "Warning", "Use only a-zA-Z0-9!");
             return;
         }
     }

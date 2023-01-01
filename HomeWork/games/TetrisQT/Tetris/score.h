@@ -16,9 +16,9 @@ public:
     Score();
     QVector<PlayerStats> getPlayers();
     void newScore(std::string name, int score);
+
 private:
     QVector<PlayerStats> players;
-
 
     std::ifstream readScore;
     std::ofstream writeScore;
