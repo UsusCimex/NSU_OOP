@@ -11,6 +11,8 @@ public:
     ~Field();
 
     //If search full lines, return count lines
+    size_t width();
+    size_t height();
     int checkLines();
     void resetField();
     int getColor(size_t x, size_t y) const;
@@ -19,8 +21,8 @@ public:
 
 private:
     std::vector<std::vector<int>> field;
-    size_t width;
-    size_t height;
+    size_t width_;
+    size_t height_;
 };
 
 #endif // FIELD_H

@@ -21,7 +21,7 @@ public:
     ~Detail();
 
     //Rotate detail
-    void rotate(size_t center);
+    void rotate();
 
     //Move detail
     //return false, if stopped
@@ -53,6 +53,7 @@ private:
     //Check stop position
     bool checkMove() const;
 
+    int figuresNum;
     size_t figures[7][4] =
     {
         {1,3,5,7}, //I

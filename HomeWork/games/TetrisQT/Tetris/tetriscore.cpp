@@ -53,7 +53,7 @@ void TetrisCore::detailAction(int key)
         detail->move(Detail::RIGHT);
         break;
     case Qt::Key_Up:
-        detail->rotate(1);
+        detail->rotate();
         break;
     case Qt::Key_Down:
         detail->move(Detail::DOWN);

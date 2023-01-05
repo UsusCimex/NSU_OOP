@@ -1,4 +1,5 @@
-#include "detail.h"
+﻿#include "detail.h"
+#include <QDebug>
 
 Detail::Detail(Field* field, unsigned int field_width, unsigned int field_height) : field(field), field_width(field_width), field_height(field_height) {}
 
@@ -9,6 +10,7 @@ Detail::Detail(Detail &detail2)
         this->detail[i] = detail2.detail[i];
     }
     color = detail2.color;
+    figuresNum = detail2.figuresNum;
 }
 
 Detail::~Detail() = default;
@@ -61,20 +63,29 @@ bool Detail::move(Detail::movement arg)
 
 bool Detail::create()
 {
-    int randDetail = qrand() % 7;
+    figuresNum = qrand() % 7;
     color = qrand() % 7 + 1;
 
     for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (field->getColor(figures[randDetail][i] % 2 + field_width / 2 - 1, figures[randDetail][i] / 2) != 0)
-        {
-            return false;
-        }
-        detail[i].rx() = figures[randDetail][i] % 2 + field_width / 2 - 1;
-        detail[i].ry() = figures[randDetail][i] / 2;
+        movedDetail[i].rx() = figures[figuresNum][i] % 2 + field_width / 2 - 1;
+        movedDetail[i].ry() = figures[figuresNum][i] / 2;
     }
 
-    return true;
+    if (figuresNum == 0)
+    {
+        for (int i = 0; i < DETAIL_SIZE; ++i)
+        {
+            movedDetail[i].ry() += 1;
+        }
+    }
+
+    for (int i = 0; i < DETAIL_SIZE; ++i)
+    {
+        detail[i] = movedDetail[i];
+    }
+
+    return check();
 }
 
 unsigned int Detail::size() const
@@ -101,28 +112,43 @@ Detail& Detail::operator=(const Detail& detail2)
         this->detail[i] = detail2.detail[i];
     }
     color = detail2.color;
+    figuresNum = detail2.figuresNum;
     return *this;
 }
 
-void Detail::rotate(size_t center)
+void Detail::rotate()
 {
-    if (center >= DETAIL_SIZE) throw std::runtime_error("center rotation error...");
-    QPoint p = detail[center]; //center of rotation
-    for (int i = 0; i < DETAIL_SIZE; ++i)
-    {
-        int x = detail[i].y() - p.y();
-        int y = detail[i].x() - p.x();
-        movedDetail[i].rx() = p.x() - x;
-        movedDetail[i].ry() = p.y() + y;
-    }
-    if (check())
+    if (figuresNum == 6) return; //O
+
+    QPoint p = detail[1]; //center of rotation
+    int moveInd = 0;
+
+    do
     {
         for (int i = 0; i < DETAIL_SIZE; ++i)
-            detail[i] = movedDetail[i];
-    }
-    else
+        {
+            //clockwise
+            if (p.x() < (field->width() / 2))
+            {
+                movedDetail[i].rx() = p.x() + p.y() - detail[i].y() + moveInd;
+            }
+            else
+            {
+                movedDetail[i].rx() = p.x() + p.y() - detail[i].y() - moveInd;
+            }
+            movedDetail[i].ry() = detail[i].x() + p.y() - p.x();
+
+            //counterclockwise
+            //movedDetail[i].rx() = detail[i].y() + p.x() - p.y();
+            //movedDetail[i].ry() = p.x() + p.y() - detail[i].x();
+        }
+        moveInd++;
+    } while (!(check() || moveInd == DETAIL_SIZE));
+
+    if (moveInd == DETAIL_SIZE) return;
+    for (int i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (center != 3) rotate(center + 1);
+        detail[i] = movedDetail[i];
     }
 }
 
