@@ -22,7 +22,6 @@ Score::Score()
         readScore >> pl.score;
         players.push_back(pl);
     }
-    readScore.close();
 }
 
 QVector<PlayerStats> Score::getPlayers()
@@ -55,6 +54,4 @@ void Score::newScore(std::string name, int score)
         writeScore << players[i].name << " ";
         writeScore << players[i].score << "\n";
     }
-
-    writeScore.close();
 }

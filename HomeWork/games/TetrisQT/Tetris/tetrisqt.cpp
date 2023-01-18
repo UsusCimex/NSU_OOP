@@ -41,7 +41,8 @@ void TetrisQT::setName(std::string name)
 
 void TetrisQT::timerEvent(QTimerEvent * event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
+
     if (_inGame)
     {
         switch (tetris->game())
@@ -112,7 +113,7 @@ void TetrisQT::keyPressEvent(QKeyEvent * event)
 
 void TetrisQT::paintEvent(QPaintEvent * event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     if (_inGame)
     {
@@ -159,7 +160,7 @@ void TetrisQT::drawDetail()
     QPainter qp(this);
     for (size_t i = 0; i < tetris->getDetail(false).size(); ++i)
     {
-        qp.drawPixmap(SHIFT_X + tetris->getDetail(false).getCube(i).rx() * DOT_WIDTH, SHIFT_Y + tetris->getDetail(false).getCube(i).ry() * DOT_HEIGHT, *tiles, tetris->getDetail(false).getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
+        qp.drawPixmap(SHIFT_X + tetris->getDetail(false).getCube(i).first * DOT_WIDTH, SHIFT_Y + tetris->getDetail(false).getCube(i).second * DOT_HEIGHT, *tiles, tetris->getDetail(false).getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
     }
 }
 
@@ -168,7 +169,7 @@ void TetrisQT::drawNextDetail()
     QPainter qp(this);
     for (size_t i = 0; i < tetris->getDetail(true).size(); ++i)
     {
-        qp.drawPixmap(SHIFT_X_NEXT + tetris->getDetail(true).getCube(i).rx() * DOT_WIDTH, SHIFT_Y_NEXT + tetris->getDetail(true).getCube(i).ry() * DOT_HEIGHT, *tiles, tetris->getDetail(true).getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
+        qp.drawPixmap(SHIFT_X_NEXT + tetris->getDetail(true).getCube(i).first * DOT_WIDTH, SHIFT_Y_NEXT + tetris->getDetail(true).getCube(i).second * DOT_HEIGHT, *tiles, tetris->getDetail(true).getColor() * DOT_HEIGHT, 0, DOT_HEIGHT, DOT_WIDTH);
     }
 }
 

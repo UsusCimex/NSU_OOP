@@ -1,11 +1,15 @@
 ﻿#include "detail.h"
 #include <QDebug>
 
-Detail::Detail(Field* field, unsigned int field_width, unsigned int field_height) : field(field), field_width(field_width), field_height(field_height) {}
+#include "field.h"
+
+Detail::Detail() = default;
+
+Detail::Detail(Field* field) : field(field), field_width(field->width()), field_height(field->height()) {}
 
 Detail::Detail(Detail &detail2)
 {
-    for (int i = 0; i < DETAIL_SIZE; ++i)
+    for (size_t i = 0; i < DETAIL_SIZE; ++i)
     {
         this->detail[i] = detail2.detail[i];
     }
@@ -17,41 +21,36 @@ Detail::~Detail() = default;
 
 bool Detail::move(Detail::movement arg)
 {
-    if (arg == LEFT)
+    if (arg == movement::LEFT)
     {
-        for (int i = 0; i < DETAIL_SIZE; ++i)
+        for (size_t i = 0; i < DETAIL_SIZE; ++i)
         {
-            movedDetail[i].rx() = detail[i].rx() - 1;
-            movedDetail[i].ry() = detail[i].ry();
+            movedDetail[i].first = detail[i].first - 1;
+            movedDetail[i].second = detail[i].second;
         }
         if (check())
-            for (int i = 0; i < DETAIL_SIZE; ++i)
-                detail[i] = movedDetail[i];
+            std::copy(movedDetail.begin(), movedDetail.end(), detail.begin());
     }
-    else if (arg == RIGHT)
+    else if (arg == movement::RIGHT)
     {
-        for (int i = 0; i < DETAIL_SIZE; ++i)
+        for (size_t i = 0; i < DETAIL_SIZE; ++i)
         {
-            movedDetail[i].rx() = detail[i].rx() + 1;
-            movedDetail[i].ry() = detail[i].ry();
+            movedDetail[i].first = detail[i].first + 1;
+            movedDetail[i].second = detail[i].second;
         }
         if (check())
-            for (int i = 0; i < DETAIL_SIZE; ++i)
-                detail[i] = movedDetail[i];
+            std::copy(movedDetail.begin(), movedDetail.end(), detail.begin());
     }
-    else if (arg == DOWN)
+    else if (arg == movement::DOWN)
     {
-        for (int i = 0; i < DETAIL_SIZE; ++i)
+        for (size_t i = 0; i < DETAIL_SIZE; ++i)
         {
-            movedDetail[i].rx() = detail[i].rx();
-            movedDetail[i].ry() = detail[i].ry() + 1;
+            movedDetail[i].first = detail[i].first;
+            movedDetail[i].second = detail[i].second + 1;
         }
         if (checkMove())
         {
-            for (int i = 0; i < DETAIL_SIZE; ++i)
-            {
-                detail[i] = movedDetail[i];
-            }
+            std::copy(movedDetail.begin(), movedDetail.end(), detail.begin());
         }
         else
         {
@@ -61,44 +60,40 @@ bool Detail::move(Detail::movement arg)
     return true;
 }
 
-bool Detail::create()
+bool Detail::transformation()
 {
     figuresNum = qrand() % 7;
     color = qrand() % 7 + 1;
 
-    for (int i = 0; i < DETAIL_SIZE; ++i)
+    for (size_t i = 0; i < DETAIL_SIZE; ++i)
     {
-        movedDetail[i].rx() = figures[figuresNum][i] % 2 + field_width / 2 - 1;
-        movedDetail[i].ry() = figures[figuresNum][i] / 2;
+        movedDetail[i].first = figures[figuresNum][i] % 2 + field_width / 2 - 1;
+        movedDetail[i].second = figures[figuresNum][i] / 2;
     }
 
     if (figuresNum == 0)
     {
-        for (int i = 0; i < DETAIL_SIZE; ++i)
+        for (size_t i = 0; i < DETAIL_SIZE; ++i)
         {
-            movedDetail[i].ry() += 1;
+            movedDetail[i].second += 1;
         }
     }
 
-    for (int i = 0; i < DETAIL_SIZE; ++i)
-    {
-        detail[i] = movedDetail[i];
-    }
-
+    std::copy(movedDetail.begin(), movedDetail.end(), detail.begin());
     return check();
 }
 
-unsigned int Detail::size() const
+size_t Detail::size() const
 {
     return DETAIL_SIZE;
 }
 
-int Detail::getColor() const
+size_t Detail::getColor() const
 {
     return color;
 }
 
-QPoint &Detail::getCube(size_t index)
+std::pair<size_t, size_t> &Detail::getCube(size_t index)
 {
     if (index > DETAIL_SIZE) throw std::exception();
 
@@ -107,10 +102,8 @@ QPoint &Detail::getCube(size_t index)
 
 Detail& Detail::operator=(const Detail& detail2)
 {
-    for (int i = 0; i < DETAIL_SIZE; ++i)
-    {
-        this->detail[i] = detail2.detail[i];
-    }
+    std::copy(detail2.detail.begin(), detail2.detail.end(), detail.begin());
+
     color = detail2.color;
     figuresNum = detail2.figuresNum;
     return *this;
@@ -120,45 +113,42 @@ void Detail::rotate()
 {
     if (figuresNum == 6) return; //O
 
-    QPoint p = detail[1]; //center of rotation
-    int moveInd = 0;
+    std::pair<size_t, size_t> p = detail[1]; //center of rotation
+    size_t moveInd = 0;
 
     do
     {
-        for (int i = 0; i < DETAIL_SIZE; ++i)
+        for (size_t i = 0; i < DETAIL_SIZE; ++i)
         {
             //clockwise
-            if (p.x() < (field->width() / 2))
+            if (p.first < (field->width() / 2))
             {
-                movedDetail[i].rx() = p.x() + p.y() - detail[i].y() + moveInd;
+                movedDetail[i].first = p.first + p.second - detail[i].second + moveInd;
             }
             else
             {
-                movedDetail[i].rx() = p.x() + p.y() - detail[i].y() - moveInd;
+                movedDetail[i].first = p.first + p.second - detail[i].second - moveInd;
             }
-            movedDetail[i].ry() = detail[i].x() + p.y() - p.x();
+            movedDetail[i].second = detail[i].first + p.second - p.first;
 
             //counterclockwise
-            //movedDetail[i].rx() = detail[i].y() + p.x() - p.y();
-            //movedDetail[i].ry() = p.x() + p.y() - detail[i].x();
+            //movedDetail[i].first = detail[i].second + p.first - p.second;
+            //movedDetail[i].second = p.first + p.second - detail[i].first;
         }
         moveInd++;
     } while (!(check() || moveInd == DETAIL_SIZE));
 
     if (moveInd == DETAIL_SIZE) return;
-    for (int i = 0; i < DETAIL_SIZE; ++i)
-    {
-        detail[i] = movedDetail[i];
-    }
+    std::copy(movedDetail.begin(), movedDetail.end(), detail.begin());
 }
 
 bool Detail::checkMove() const
 {
     if (!check())
     {
-        for (int i = 0; i < DETAIL_SIZE; ++i)
+        for (size_t i = 0; i < DETAIL_SIZE; ++i)
         {
-            if (movedDetail[i].y() >= field_height || field->getColor(movedDetail[i].x(), movedDetail[i].y()))
+            if (movedDetail[i].second >= field_height || !field->isFree(movedDetail[i].first, movedDetail[i].second))
             {
                 return false;
             }
@@ -169,9 +159,9 @@ bool Detail::checkMove() const
 
 bool Detail::check() const
 {
-    for (int i = 0; i < DETAIL_SIZE; ++i)
+    for (size_t i = 0; i < DETAIL_SIZE; ++i)
     {
-        if (movedDetail[i].x() < 0 || movedDetail[i].x() >= field_width || movedDetail[i].y() >= field_height || field->getColor(movedDetail[i].x(), movedDetail[i].y()) != 0)
+        if (movedDetail[i].first >= field_width || movedDetail[i].second >= field_height || !field->isFree(movedDetail[i].first, movedDetail[i].second))
         {
             return false;
         }

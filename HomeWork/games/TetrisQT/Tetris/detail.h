@@ -1,22 +1,22 @@
 #ifndef DETAIL_H
 #define DETAIL_H
 
-#include <QPoint>
-#include <QPixmap>
+#include <array>
 
-#include "field.h"
+class Field;
 
 class Detail
 {
 public:
-    enum movement
+    enum class movement
     {
         LEFT,
         RIGHT,
         DOWN
     };
 
-    Detail(Field* field, unsigned int field_width, unsigned int field_height);
+    Detail();
+    Detail(Field* field);
     Detail(Detail& detail2);
     ~Detail();
 
@@ -26,34 +26,34 @@ public:
     //Move detail
     //return false, if stopped
     //return true, else (and if smash into the wall)
-    bool move(movement arg = DOWN);
+    bool move(movement arg = movement::DOWN);
 
     //Create random detail
     //return false, if don't search place
-    bool create();
+    bool transformation();
 
-    unsigned int size() const;
-    int getColor() const;
-    QPoint& getCube(size_t index);
+    size_t size() const;
+    size_t getColor() const;
+    std::pair<size_t, size_t>& getCube(size_t index);
 
     Detail& operator=(const Detail& detail2);
 private:
     static constexpr int DETAIL_SIZE = 4;
-    Field* field;
+    Field* field = nullptr;
     unsigned int field_width;
     unsigned int field_height;
 
-    QPoint detail[DETAIL_SIZE];
-    QPoint movedDetail[DETAIL_SIZE];
+    std::array<std::pair<size_t, size_t>, DETAIL_SIZE> detail;
+    std::array<std::pair<size_t, size_t>, DETAIL_SIZE> movedDetail;
 
-    int color;
+    size_t color = 0;
 
     //Check movedDetail position
     bool check() const;
     //Check stop position
     bool checkMove() const;
 
-    int figuresNum;
+    size_t figuresNum = 0;
     size_t figures[7][4] =
     {
         {1,3,5,7}, //I

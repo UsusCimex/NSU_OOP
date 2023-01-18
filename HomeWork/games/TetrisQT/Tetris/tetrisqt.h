@@ -34,14 +34,14 @@ protected slots:
     void paintEvent(QPaintEvent *) override;
 
 protected:
-    static constexpr int SHIFT_X = 45;
-    static constexpr int SHIFT_Y = 45;
+    static constexpr size_t SHIFT_X = 45;
+    static constexpr size_t SHIFT_Y = 45;
 
-    static constexpr int SHIFT_X_NEXT = 400;
-    static constexpr int SHIFT_Y_NEXT = 110;
+    static constexpr size_t SHIFT_X_NEXT = 400;
+    static constexpr size_t SHIFT_Y_NEXT = 110;
 
-    static constexpr int DOT_WIDTH = 40;
-    static constexpr int DOT_HEIGHT = 40;
+    static constexpr size_t DOT_WIDTH = 40;
+    static constexpr size_t DOT_HEIGHT = 40;
 
     TetrisCore* tetris;
 

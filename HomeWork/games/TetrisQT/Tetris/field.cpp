@@ -3,7 +3,7 @@
 
 Field::Field(size_t width_, size_t height_) : width_(width_), height_(height_)
 {
-    std::vector<int> hght;
+    std::vector<size_t> hght;
     for (size_t j = 0; j < height_; ++j)
     {
         hght.push_back(0);
@@ -59,12 +59,17 @@ void Field::resetField()
     }
 }
 
-int Field::getColor(size_t x, size_t y) const
+size_t Field::getColor(size_t x, size_t y) const
 {
     return field[x][y];
 }
 
-void Field::setColor(size_t x, size_t y, int color)
+bool Field::isFree(size_t x, size_t y) const
+{
+    return field[x][y] == 0;
+}
+
+void Field::setColor(size_t x, size_t y, size_t color)
 {
     field[x][y] = color;
 }

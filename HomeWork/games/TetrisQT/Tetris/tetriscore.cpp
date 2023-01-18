@@ -2,19 +2,13 @@
 
 TetrisCore::TetrisCore()
 {
-    field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
-
-    detail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
-    nextDetail = new Detail(field, FIELD_WIDTH, FIELD_HEIGHT);
+    field = std::unique_ptr<Field>(new Field(FIELD_WIDTH, FIELD_HEIGHT));
+    detail = std::unique_ptr<Detail>(new Detail(field.get()));
+    nextDetail = std::unique_ptr<Detail>(new Detail(field.get()));
     score = 0;
 }
 
-TetrisCore::~TetrisCore()
-{
-    delete field;
-    delete detail;
-    delete nextDetail;
-}
+TetrisCore::~TetrisCore() = default;
 
 int TetrisCore::game()
 {
@@ -24,7 +18,7 @@ int TetrisCore::game()
         res = 1;
         for (size_t i = 0; i < detail->size(); ++i)
         {
-            field->setColor(detail->getCube(i).x(),detail->getCube(i).y(), detail->getColor());
+            field->setColor(detail->getCube(i).first,detail->getCube(i).second, detail->getColor());
         }
         int countLines = field->checkLines();
         if (countLines > 0)
@@ -37,7 +31,7 @@ int TetrisCore::game()
             speed *= MOVE_SPEED;
         }
         (*detail) = (*nextDetail);
-        if (!nextDetail->create()) res = -1;
+        if (!nextDetail->transformation()) res = -1;
     }
     return res;
 }
@@ -47,16 +41,16 @@ void TetrisCore::detailAction(int key)
     switch (key)
     {
     case Qt::Key_Left:
-        detail->move(Detail::LEFT);
+        detail->move(Detail::movement::LEFT);
         break;
     case Qt::Key_Right:
-        detail->move(Detail::RIGHT);
+        detail->move(Detail::movement::RIGHT);
         break;
     case Qt::Key_Up:
         detail->rotate();
         break;
     case Qt::Key_Down:
-        detail->move(Detail::DOWN);
+        detail->move(Detail::movement::DOWN);
         break;
     }
 }
@@ -71,7 +65,7 @@ int TetrisCore::getScore() const
     return score;
 }
 
-Detail TetrisCore::getDetail(bool isNext) const
+Detail TetrisCore::getDetail(bool isNext)
 {
     if (isNext)
     {
@@ -85,7 +79,7 @@ Detail TetrisCore::getDetail(bool isNext) const
 
 Field *TetrisCore::getField() const
 {
-    return field;
+    return field.get();
 }
 
 void TetrisCore::init()
@@ -94,7 +88,7 @@ void TetrisCore::init()
     score = 0;
     level = 1;
 
-    detail->create();
-    nextDetail->create();
+    detail->transformation();
+    nextDetail->transformation();
     speed = 750;
 }

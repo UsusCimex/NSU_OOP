@@ -1,6 +1,9 @@
 #ifndef TETRISCORE_H
 #define TETRISCORE_H
 
+#include <memory>
+#include <QKeyEvent>
+
 #include "detail.h"
 #include "field.h"
 
@@ -17,7 +20,7 @@ public:
     int getSpeed() const;
     int getScore() const;
 
-    Detail getDetail(bool isNext) const;
+    Detail getDetail(bool isNext);
     Field *getField() const;
 
     void init();
@@ -29,11 +32,10 @@ private:
     static constexpr double MOVE_SPEED = 0.95;
     int speed;
 
-    Field* field;
+    std::unique_ptr<Field> field;
     int level = 1;
-
-    Detail* detail;
-    Detail* nextDetail;
+    std::unique_ptr<Detail> detail;
+    std::unique_ptr<Detail> nextDetail;
 
     int score;
 };
