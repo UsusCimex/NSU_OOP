@@ -1,19 +1,35 @@
 package data;
 
-public abstract class CommandBuffer {
+import java.io.File;
+import java.io.RandomAccessFile;
+
+public class CommandBuffer {
     private final static int BUFFER_SIZE = 1000;
     
-    public static char getCommand(int index) {
+    public CommandBuffer(String filePath) {
+        file = new File(filePath);
+        if (!file.canRead()) {} //throw
+    }
+
+    public char getCommand(int index) {
         if (index < 0) {} //throw
         if ((index < pointer) || (index >= pointer + BUFFER_SIZE)) {
             readCommands(index);
+            pointer = index;
         }
-        return buffer[index - pointer];
+        return (char)buffer[index - pointer];
     }
-    private static void readCommands(int index) {
-        //use FileReader
+    private void readCommands(int index) {
+        try(RandomAccessFile reader = new RandomAccessFile(file, "r")) {
+            reader.seek(index);
+            reader.read(buffer, 0, BUFFER_SIZE);
+        }
+        catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
-    private static char[] buffer = new char[BUFFER_SIZE];
-    private static int pointer = 0;
+    private File file;
+    private byte[] buffer = new byte[BUFFER_SIZE];
+    private int pointer = -1;
 }
