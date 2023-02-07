@@ -9,9 +9,9 @@ import operation.*;
 public class OperationFactory {
     private final static String FILE_PATH = "initOperators.txt";
     
-    private static Map<String, Operation> map = new HashMap<>();
+    private static Map<Character, Operation> map = new HashMap<>();
 
-    public static void register(String key, String className) {
+    public static void register(Character key, String className) {
         try {
             Class<?> nClass = Class.forName(className);
             Operation op = (Operation)nClass.getDeclaredConstructor().newInstance();
@@ -21,7 +21,7 @@ public class OperationFactory {
         }
     }
 
-    public static Object create(String key) {
+    public static Object create(Character key) {
         Operation op = null;
         try {
             op = map.get(key);
@@ -38,8 +38,8 @@ public class OperationFactory {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String string = reader.readLine();
             while (string != null) {
-                String key = string.substring(0, string.indexOf(' '));
-                String value = string.substring(string.indexOf(' ') + 1, string.length());
+                Character key = string.charAt(0);
+                String value = string.substring(2, string.length());
                 register(key, value);
                 string = reader.readLine();
             }
