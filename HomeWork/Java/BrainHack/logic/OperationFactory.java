@@ -21,7 +21,7 @@ public class OperationFactory {
         }
     }
 
-    public static Object create(Character key) {
+    public static Operation create(Character key) {
         Operation op = null;
         try {
             op = map.get(key);
