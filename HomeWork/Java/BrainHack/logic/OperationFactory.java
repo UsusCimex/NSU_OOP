@@ -7,7 +7,7 @@ import java.util.Map;
 import operation.*;
 
 public class OperationFactory {
-    private final static String FILE_PATH = "initOperators.txt";
+    private final static String FILE_PATH = "initOperators.init";
     
     private static Map<Character, Operation> map = new HashMap<>();
 

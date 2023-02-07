@@ -1,0 +1,8 @@
++ operators.Plus
+- operators.Minus
+. operators.Out
+, operators.In
+[ operators.While
+] operators.End
+> operators.Next
+< operators.Back
