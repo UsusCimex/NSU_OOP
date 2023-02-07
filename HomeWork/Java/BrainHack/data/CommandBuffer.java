@@ -11,6 +11,10 @@ public class CommandBuffer {
         if (!file.canRead()) {} //throw
     }
 
+    public int getFileSize() {
+        return (int)file.length();
+    }
+
     public char getCommand(int index) {
         if (index < 0) {} //throw
         if ((index < pointer) || (index >= pointer + BUFFER_SIZE)) {
@@ -19,6 +23,7 @@ public class CommandBuffer {
         }
         return (char)buffer[index - pointer];
     }
+
     private void readCommands(int index) {
         try(RandomAccessFile reader = new RandomAccessFile(file, "r")) {
             reader.seek(index);
