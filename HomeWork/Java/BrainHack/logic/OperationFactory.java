@@ -11,7 +11,7 @@ public class OperationFactory {
     
     private static Map<Character, Operation> map = new HashMap<>();
 
-    public static void register(Character key, String className) {
+    private static void register(Character key, String className) {
         try {
             Class<?> nClass = Class.forName(className);
             Operation op = (Operation)nClass.getDeclaredConstructor().newInstance();
