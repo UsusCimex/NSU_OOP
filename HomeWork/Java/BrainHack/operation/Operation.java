@@ -1,6 +1,6 @@
 package operation;
-import data.*;
 
 public abstract class Operation {
-    public void make() {}
+    //Return movement
+    public int make() { return 1; }
 }

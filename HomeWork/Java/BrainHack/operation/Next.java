@@ -1,6 +1,10 @@
 package operation;
-import data.*;
+import data.RegisterTape;
 
 public class Next extends Operation{
-
+    @Override
+    public int make() {
+        RegisterTape.setCellIndex(RegisterTape.getCellIndex() + 1);
+        return 1;
+    }
 }
