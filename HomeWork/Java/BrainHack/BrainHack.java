@@ -8,12 +8,13 @@ public class BrainHack {
         else execute(args[0]);
     }
     public static void execute(String path) {
-        int pointer = 0;
+        ExecutablePointer pointer = new ExecutablePointer();
         CommandBuffer buffer = new CommandBuffer(path);
-        while (pointer < buffer.getFileSize() && pointer > 0) {
-            char cmd = buffer.getCommand(pointer);
+        while (pointer.p < buffer.getFileSize() && pointer.p >= 0) {
+            char cmd = buffer.getCommand(pointer.p);
+            if (cmd == '\n' || cmd == ' ') { pointer.p++; continue; }
             Operation op = OperationFactory.create(cmd);
-            pointer += op.make();
+            op.run(pointer);
         }
     }
 }
