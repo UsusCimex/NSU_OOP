@@ -1,12 +1,12 @@
 package data;
 
 public abstract class StackWhile {
-    private final static int STACK_SIZE = 1000; 
+    private final static Integer STACK_SIZE = 1000; 
 
-    public static int top() {
+    public static Integer top() {
         return stack[pointer];
     }
-    public static void push(int value) {
+    public static void push(Integer value) {
         if (pointer >= STACK_SIZE) {System.out.println("Stack push miss");} //throw
         stack[++pointer] = value;
     }
@@ -15,6 +15,6 @@ public abstract class StackWhile {
         pointer--;
     }
 
-    private static int[] stack = new int[STACK_SIZE];
-    private static int pointer = -1;
+    private static Integer[] stack = new Integer[STACK_SIZE];
+    private static Integer pointer = -1;
 }

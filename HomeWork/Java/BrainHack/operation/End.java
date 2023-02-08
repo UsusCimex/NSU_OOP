@@ -6,9 +6,9 @@ import data.StackWhile;
 public class End extends Operation{
     @Override
     public void run(ExecutablePointer pointer) {
-        int mover = StackWhile.top();
+        Integer mover = StackWhile.top();
         StackWhile.pop();
-        if ((int)RegisterTape.getCellValue() == 0) {
+        if (RegisterTape.getCellValue() == 0) {
             pointer.p++;
         }
         else {

@@ -9,9 +9,9 @@ import operation.*;
 public class OperationFactory {
     private final static String FILE_PATH = "logic/initOperation.init";
     
-    private static Map<Character, Operation> map = new HashMap<>();
+    private static Map<Integer, Operation> map = new HashMap<>();
 
-    private static void register(Character key, String className) {
+    private static void register(Integer key, String className) {
         try {
             Class<?> nClass = Class.forName(className);
             Operation op = (Operation)nClass.getDeclaredConstructor().newInstance();
@@ -21,7 +21,7 @@ public class OperationFactory {
         }
     }
 
-    public static Operation create(Character key) {
+    public static Operation create(Integer key) {
         Operation op = null;
         try {
             op = map.get(key);
@@ -38,7 +38,7 @@ public class OperationFactory {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String string = reader.readLine();
             while (string != null) {
-                Character key = string.charAt(0);
+                Integer key = (int)string.charAt(0);
                 String value = string.substring(2, string.length());
                 register(key, value);
                 string = reader.readLine();

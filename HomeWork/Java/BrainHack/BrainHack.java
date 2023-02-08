@@ -11,7 +11,7 @@ public class BrainHack {
         ExecutablePointer pointer = new ExecutablePointer();
         CommandBuffer buffer = new CommandBuffer(path);
         while (pointer.p < buffer.getFileSize() && pointer.p >= 0) {
-            char cmd = buffer.getCommand(pointer.p);
+            Integer cmd = buffer.getCommand(pointer.p);
             if (cmd == '\n' || cmd == ' ') { pointer.p++; continue; }
             Operation op = OperationFactory.create(cmd);
             op.run(pointer);

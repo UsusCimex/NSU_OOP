@@ -1,5 +1,6 @@
 package operation;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 
 import data.ExecutablePointer;
 import data.RegisterTape;
@@ -7,10 +8,10 @@ import data.RegisterTape;
 public class In extends Operation{
     @Override
     public void run(ExecutablePointer pointer) {
-        char read = ' ';
+        Integer read = 0;
         try {
-            InputStreamReader scan = new InputStreamReader(System.in);
-            read = (char)scan.read();
+            Scanner scan = new Scanner(System.in);
+            read = scan.nextInt();
         }
         catch(Exception ex) {
             System.out.println("Scanner error: " + ex.getMessage());

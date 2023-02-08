@@ -4,27 +4,27 @@ import java.io.File;
 import java.io.RandomAccessFile;
 
 public class CommandBuffer {
-    private final static int BUFFER_SIZE = 1000;
+    private final static Integer BUFFER_SIZE = 1000;
     
     public CommandBuffer(String filePath) {
         file = new File(filePath);
         if (!file.canRead()) {System.out.println("File " + filePath + " not found!");} //throw
     }
 
-    public int getFileSize() {
+    public Integer getFileSize() {
         return (int)file.length();
     }
 
-    public char getCommand(int index) {
+    public Integer getCommand(Integer index) {
         if (index < 0) {System.out.println("Command with index " + index + " not found!");} //throw
-        if ((index < pointer) || (index >= pointer + BUFFER_SIZE) || (pointer == -1)) {
+        if ((index < poIntegerer) || (index >= poIntegerer + BUFFER_SIZE) || (poIntegerer == -1)) {
             readCommands(index);
-            pointer = index;
+            poIntegerer = index;
         }
-        return (char)buffer[index - pointer];
+        return (int)buffer[index - poIntegerer];
     }
 
-    private void readCommands(int index) {
+    private void readCommands(Integer index) {
         try(RandomAccessFile reader = new RandomAccessFile(file, "r")) {
             reader.seek(index);
             reader.read(buffer, 0, BUFFER_SIZE);
@@ -36,5 +36,5 @@ public class CommandBuffer {
 
     private File file;
     private byte[] buffer = new byte[BUFFER_SIZE];
-    private int pointer = -1;
+    private Integer poIntegerer = -1;
 }

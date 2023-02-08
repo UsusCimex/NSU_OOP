@@ -5,7 +5,7 @@ import data.RegisterTape;
 public class Plus extends Operation{
     @Override
     public void run(ExecutablePointer pointer) {
-        RegisterTape.setCellValue((char)(RegisterTape.getCellValue() + 1));
+        RegisterTape.setCellValue(RegisterTape.getCellValue() + 1);
         pointer.p++;
     }
 }
