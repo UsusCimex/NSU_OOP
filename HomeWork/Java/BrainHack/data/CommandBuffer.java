@@ -8,7 +8,7 @@ public class CommandBuffer {
     
     public CommandBuffer(String filePath) {
         file = new File(filePath);
-        if (!file.canRead()) {} //throw
+        if (!file.canRead()) {System.out.println("File " + filePath + " not found!");} //throw
     }
 
     public int getFileSize() {
@@ -16,8 +16,8 @@ public class CommandBuffer {
     }
 
     public char getCommand(int index) {
-        if (index < 0) {} //throw
-        if ((index < pointer) || (index >= pointer + BUFFER_SIZE)) {
+        if (index < 0) {System.out.println("Command with index " + index + " not found!");} //throw
+        if ((index < pointer) || (index >= pointer + BUFFER_SIZE) || (pointer == -1)) {
             readCommands(index);
             pointer = index;
         }

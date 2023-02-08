@@ -16,7 +16,7 @@ public abstract class RegisterTape {
         return index;
     }
     public static void setCellIndex(int value) {
-        if (value < 0 || value >= TAPE_SIZE) {} //throw
+        if (value < 0 || value >= TAPE_SIZE) {System.out.println("Index overflow!");} //throw
         index = value;
     }
 

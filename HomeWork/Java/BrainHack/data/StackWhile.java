@@ -7,11 +7,11 @@ public abstract class StackWhile {
         return stack[pointer];
     }
     public static void push(int value) {
-        if (pointer >= STACK_SIZE) {} //throw
+        if (pointer >= STACK_SIZE) {System.out.println("Stack push miss");} //throw
         stack[++pointer] = value;
     }
     public static void pop() {
-        if (pointer < 0) {} //throw
+        if (pointer < 0) {System.out.println("Stack pop miss");} //throw
         pointer--;
     }
 
