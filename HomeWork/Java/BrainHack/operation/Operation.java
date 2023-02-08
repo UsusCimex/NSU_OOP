@@ -1,6 +1,7 @@
 package operation;
 
+import data.ExecutablePointer;
+
 public abstract class Operation {
-    //Return movement
-    public int make() { return 1; }
+    public void run(ExecutablePointer pointer) {}
 }

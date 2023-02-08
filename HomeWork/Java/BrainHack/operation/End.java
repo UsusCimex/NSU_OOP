@@ -1,15 +1,18 @@
 package operation;
+import data.ExecutablePointer;
 import data.RegisterTape;
 import data.StackWhile;
 
 public class End extends Operation{
     @Override
-    public int make() {
+    public void run(ExecutablePointer pointer) {
         int mover = StackWhile.top();
         StackWhile.pop();
-        if (RegisterTape.getCellValue() == 0) {
-            return 1;
+        if ((int)RegisterTape.getCellValue() == 0) {
+            pointer.p++;
         }
-        return mover - RegisterTape.getCellIndex();
+        else {
+            pointer.p = mover;
+        }
     }
 }

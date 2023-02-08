@@ -1,15 +1,21 @@
 package operation;
-import java.util.Scanner;
+import java.io.InputStreamReader;
 
+import data.ExecutablePointer;
 import data.RegisterTape;
 
 public class In extends Operation{
     @Override
-    public int make() {
-        Scanner scan = new Scanner(System.in);
-        char read = (char)scan.nextByte();
+    public void run(ExecutablePointer pointer) {
+        char read = ' ';
+        try {
+            InputStreamReader scan = new InputStreamReader(System.in);
+            read = (char)scan.read();
+        }
+        catch(Exception ex) {
+            System.out.println("Scanner error: " + ex.getMessage());
+        }
         RegisterTape.setCellValue(read);
-        scan.close();
-        return 1;
+        pointer.p++;
     }
 }
