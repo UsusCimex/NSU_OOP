@@ -11,10 +11,10 @@ public abstract class StackWhile {
         stack[++pointer] = value;
     }
     public static void pop() {
-        if (pointer <= 0) {} //throw
+        if (pointer < 0) {} //throw
         pointer--;
     }
 
     private static int[] stack = new int[STACK_SIZE];
-    private static int pointer = 0;
+    private static int pointer = -1;
 }
