@@ -8,6 +8,7 @@ public abstract class RegisterTape {
     public static Integer getCellValue() {
         return arr[index];
     }
+
     public static void setCellValue(Integer value) {
         arr[index] = value;
     }
@@ -15,8 +16,11 @@ public abstract class RegisterTape {
     public static Integer getCellIndex() {
         return index;
     }
+
     public static void setCellIndex(Integer value) {
-        if (value < 0 || value >= TAPE_SIZE) {System.out.println("Index overflow!");} //throw
+        if (value < 0 || value >= TAPE_SIZE) {
+            System.out.println("Index overflow!");
+        } // throw
         index = value;
     }
 

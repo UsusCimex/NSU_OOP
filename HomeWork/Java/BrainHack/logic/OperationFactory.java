@@ -1,20 +1,21 @@
 package logic;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import operation.*;
+import operation.Operation;
 
 public class OperationFactory {
     private final static String FILE_PATH = "logic/initOperation.init";
-    
+
     private static Map<Integer, Operation> map = new HashMap<>();
 
     private static void register(Integer key, String className) {
         try {
             Class<?> nClass = Class.forName(className);
-            Operation op = (Operation)nClass.getDeclaredConstructor().newInstance();
+            Operation op = (Operation) nClass.getDeclaredConstructor().newInstance();
             map.put(key, op);
         } catch (Exception ex) {
             System.out.println("Register error: " + ex.getMessage());
@@ -38,7 +39,7 @@ public class OperationFactory {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String string = reader.readLine();
             while (string != null) {
-                Integer key = (int)string.charAt(0);
+                Integer key = (int) string.charAt(0);
                 String value = string.substring(2, string.length());
                 register(key, value);
                 string = reader.readLine();
