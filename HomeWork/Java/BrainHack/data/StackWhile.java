@@ -1,7 +1,5 @@
 package data;
 
-import java.util.Arrays;
-
 public abstract class StackWhile {
     private final static Integer STACK_SIZE = 1000;
 
@@ -30,7 +28,8 @@ public abstract class StackWhile {
 
     private static Loop[] stack = new Loop[STACK_SIZE];
     static {
-        Arrays.fill(stack, new Loop());
+        for (int i = 0; i < STACK_SIZE; ++i)
+            stack[i] = new Loop();
     }
     private static Integer pointer = -1;
 }
