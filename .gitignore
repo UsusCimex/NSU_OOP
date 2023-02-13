@@ -6,3 +6,5 @@ temp.*
 *.txt
 ClassWork
 lib
+target
+.editorconfig
