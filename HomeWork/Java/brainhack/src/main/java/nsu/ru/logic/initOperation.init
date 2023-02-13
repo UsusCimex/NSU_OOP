@@ -1,0 +1,8 @@
++ operation.Plus
+- operation.Minus
+. operation.Out
+, operation.In
+[ operation.While
+] operation.End
+> operation.Next
+< operation.Back
