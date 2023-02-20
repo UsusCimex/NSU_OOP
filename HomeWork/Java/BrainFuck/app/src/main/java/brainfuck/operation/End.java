@@ -1,11 +1,11 @@
-package operation;
+package brainfuck.operation;
 
-import data.ExecutablePointer;
-import data.Loop;
-import data.RegisterTape;
-import data.StackWhile;
+import brainfuck.data.ExecutablePointer;
+import brainfuck.data.Loop;
+import brainfuck.data.RegisterTape;
+import brainfuck.data.StackWhile;
 
-public class End extends Operation {
+public class End implements Operation {
     @Override
     public void run(ExecutablePointer pointer) {
         Loop mover = StackWhile.top();

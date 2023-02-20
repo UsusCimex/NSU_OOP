@@ -1,9 +1,9 @@
-package operation;
+package brainfuck.operation;
 
-import data.ExecutablePointer;
-import data.RegisterTape;
+import brainfuck.data.ExecutablePointer;
+import brainfuck.data.RegisterTape;
 
-public class Back extends Operation {
+public class Back implements Operation {
     @Override
     public void run(ExecutablePointer pointer) {
         RegisterTape.setCellIndex(RegisterTape.getCellIndex() - 1);

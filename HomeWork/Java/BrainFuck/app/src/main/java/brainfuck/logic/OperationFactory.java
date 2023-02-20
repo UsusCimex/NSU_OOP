@@ -1,14 +1,16 @@
-package logic;
+package brainfuck.logic;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import operation.Operation;
+//??????? import java.util.Properties;
+
+import brainfuck.operation.Operation;
 
 public class OperationFactory {
-    private final static String FILE_PATH = "logic/initOperation.init";
+    private final static String FILE_PATH = "/home/danil/git/21212_lanin/HomeWork/Java/BrainFuck/app/src/main/resources/initOperation.init";
 
     private static Map<Integer, Operation> map = new HashMap<>();
 
@@ -18,7 +20,7 @@ public class OperationFactory {
             Operation op = (Operation) nClass.getDeclaredConstructor().newInstance();
             map.put(key, op);
         } catch (Exception ex) {
-            System.out.println("Register error: " + ex.getMessage());
+            System.err.println("Register error: " + ex.getMessage());
         }
     }
 
@@ -27,10 +29,10 @@ public class OperationFactory {
         try {
             op = map.get(key);
         } catch (Exception ex) {
-            System.out.println("Create error: " + ex.getMessage());
+            System.err.println("Create error: " + ex.getMessage());
         }
         if (op == null) {
-            System.out.println("class (" + key + ") don't searched");
+            System.err.println("class (" + key + ") don't searched");
         }
         return op;
     }
@@ -45,7 +47,7 @@ public class OperationFactory {
                 string = reader.readLine();
             }
         } catch (Exception ex) {
-            System.out.println("File reading error: " + ex.getMessage());
+            System.err.println("File reading error: " + ex.getMessage());
         }
     }
 }

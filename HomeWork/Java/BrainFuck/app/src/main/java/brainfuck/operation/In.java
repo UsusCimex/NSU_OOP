@@ -1,11 +1,11 @@
-package operation;
+package brainfuck.operation;
 
 import java.util.Scanner;
 
-import data.ExecutablePointer;
-import data.RegisterTape;
+import brainfuck.data.ExecutablePointer;
+import brainfuck.data.RegisterTape;
 
-public class In extends Operation {
+public class In implements Operation {
     @Override
     public void run(ExecutablePointer pointer) {
         Integer read = 0;

@@ -1,9 +1,9 @@
-package operation;
+package brainfuck.operation;
 
-import data.ExecutablePointer;
-import data.RegisterTape;
+import brainfuck.data.ExecutablePointer;
+import brainfuck.data.RegisterTape;
 
-public class Plus extends Operation {
+public class Plus implements Operation {
     @Override
     public void run(ExecutablePointer pointer) {
         RegisterTape.setCellValue(RegisterTape.getCellValue() + 1);

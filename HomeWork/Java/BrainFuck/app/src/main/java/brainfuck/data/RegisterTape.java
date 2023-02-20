@@ -1,6 +1,4 @@
-package data;
-
-import java.util.Arrays;
+package brainfuck.data;
 
 public abstract class RegisterTape {
     private static final Integer TAPE_SIZE = 30000; // 30000 default value by U.Muller(author)
@@ -17,16 +15,23 @@ public abstract class RegisterTape {
         return index;
     }
 
-    public static void setCellIndex(Integer value) {
+    public static void setCellIndex(Integer value) throws IndexOutOfBoundsException{
         if (value < 0 || value >= TAPE_SIZE) {
-            System.out.println("Index overflow!");
-        } // throw
+            throw new IndexOutOfBoundsException();
+        }
         index = value;
+    }
+
+    public static void resetTape() {
+        for (int i = 0; i < TAPE_SIZE; ++i) {
+            arr[i] = 0;
+        }
+        index = 0;
     }
 
     private static Integer[] arr = new Integer[TAPE_SIZE];
     private static Integer index = 0;
     static {
-        Arrays.fill(arr, 0);
+        resetTape();
     }
 }
