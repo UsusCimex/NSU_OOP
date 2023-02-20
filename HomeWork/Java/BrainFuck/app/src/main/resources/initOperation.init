@@ -1,8 +1,0 @@
-+ brainfuck.operation.Plus
-- brainfuck.operation.Minus
-. brainfuck.operation.Out
-, brainfuck.operation.In
-[ brainfuck.operation.While
-] brainfuck.operation.End
-> brainfuck.operation.Next
-< brainfuck.operation.Back
