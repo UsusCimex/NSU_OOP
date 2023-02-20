@@ -23,8 +23,6 @@ public class OperationFactory {
                 Class<?> clazz = Class.forName(className);
                 Operation object = (Operation) clazz.getConstructor().newInstance();
                 map.put(objName, object);
-
-                System.out.println(className + " = " + objName);
             }
         } catch (Exception e) {
             e.printStackTrace();
