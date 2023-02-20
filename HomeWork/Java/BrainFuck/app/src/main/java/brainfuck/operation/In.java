@@ -2,20 +2,14 @@ package brainfuck.operation;
 
 import java.util.Scanner;
 
-import brainfuck.data.ExecutablePointer;
-import brainfuck.data.RegisterTape;
+import brainfuck.data.CommandContext;
 
 public class In implements Operation {
+    private static Scanner scan = new Scanner(System.in);
     @Override
-    public void run(ExecutablePointer pointer) {
-        Integer read = 0;
-        try {
-            Scanner scan = new Scanner(System.in);
-            read = scan.nextInt();
-        } catch (Exception ex) {
-            System.out.println("Scanner error: " + ex.getMessage());
-        }
-        RegisterTape.setCellValue(read);
-        pointer.p++;
+    public void run(CommandContext context) {
+        Integer read = scan.nextInt();
+        context.registerTape.setCellValue(read);
+        context.pointer++;
     }
 }

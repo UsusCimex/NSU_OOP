@@ -1,12 +1,11 @@
 package brainfuck.operation;
 
-import brainfuck.data.ExecutablePointer;
-import brainfuck.data.RegisterTape;
+import brainfuck.data.CommandContext;
 
 public class Out implements Operation {
     @Override
-    public void run(ExecutablePointer pointer) {
-        System.out.print(RegisterTape.getCellValue() + " ");
-        pointer.p++;
+    public void run(CommandContext context) {
+        System.out.print(context.registerTape.getCellValue() + " ");
+        context.pointer++;
     }
 }

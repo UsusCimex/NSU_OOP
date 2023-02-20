@@ -1,7 +1,7 @@
 package brainfuck.operation;
 
-import brainfuck.data.ExecutablePointer;
+import brainfuck.data.CommandContext;
 
 public interface Operation {
-    public abstract void run(ExecutablePointer pointer);
+    public abstract void run(CommandContext context);
 }

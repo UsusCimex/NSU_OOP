@@ -1,19 +1,17 @@
 package brainfuck.operation;
 
-import brainfuck.data.ExecutablePointer;
+import brainfuck.data.CommandContext;
 import brainfuck.data.Loop;
-import brainfuck.data.RegisterTape;
-import brainfuck.data.StackWhile;
 
 public class End implements Operation {
     @Override
-    public void run(ExecutablePointer pointer) {
-        Loop mover = StackWhile.top();
-        StackWhile.pop();
-        if (RegisterTape.getCellValue() == 0) {
-            pointer.p++;
+    public void run(CommandContext context) {
+        Loop mover = context.stackWhile.top();
+        context.stackWhile.pop();
+        if (context.registerTape.getCellValue() == 0) {
+            context.pointer++;
         } else {
-            pointer.p = mover.from;
+            context.pointer = mover.from;
         }
     }
 }

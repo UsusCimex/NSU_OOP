@@ -1,12 +1,11 @@
 package brainfuck.operation;
 
-import brainfuck.data.ExecutablePointer;
-import brainfuck.data.RegisterTape;
+import brainfuck.data.CommandContext;
 
 public class Minus implements Operation {
     @Override
-    public void run(ExecutablePointer pointer) {
-        RegisterTape.setCellValue(RegisterTape.getCellValue() - 1);
-        pointer.p++;
+    public void run(CommandContext context) {
+        context.registerTape.setCellValue(context.registerTape.getCellValue() - 1);
+        context.pointer++;
     }
 }

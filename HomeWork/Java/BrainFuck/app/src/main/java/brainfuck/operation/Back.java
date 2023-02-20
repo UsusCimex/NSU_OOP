@@ -1,12 +1,11 @@
 package brainfuck.operation;
 
-import brainfuck.data.ExecutablePointer;
-import brainfuck.data.RegisterTape;
+import brainfuck.data.CommandContext;
 
 public class Back implements Operation {
     @Override
-    public void run(ExecutablePointer pointer) {
-        RegisterTape.setCellIndex(RegisterTape.getCellIndex() - 1);
-        pointer.p++;
+    public void run(CommandContext context) {
+        context.registerTape.setCellIndex(context.registerTape.getCellIndex() - 1);
+        context.pointer++;
     }
 }
