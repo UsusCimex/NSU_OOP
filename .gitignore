@@ -5,3 +5,6 @@ build
 temp.*
 *.txt
 ClassWork
+lib
+target
+.editorconfig
