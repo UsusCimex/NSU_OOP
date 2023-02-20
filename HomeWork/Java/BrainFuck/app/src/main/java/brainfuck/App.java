@@ -9,28 +9,24 @@ import brainfuck.logic.*;
 
 public class App {
     public static void main(String[] args) {
-        // if (args.length != 1) {
-        //     System.out.println("Enter PATH to executable file!");
-        // } else
-        execute("/home/danil/git/21212_lanin/HomeWork/Java/BrainFuck/app/src/main/resources/code.bf");
+        if (args.length != 1) {
+            System.out.println("Enter PATH to executable file!");
+        } else {
+            execute(args[1]); //"/home/danil/git/21212_lanin/HomeWork/Java/BrainFuck/app/src/main/resources/code.bf"
+        }
     }
 
     public static void execute(String path) {
-        ExecutablePointer pointer = new ExecutablePointer();
-        CommandBuffer buffer;
         try {
-            buffer = new CommandBuffer(path);
-            while (pointer.p < buffer.getFileSize() && pointer.p >= 0) {
-                Integer cmd = buffer.getCommand(pointer.p);
-                if (cmd == '\n' || cmd == ' ') {
-                    pointer.p++;
+            CommandContext context = new CommandContext(path);
+            while (context.pointer < context.commandBuffer.getFileSize() && context.pointer >= 0) {
+                String cmd = Character.toString(context.commandBuffer.getCommand(context.pointer));
+                if (cmd == "\n" || cmd == " ") {
+                    context.pointer++;
                     continue;
                 }
-                if (cmd == '[') {
-                    StackWhile.push(pointer.p, buffer.searchEndWhile(pointer.p));
-                }
-                Operation op = OperationFactory.create(cmd);
-                op.run(pointer);
+                Operation op = OperationFactory.GetInstance().create(cmd);
+                op.run(context);
             }
         }
         catch(FileNotFoundException ex) {
