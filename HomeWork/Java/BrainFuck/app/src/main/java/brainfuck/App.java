@@ -10,8 +10,11 @@ import brainfuck.logic.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+//** Главный класс приложения */
 public class App {
+    //** Логгер для класса App */
     private static final Logger logger = LogManager.getLogger(App.class);
+    //** Главный метод приложения. @param args аргументы командной строки. В настоящее время не используется */
     public static void main(String[] args) {
         if (args.length != 0) {
             System.out.println("Enter PATH to executable file!");
@@ -21,6 +24,7 @@ public class App {
         }
     }
 
+    //** Запускает исполнение программы BrainFuck из файла по заданному пути. @param path путь к файлу с программой brainfuck */
     public static void execute(String path) {
         try {
             CommandContext context = new CommandContext(path);

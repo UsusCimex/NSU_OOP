@@ -11,12 +11,18 @@ import brainfuck.operation.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/** Фабрика операций */
 public class OperationFactory {
+    /** Логгер для класса OperationFactory */
     private static final Logger logger = LogManager.getLogger(OperationFactory.class);
+    /** Путь к файлу с настройками фабрики */
     private final String FILE_PATH = "src/main/resources/operations.properties";
+    //** Хранилище для объектов */
     private Map<String, Operation> map = null;
+    /** Единственный экземпляр класса(Singleton) */
     private static OperationFactory instance = null;
 
+    /** Создаёт единственный экземпляр, с операциями загруженными из файла настройки */
     private OperationFactory() {
         map = new HashMap<>();
         Properties props = new Properties();
@@ -33,7 +39,7 @@ public class OperationFactory {
             e.printStackTrace();
         }
     }
-
+    //** Получает единственный экземпляр класса OperationFactory. @return единственный экземпляр класса. */
     public static OperationFactory GetInstance() {
         if (instance == null) {
             instance = new OperationFactory();
@@ -41,7 +47,7 @@ public class OperationFactory {
         }
         return instance;
     }
-
+    //** Создаёт объект операции по имени. @param name имя операции. @return объект операции. */
     public Operation create(String name) {
         logger.info("Creating " + name + " object");
         return map.get(name);

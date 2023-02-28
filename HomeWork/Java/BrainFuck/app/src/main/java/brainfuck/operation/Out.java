@@ -2,6 +2,7 @@ package brainfuck.operation;
 
 import brainfuck.data.CommandContext;
 
+//** Вывод содержимого ячейки. */
 public class Out implements Operation {
     @Override
     public void run(CommandContext context) {

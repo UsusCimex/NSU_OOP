@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import brainfuck.data.CommandContext;
 
+//** Считывание данных с консоли. */
 public class In implements Operation {
     private static Scanner scan = new Scanner(System.in);
     @Override
