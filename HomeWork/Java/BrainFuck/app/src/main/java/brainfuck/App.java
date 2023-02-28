@@ -7,12 +7,17 @@ import java.io.FileNotFoundException;
 import brainfuck.data.*;
 import brainfuck.logic.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class App {
+    private static final Logger logger = LogManager.getLogger(App.class);
     public static void main(String[] args) {
         if (args.length != 0) {
             System.out.println("Enter PATH to executable file!");
         } else {
-            execute("/home/danil/git/21212_lanin/HomeWork/Java/BrainFuck/app/src/main/resources/code.bf"); //args[1]
+            logger.info("Programm started!");
+            execute("src/main/resources/code.bf"); //args[1]
         }
     }
 

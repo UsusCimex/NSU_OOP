@@ -3,229 +3,226 @@
  */
 package brainfuck;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 
-// import brainfuck.data.ExecutablePointer;
-// import brainfuck.data.RegisterTape;
-// import brainfuck.data.StackWhile;
-// import brainfuck.logic.OperationFactory;
-// import brainfuck.operation.Operation;
-// import brainfuck.data.Loop;
+import brainfuck.data.CommandContext;
+import brainfuck.logic.OperationFactory;
+import brainfuck.operation.Operation;
+import brainfuck.data.RegisterTape;
+import brainfuck.data.StackWhile;
 
-// import java.io.ByteArrayInputStream;
-// import java.io.ByteArrayOutputStream;
-// import java.io.InputStream;
-// import java.io.PrintStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 
-// import org.apache.logging.log4j.LogManager;
-// import org.apache.logging.log4j.Logger;
-// import org.junit.jupiter.api.Assertions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-// // import org.junit.jupiter.api.Assertions;
-
+@TestInstance(Lifecycle.PER_CLASS)
 public class AppTest {
+    private static final Logger logger = LogManager.getLogger(AppTest.class);
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final ByteArrayInputStream inContent = new ByteArrayInputStream("10".getBytes());
+    private final PrintStream originalOut = System.out;
+    private final InputStream originalIn = System.in;
+
+    public void setUpStreams() {
+        System.setOut(new PrintStream(outContent));
+        System.setIn(inContent);
+    }
+    public void restoreStreams() {
+        System.setOut(originalOut);
+        System.setIn(originalIn);
+    }
+
+    CommandContext cc;
+    @BeforeAll
+    public void init() throws IOException{
+        try {
+            cc = new CommandContext("src/test/resources/forTest.txt");
+        }
+        catch(FileNotFoundException ex) {
+            throw new RuntimeException("File cannot be opened!");
+        }
+        System.setProperty("log4j.configurationFile", "log4j2.xml");
+    }
+
+    @Test 
+    public void TestOperationPlus() {
+        RegisterTape.GetInstance().resetTape();
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        
+        Operation a = OperationFactory.GetInstance().create("+");
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 1);
+
+        a.run(cc);
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 3);
+
+        logger.info("TestOperationPlus PASSED");
+    }
+
+    @Test 
+    public void TestOperationMinus() {
+        RegisterTape.GetInstance().resetTape();
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        Operation a = OperationFactory.GetInstance().create("-");
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), -1);
+
+        a.run(cc);
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), -3);
+
+        logger.info("TestOperationMinus PASSED");
+    }
+
+    @Test 
+    public void TestOperationNext() {
+        RegisterTape.GetInstance().resetTape();
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        Operation a = OperationFactory.GetInstance().create(">");
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 1);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        a.run(cc);
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 3);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        logger.info("TestOperationNext PASSED");
+    }
+
+    @Test 
+    public void TestOperationBack() {
+        RegisterTape.GetInstance().resetTape();
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        Operation a = OperationFactory.GetInstance().create(">");
+        a.run(cc);
+        a.run(cc);
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 3);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        a = OperationFactory.GetInstance().create("<");
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 2);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        a.run(cc);
+        a.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        logger.info("TestOperationBack PASSED");
+    }
+    
+    @Test 
+    public void TestLoop() {
+        RegisterTape.GetInstance().resetTape();
+        StackWhile.GetInstance().resetStack();
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        Assertions.assertEquals(cc.pointer, 0);
+        Operation a = OperationFactory.GetInstance().create("[");
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { a.run(cc); } );
+
+        try {
+            cc.ChangeFile("src/test/resources/loopTest.txt");
+        }
+        catch(FileNotFoundException ex) {
+            return;
+        }
+        
+        cc.pointer = 0;
+        a.run(cc);
+        Assertions.assertEquals(cc.pointer, 3);
+
+        cc.pointer = 0;
+        RegisterTape.GetInstance().setCellIndex(0);
+        RegisterTape.GetInstance().setCellValue(1);
+        a.run(cc);
+        Assertions.assertEquals(cc.pointer, 1);
+        Assertions.assertEquals(StackWhile.GetInstance().top().from, 0);
+        Assertions.assertEquals(StackWhile.GetInstance().top().from, 0);
+
+        cc.pointer = 2;
+        RegisterTape.GetInstance().setCellIndex(2);
+        RegisterTape.GetInstance().setCellValue(0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 2);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Operation b = OperationFactory.GetInstance().create("]");
+        b.run(cc);
+        Assertions.assertEquals(cc.pointer, 3);
+
+        cc.pointer = 0;
+        RegisterTape.GetInstance().setCellIndex(0);
+        a.run(cc);
+        cc.pointer = 2;
+        RegisterTape.GetInstance().setCellIndex(2);
+        RegisterTape.GetInstance().setCellValue(1);
+        b.run(cc);
+        Assertions.assertEquals(cc.pointer, 0);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { b.run(cc); });
+
+        logger.info("TestLoop PASSED");
+    }
+
+    @Test
+    public void TestInputAndOutput() {
+        setUpStreams();
+        RegisterTape.GetInstance().resetTape();
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+
+        Operation op1 = OperationFactory.GetInstance().create(",");
+        op1.run(cc);
+
+        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 10);
+
+        Operation op2 = OperationFactory.GetInstance().create(".");
+        op2.run(cc);
+        Assertions.assertEquals(outContent.toByteArray()[0], 49); //49 == '1'
+        Assertions.assertEquals(outContent.toByteArray()[1], 48); //49 == '0'
+        op2.run(cc);
+        Assertions.assertEquals(outContent.toByteArray()[3], 49);
+        Assertions.assertEquals(outContent.toByteArray()[4], 48);
+
+        restoreStreams();
+
+        logger.info("TestInputAndOutput PASSED");
+    }
 }
-//     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-//     private final ByteArrayInputStream inContent = new ByteArrayInputStream("10".getBytes());
-//     private final PrintStream originalOut = System.out;
-//     private final InputStream originalIn = System.in;
-
-//     public void setUpStreams() {
-//         System.setOut(new PrintStream(outContent));
-//         System.setIn(inContent);
-//     }
-//     public void restoreStreams() {
-//         System.setOut(originalOut);
-//         System.setIn(originalIn);
-//     }
-
-//     static private final Logger LOGGER = LogManager.getLogger(AppTest.class.getName());
-//     private final String LOGGER_TEST = "TEST";
-
-//     @Test 
-//     void TestOperationPlus() {
-//         RegisterTape.resetTape();
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         ExecutablePointer pointer = new ExecutablePointer();
-//         Integer op = "+".hashCode();
-//         Operation a = OperationFactory.create(op);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 1);
-
-//         a.run(pointer);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 3);
-
-//         LOGGER.info(a.getClass().getSimpleName() + LOGGER_TEST);
-//     }
-
-//     @Test 
-//     void TestOperationMinus() {
-//         RegisterTape.resetTape();
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         ExecutablePointer pointer = new ExecutablePointer();
-//         Integer op = "-".hashCode();
-//         Operation a = OperationFactory.create(op);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), -1);
-
-//         a.run(pointer);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), -3);
-
-//         LOGGER.info(a.getClass().getSimpleName() + LOGGER_TEST);
-//     }
-
-//     @Test 
-//     void TestOperationNext() {
-//         RegisterTape.resetTape();
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         ExecutablePointer pointer = new ExecutablePointer();
-//         Integer op = ">".hashCode();
-//         Operation a = OperationFactory.create(op);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 1);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         a.run(pointer);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 3);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         LOGGER.info(a.getClass().getSimpleName() + LOGGER_TEST);
-//     }
-
-//     @Test 
-//     void TestOperationBack() {
-//         RegisterTape.resetTape();
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         ExecutablePointer pointer = new ExecutablePointer();
-//         Integer op = ">".hashCode();
-//         Operation a = OperationFactory.create(op);
-//         a.run(pointer);
-//         a.run(pointer);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 3);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         op = "<".hashCode();
-//         a = OperationFactory.create(op);
-
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 2);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         a.run(pointer);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         LOGGER.info(a.getClass().getSimpleName() + LOGGER_TEST);
-//     }
-    
-//     @Test 
-//     void TestLoop() {
-//         RegisterTape.resetTape();
-//         StackWhile.resetStack();
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         ExecutablePointer pointer = new ExecutablePointer();
-//         Assertions.assertEquals(pointer.p, 0);
-//         Integer beg = "[".hashCode();
-//         Operation a = OperationFactory.create(beg);
-//         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { a.run(pointer); } );
-        
-//         StackWhile.push(0, 2);
-//         Loop lp = StackWhile.top();
-//         Assertions.assertEquals(lp.from, 0);
-//         Assertions.assertEquals(lp.to, 2);
-
-//         a.run(pointer);
-//         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { a.run(pointer); } );
-//         Assertions.assertEquals(pointer.p, 3);
-        
-//         pointer.p = 0;
-//         StackWhile.push(0, 2);
-
-//         RegisterTape.setCellValue(1);
-
-//         a.run(pointer);
-//         Assertions.assertEquals(pointer.p, 1);
-//         pointer.p = 2;
-
-//         Assertions.assertEquals(StackWhile.top().from, 0);
-//         Assertions.assertEquals(StackWhile.top().to, 2);
-
-//         Integer end = "]".hashCode();
-//         Operation b = OperationFactory.create(end);
-//         b.run(pointer);
-
-//         StackWhile.push(0, 2);
-//         Assertions.assertEquals(pointer.p, 0);
-//         RegisterTape.setCellValue(0);
-//         a.run(pointer);
-
-//         Assertions.assertEquals(pointer.p, 3);
-
-//         LOGGER.info(a.getClass().getSimpleName() + LOGGER_TEST);
-//         LOGGER.info(b.getClass().getSimpleName() + LOGGER_TEST);
-//     }
-
-//     @Test
-//     void TestInputAndOutput() {
-//         setUpStreams();
-//         RegisterTape.resetTape();
-
-//         Assertions.assertEquals(RegisterTape.getCellIndex(), 0);
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 0);
-
-//         ExecutablePointer pointer = new ExecutablePointer();
-//         Integer in = ",".hashCode();
-//         Operation op1 = OperationFactory.create(in);
-//         op1.run(pointer);
-
-//         Assertions.assertEquals(RegisterTape.getCellValue(), 10);
-
-//         Integer out = ".".hashCode();
-//         Operation op2 = OperationFactory.create(out);
-//         op2.run(pointer);
-//         Assertions.assertEquals(outContent.toByteArray()[0], 49); //49 == '1'
-//         Assertions.assertEquals(outContent.toByteArray()[1], 48); //49 == '0'
-//         op2.run(pointer);
-//         Assertions.assertEquals(outContent.toByteArray()[3], 49);
-//         Assertions.assertEquals(outContent.toByteArray()[4], 48);
-
-//         restoreStreams();
-
-//         LOGGER.info(op1.getClass().getSimpleName() + LOGGER_TEST);
-//         LOGGER.info(op2.getClass().getSimpleName() + LOGGER_TEST);
-//     }
-    
-// }

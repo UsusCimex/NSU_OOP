@@ -1,11 +1,16 @@
 package brainfuck.data;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class RegisterTape {
+    private static final Logger logger = LogManager.getLogger(RegisterTape.class);
     private static final Integer TAPE_SIZE = 30000; // 30000 default value by U.Muller(author)
     private static RegisterTape instance = null;
 
     public static RegisterTape GetInstance() {
         if (instance == null) {
+            logger.info("RegisterTape created!");
             instance = new RegisterTape();
         }
         return instance;
@@ -30,6 +35,7 @@ public class RegisterTape {
 
     public void setCellIndex(Integer value) throws IndexOutOfBoundsException{
         if (value < 0 || value >= TAPE_SIZE) {
+            logger.error("Attempt to index = " + value + ", max index = " + TAPE_SIZE);
             throw new IndexOutOfBoundsException();
         }
         index = value;
@@ -40,6 +46,7 @@ public class RegisterTape {
             arr[i] = 0;
         }
         index = 0;
+        logger.info("RegisterTape reseted!");
     }
 
     private Integer[] arr = null;
