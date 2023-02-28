@@ -23,7 +23,7 @@ public class CommandBuffer {
     }
 
     public Character getCommand(Integer index) throws IndexOutOfBoundsException{
-        if (index < 0) {
+        if (index < 0 || index > getFileSize()) {
             throw new IndexOutOfBoundsException();
         }
         if ((index < pointer) || (index >= pointer + BUFFER_SIZE) || (pointer == -1)) {
