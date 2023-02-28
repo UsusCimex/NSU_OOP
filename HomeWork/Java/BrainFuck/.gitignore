@@ -1,6 +1,9 @@
 **
 *
 !/app
+!log4j2.xml
+!code.bf
+!differentCodes.txt
 
 # Ignore Gradle build output directory
 build
