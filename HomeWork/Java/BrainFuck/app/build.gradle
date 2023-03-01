@@ -7,6 +7,8 @@
  */
 plugins {
     id 'application'
+    id 'java'
+    id 'org.springframework.boot' version '2.5.3'
 }
 
 repositories {
@@ -39,10 +41,4 @@ test {
 run {
     standardInput = System.in
     systemProperty 'log4j.configurationFile', 'src/main/resources/log4j2.xml'
-}
-
-javadoc {
-    options.encoding = 'UTF-8'
-    options.charSet = 'UTF-8'
-    options.docEncoding = 'UTF-8'
 }
