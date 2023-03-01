@@ -10,14 +10,18 @@ import java.io.RandomAccessFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//** Основное хранили для кода написанных на BrainFuck */
+/** Основное хранили для кода написанных на BrainFuck */
 public class CommandBuffer {
-    //** Логгер для класса CommandBuffer */
+    /** Логгер для класса CommandBuffer */
     private static final Logger logger = LogManager.getLogger(CommandBuffer.class);
-    //** Размер буффера */
+    /** Размер буффера */
     private final static Integer BUFFER_SIZE = 1000;
 
-    //** Создаёт экземпляр класса CommandBuffer на основе пути к файлу с кодом. @param filePath путь к файлу с кодом. @throws FileNotFoundException если файл не существует или не может быть прочитан. */
+    /** 
+     * Создаёт экземпляр класса CommandBuffer на основе пути к файлу с кодом. 
+     * @param filePath путь к файлу с кодом. 
+     * @throws FileNotFoundException если файл не существует или не может быть прочитан. 
+     */
     public CommandBuffer(String filePath) throws FileNotFoundException {
         file = new File(filePath);
         if (!file.canRead()) {
@@ -27,12 +31,16 @@ public class CommandBuffer {
         buffer = new char[BUFFER_SIZE];
     }
 
-    //** Возвращает размер файла с кодом. @return размер файла с кодом в байтах. */
+    /** Возвращает размер файла с кодом. @return размер файла с кодом в байтах. */
     public Long getFileSize() {
         return file.length();
     }
 
-    //** Возвращает считанную команду с буфера по указаному индексу. @param index индекс команды в коде BrainFuck. @return команда BrainFuck. @throws IndexOutOfBoundsException если произошло обращение по не существующему индексу. */
+    /** Возвращает считанную команду с буфера по указаному индексу. 
+     * @param index индекс команды в коде BrainFuck. 
+     * @return команда BrainFuck. 
+     * @throws IndexOutOfBoundsException если произошло обращение по не существующему индексу. 
+     */
     public Character getCommand(Integer index) throws IndexOutOfBoundsException {
         if (index < 0 || index > getFileSize()) {
             logger.error("Attempt to index = " + index + ", max index = " + getFileSize());
@@ -45,7 +53,10 @@ public class CommandBuffer {
         return buffer[index - pointer];
     }
 
-    //** Считывание с файла команд от указанного индекса в размере вместимости буфера. @param index индекс, с которого стоит считывать информацию. */
+    /** 
+     * Считывание с файла команд от указанного индекса в размере вместимости буфера. 
+     * @param index индекс, с которого стоит считывать информацию. 
+     */
     private void readCommands(Integer index) {
         try (RandomAccessFile raFile = new RandomAccessFile(file, "r")) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(raFile.getFD()), "UTF-8"));
@@ -57,10 +68,10 @@ public class CommandBuffer {
         }
     }
 
-    //** Файл с кодом BrainFuck */
+    /** Файл с кодом BrainFuck */
     private File file;
-    //** Буфер  */
+    /** Буфер  */
     private char[] buffer = null;
-    //** Индекс с которого произошло последнее считывание с файла */
+    /** Индекс с которого произошло последнее считывание с файла */
     private Integer pointer = -1;
 }

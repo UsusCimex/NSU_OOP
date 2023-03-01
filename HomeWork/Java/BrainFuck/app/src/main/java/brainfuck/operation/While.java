@@ -3,7 +3,7 @@ package brainfuck.operation;
 import brainfuck.data.CommandContext;
 import brainfuck.data.Loop;
 
-//** Начало цикла. Не зайдёт внутрь цикла, если значение в данной ячейке 0. */
+/** Начало цикла. Не зайдёт внутрь цикла, если значение в данной ячейке 0. */
 public class While implements Operation {
     @Override
     public void run(CommandContext context) {
@@ -17,7 +17,7 @@ public class While implements Operation {
         }
     }
 
-    //** Поиск конца цикла, с учётом вложенных циклов. */
+    /** Поиск конца цикла, с учётом вложенных циклов. */
     private Integer searchEndWhile(CommandContext context) {
         int searcher = 1;
         int index = context.pointer;

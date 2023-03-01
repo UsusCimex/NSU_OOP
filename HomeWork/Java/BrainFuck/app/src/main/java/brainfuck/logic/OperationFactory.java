@@ -1,6 +1,6 @@
 package brainfuck.logic;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,8 +15,8 @@ import org.apache.logging.log4j.Logger;
 public class OperationFactory {
     /** Логгер для класса OperationFactory */
     private static final Logger logger = LogManager.getLogger(OperationFactory.class);
-    /** Путь к файлу с настройками фабрики */
-    private final String FILE_PATH = "src/main/resources/operations.properties";
+    /** Файл с настройками фабрики */
+    private final InputStream file = getClass().getResourceAsStream("/operations.properties");
     //** Хранилище для объектов */
     private Map<String, Operation> map = null;
     /** Единственный экземпляр класса(Singleton) */
@@ -27,7 +27,7 @@ public class OperationFactory {
         map = new HashMap<>();
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(FILE_PATH));
+            props.load(file);
             for (String className : props.stringPropertyNames()) {
                 String objName = props.getProperty(className);
                 Class<?> clazz = Class.forName(className);

@@ -5,16 +5,19 @@ import java.util.EmptyStackException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//** Стек циклов */
+/** Стек циклов */
 public class StackWhile {
-    //** Логер класса StackWhile. */
+    /** Логер класса StackWhile. */
     private static final Logger logger = LogManager.getLogger(StackWhile.class);
-    //** Максимальный размер стека. */
+    /** Максимальный размер стека. */
     private final static Integer STACK_SIZE = 1000;
-    //** Единственный экземпляр класса StackWhile(Singleton). */
+    /** Единственный экземпляр класса StackWhile(Singleton). */
     private static StackWhile instance = null;
 
-    //** Получает единственный экземпляр класса StackWhile. @return единственный экземпляр класса. */
+    /** 
+     * Получает единственный экземпляр класса StackWhile. 
+     * @return единственный экземпляр класса. 
+     */
     public static StackWhile GetInstance() {
         if (instance == null) {
             logger.info("StackWhile created!");
@@ -23,7 +26,7 @@ public class StackWhile {
         return instance;
     }
 
-    //** Создание единственного экземпляра класса StackWhile. */
+    /** Создание единственного экземпляра класса StackWhile. */
     private StackWhile() {
         stack = new Loop[STACK_SIZE];
         for (int i = 0; i < STACK_SIZE; ++i) {
@@ -32,7 +35,10 @@ public class StackWhile {
         resetStack();
     }
 
-    //** Просмотр вершины стека. @throws IndexOutOfBoundsException при попытке посмотреть вершину пустого стека. */
+    /** 
+     * Просмотр вершины стека. 
+     * @throws IndexOutOfBoundsException при попытке посмотреть вершину пустого стека. 
+     */
     public Loop top() throws IndexOutOfBoundsException {
         if (pointer < 0 || pointer >= STACK_SIZE) {
             logger.error("Stack pointer = " + pointer + ", max size = " + STACK_SIZE);
@@ -41,7 +47,12 @@ public class StackWhile {
         return stack[pointer];
     }
 
-    //** Добавление элемента на вершину стека. @param fValue адрес начала цикла. @param sValue адрес конца цикла. @throws RuntimeException если превышен максимальный размер стека. */
+    /** 
+     * Добавление элемента на вершину стека. 
+     * @param fValue адрес начала цикла. 
+     * @param sValue адрес конца цикла. 
+     * @throws RuntimeException если превышен максимальный размер стека. 
+     */
     public void push(Integer fValue, Integer sValue) throws RuntimeException {
         pointer++;
         if (pointer >= STACK_SIZE) {
@@ -52,7 +63,10 @@ public class StackWhile {
         stack[pointer].to = sValue;
     }
 
-    //** Удаление элемента из вершины стека. @throws EmptyStackException при попытке удалить из пустого стека. */
+    /** 
+     * Удаление элемента из вершины стека. 
+     * @throws EmptyStackException при попытке удалить из пустого стека. 
+     */
     public void pop() throws EmptyStackException {
         if (pointer < 0) {
             logger.error("Stack pointer = " + pointer + ", pop error");
@@ -61,7 +75,7 @@ public class StackWhile {
         pointer--;
     }
 
-    //** Очистка стека, на данный момент используется только в тестах. */
+    /** Очистка стека, на данный момент используется только в тестах. */
     public void resetStack() {
         for (int i = 0; i < STACK_SIZE; ++i) {
             stack[i].from = 0;
@@ -71,8 +85,8 @@ public class StackWhile {
         logger.info("StackWhile reseted!");
     }
 
-    //** Стек. */
+    /** Стек. */
     private Loop[] stack = null;
-    //** Указатель на вершину стека. */
+    /** Указатель на вершину стека. */
     private Integer pointer = -1;
 }

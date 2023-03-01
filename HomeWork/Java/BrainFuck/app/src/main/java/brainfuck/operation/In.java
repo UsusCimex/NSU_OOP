@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import brainfuck.data.CommandContext;
 
-//** Считывание данных с консоли. */
+/** Считывание данных с консоли. */
 public class In implements Operation {
     private static final Logger logger = LogManager.getLogger(In.class);
     private static Scanner scan = new Scanner(System.in);

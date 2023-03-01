@@ -2,7 +2,7 @@ package brainfuck.operation;
 
 import brainfuck.data.CommandContext;
 
-//** Инкремент указателя. */
+/** Инкремент указателя. */
 public class Next implements Operation {
     @Override
     public void run(CommandContext context) {

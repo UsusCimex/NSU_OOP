@@ -1,6 +1,5 @@
-**
 *
-!/app
+!app
 !log4j2.xml
 !code.bf
 !differentCodes.txt

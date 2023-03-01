@@ -5,7 +5,7 @@ import brainfuck.data.CommandContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//** Вывод содержимого ячейки. */
+/** Вывод содержимого ячейки. */
 public class Out implements Operation {
     private static final Logger logger = LogManager.getLogger(Out.class);
     @Override
