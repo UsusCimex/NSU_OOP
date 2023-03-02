@@ -39,7 +39,10 @@ public class OperationFactory {
             e.printStackTrace();
         }
     }
-    //** Получает единственный экземпляр класса OperationFactory. @return единственный экземпляр класса. */
+    /** 
+     * Получает единственный экземпляр класса OperationFactory. 
+     * @return единственный экземпляр класса. 
+     */
     public static OperationFactory GetInstance() {
         if (instance == null) {
             instance = new OperationFactory();
@@ -47,7 +50,10 @@ public class OperationFactory {
         }
         return instance;
     }
-    //** Создаёт объект операции по имени. @param name имя операции. @return объект операции. */
+    /** 
+     * Возвращает ссылку на объект операции по имени. 
+     * @param name имя операции. @return объект операции. 
+     */
     public Operation create(String name) {
         logger.info("Creating " + name + " object");
         return map.get(name);

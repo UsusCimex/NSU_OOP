@@ -5,11 +5,15 @@
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
  * User Manual available at https://docs.gradle.org/7.3/userguide/building_java_projects.html
  */
+
 plugins {
     id 'application'
     id 'java'
     id 'org.springframework.boot' version '2.5.3'
 }
+
+sourceCompatibility = 1.17
+targetCompatibility = 1.17
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -35,10 +39,8 @@ application {
 
 test {
     useJUnit();
-    systemProperty 'log4j.configurationFile', 'src/main/resources/log4j2.xml'
-}
+}   
 
 run {
     standardInput = System.in
-    systemProperty 'log4j.configurationFile', 'src/main/resources/log4j2.xml'
 }

@@ -14,17 +14,12 @@ import org.apache.logging.log4j.Logger;
 public class App {
     /** Логгер для класса App */
     private static final Logger logger = LogManager.getLogger(App.class);
-    /** 
-     * Главный метод приложения. 
-     * @param args аргументы командной строки. 
-     * В настоящее время не используется 
-     */
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Enter PATH to executable file!");
         } else {
             logger.info("Programm started!");
-            execute(args[0]); //"src/main/resources/code.bf"
+            execute(args[0]);
         }
     }
 
@@ -48,7 +43,7 @@ public class App {
         catch(FileNotFoundException ex) {
             System.err.println("File not found ^_^");
         }
-        catch(Exception ex) {
+        catch(IndexOutOfBoundsException ex) {
             System.err.println("BF destroyd...");
             ex.printStackTrace();
         }

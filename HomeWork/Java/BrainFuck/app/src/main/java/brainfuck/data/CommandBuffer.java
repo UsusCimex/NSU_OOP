@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 
@@ -28,7 +29,6 @@ public class CommandBuffer {
             logger.error("File " + filePath + " did not open");
             throw new FileNotFoundException();
         }
-        buffer = new char[BUFFER_SIZE];
     }
 
     /** Возвращает размер файла с кодом. @return размер файла с кодом в байтах. */
@@ -62,16 +62,17 @@ public class CommandBuffer {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(raFile.getFD()), "UTF-8"));
             raFile.seek(index);
             reader.read(buffer, 0, BUFFER_SIZE);
-        } catch (Exception ex) {
+            reader.close();
+        } catch (IOException ex) {
             logger.error("Error file reader! In \"readCommands\" function!");
             System.err.println(ex.getMessage());
         }
     }
 
-    /** Файл с кодом BrainFuck */
-    private File file;
+    /** Файл */
+    File file = null;
     /** Буфер  */
-    private char[] buffer = null;
+    private char[] buffer = new char[BUFFER_SIZE];
     /** Индекс с которого произошло последнее считывание с файла */
     private Integer pointer = -1;
 }

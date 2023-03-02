@@ -19,12 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 @TestInstance(Lifecycle.PER_CLASS)
 public class AppTest {
-    private static final Logger logger = LogManager.getLogger(AppTest.class);
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayInputStream inContent = new ByteArrayInputStream("10".getBytes());
     private final PrintStream originalOut = System.out;
@@ -55,74 +51,68 @@ public class AppTest {
     public void TestOperationPlus() {
         RegisterTape.GetInstance().resetTape();
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
         
         Operation a = OperationFactory.GetInstance().create("+");
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 1);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 3);
-
-        logger.info("TestOperationPlus PASSED");
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(3, RegisterTape.GetInstance().getCellValue());
     }
 
     @Test 
     public void TestOperationMinus() {
         RegisterTape.GetInstance().resetTape();
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         Operation a = OperationFactory.GetInstance().create("-");
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
         Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), -1);
 
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
         Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), -3);
-
-        logger.info("TestOperationMinus PASSED");
     }
 
     @Test 
     public void TestOperationNext() {
         RegisterTape.GetInstance().resetTape();
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         Operation a = OperationFactory.GetInstance().create(">");
         a.run(cc);
 
         Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 1);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         a.run(cc);
         a.run(cc);
 
         Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 3);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
-
-        logger.info("TestOperationNext PASSED");
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
     }
 
     @Test 
     public void TestOperationBack() {
         RegisterTape.GetInstance().resetTape();
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         Operation a = OperationFactory.GetInstance().create(">");
         a.run(cc);
@@ -130,21 +120,19 @@ public class AppTest {
         a.run(cc);
 
         Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 3);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         a = OperationFactory.GetInstance().create("<");
         a.run(cc);
 
         Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 2);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
-
-        logger.info("TestOperationBack PASSED");
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
     }
     
     @Test 
@@ -152,15 +140,15 @@ public class AppTest {
         RegisterTape.GetInstance().resetTape();
         StackWhile.GetInstance().resetStack();
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         Assertions.assertEquals(cc.pointer, 0);
         Operation a = OperationFactory.GetInstance().create("[");
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { a.run(cc); } );
 
         try {
-            cc.ChangeFile("src/test/resources/loopTest.txt");
+            cc.ChangeFileForTest("src/test/resources/loopTest.txt");
         }
         catch(FileNotFoundException ex) {
             return;
@@ -175,14 +163,14 @@ public class AppTest {
         RegisterTape.GetInstance().setCellValue(1);
         a.run(cc);
         Assertions.assertEquals(cc.pointer, 1);
-        Assertions.assertEquals(StackWhile.GetInstance().top().from, 0);
-        Assertions.assertEquals(StackWhile.GetInstance().top().from, 0);
+        Assertions.assertEquals(StackWhile.GetInstance().top().from(), 0);
+        Assertions.assertEquals(StackWhile.GetInstance().top().to(), 0);
 
         cc.pointer = 2;
         RegisterTape.GetInstance().setCellIndex(2);
         RegisterTape.GetInstance().setCellValue(0);
         Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 2);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
         Operation b = OperationFactory.GetInstance().create("]");
         b.run(cc);
         Assertions.assertEquals(cc.pointer, 3);
@@ -196,8 +184,6 @@ public class AppTest {
         b.run(cc);
         Assertions.assertEquals(cc.pointer, 0);
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { b.run(cc); });
-
-        logger.info("TestLoop PASSED");
     }
 
     @Test
@@ -205,8 +191,8 @@ public class AppTest {
         setUpStreams();
         RegisterTape.GetInstance().resetTape();
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 0);
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
+        Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         Operation op1 = OperationFactory.GetInstance().create(",");
         op1.run(cc);
@@ -222,7 +208,5 @@ public class AppTest {
         Assertions.assertEquals(outContent.toByteArray()[4], 48);
 
         restoreStreams();
-
-        logger.info("TestInputAndOutput PASSED");
     }
 }

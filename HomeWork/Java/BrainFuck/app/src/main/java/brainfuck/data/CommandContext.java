@@ -23,7 +23,7 @@ public class CommandContext {
      * @param path пусть до нового файла BrainFuck. 
      * @throws FileNotFoundException если файл не существует или не может быть прочитан. 
      */
-    public void ChangeFile(String path) throws FileNotFoundException {
+    public void ChangeFileForTest(String path) throws FileNotFoundException {
         commandBuffer = new CommandBuffer(path);
         pointer = 0;
         registerTape.resetTape();

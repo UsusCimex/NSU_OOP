@@ -29,9 +29,6 @@ public class StackWhile {
     /** Создание единственного экземпляра класса StackWhile. */
     private StackWhile() {
         stack = new Loop[STACK_SIZE];
-        for (int i = 0; i < STACK_SIZE; ++i) {
-            stack[i] = new Loop();
-        }
         resetStack();
     }
 
@@ -59,8 +56,7 @@ public class StackWhile {
             logger.error("Stack pointer = " + pointer + ", max size = " + STACK_SIZE + ", push error");
             throw new RuntimeException(); // Stack overflow
         }
-        stack[pointer].from = fValue;
-        stack[pointer].to = sValue;
+        stack[pointer] = new Loop(fValue, sValue);
     }
 
     /** 
@@ -78,8 +74,7 @@ public class StackWhile {
     /** Очистка стека, на данный момент используется только в тестах. */
     public void resetStack() {
         for (int i = 0; i < STACK_SIZE; ++i) {
-            stack[i].from = 0;
-            stack[i].to = 0;
+            stack[i] = new Loop(0,0);
         }
         pointer = -1;
         logger.info("StackWhile reseted!");

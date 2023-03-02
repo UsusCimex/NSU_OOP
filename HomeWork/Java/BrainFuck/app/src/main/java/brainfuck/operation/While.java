@@ -10,7 +10,7 @@ public class While implements Operation {
         context.stackWhile.push(context.pointer, searchEndWhile(context));
         Loop loop = context.stackWhile.top();
         if (context.registerTape.getCellValue() == 0) {
-            context.pointer = loop.to + 1;
+            context.pointer = loop.to() + 1;
             context.stackWhile.pop();
         } else {
             context.pointer++;

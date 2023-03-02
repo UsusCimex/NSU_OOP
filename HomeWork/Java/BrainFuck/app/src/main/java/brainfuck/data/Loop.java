@@ -1,9 +1,4 @@
 package brainfuck.data;
 
 /** Вспомогательная оболочка для стека циклов. Используется для хранения адреса начала и конца цикла. */
-public class Loop {
-    /** Адрес на начало цикла. */
-    public int from = 0;
-    /** Адрес на конец цикла. */
-    public int to = 0;
-}
+public record Loop(Integer from, Integer to) { }

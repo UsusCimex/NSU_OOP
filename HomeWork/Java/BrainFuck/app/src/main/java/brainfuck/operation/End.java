@@ -12,7 +12,7 @@ public class End implements Operation {
         if (context.registerTape.getCellValue() == 0) {
             context.pointer++;
         } else {
-            context.pointer = mover.from;
+            context.pointer = mover.from();
         }
     }
 }
