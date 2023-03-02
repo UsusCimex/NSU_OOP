@@ -78,13 +78,13 @@ public class AppTest {
         a.run(cc);
 
         Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), -1);
+        Assertions.assertEquals(-1, RegisterTape.GetInstance().getCellValue());
 
         a.run(cc);
         a.run(cc);
 
         Assertions.assertEquals(0, RegisterTape.GetInstance().getCellIndex());
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), -3);
+        Assertions.assertEquals(-3, RegisterTape.GetInstance().getCellValue());
     }
 
     @Test 
@@ -103,7 +103,7 @@ public class AppTest {
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 3);
+        Assertions.assertEquals(3, RegisterTape.GetInstance().getCellIndex());
         Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
     }
 
@@ -119,13 +119,13 @@ public class AppTest {
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 3);
+        Assertions.assertEquals(3, RegisterTape.GetInstance().getCellIndex());
         Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         a = OperationFactory.GetInstance().create("<");
         a.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 2);
+        Assertions.assertEquals(2, RegisterTape.GetInstance().getCellIndex());
         Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
 
         a.run(cc);
@@ -156,20 +156,20 @@ public class AppTest {
         
         cc.pointer = 0;
         a.run(cc);
-        Assertions.assertEquals(cc.pointer, 3);
+        Assertions.assertEquals(3, cc.pointer);
 
         cc.pointer = 0;
         RegisterTape.GetInstance().setCellIndex(0);
         RegisterTape.GetInstance().setCellValue(1);
         a.run(cc);
-        Assertions.assertEquals(cc.pointer, 1);
-        Assertions.assertEquals(StackWhile.GetInstance().top().from(), 0);
-        Assertions.assertEquals(StackWhile.GetInstance().top().to(), 0);
+        Assertions.assertEquals(1, cc.pointer);
+        Assertions.assertEquals(0, StackWhile.GetInstance().top().from());
+        Assertions.assertEquals(0, StackWhile.GetInstance().top().to());
 
         cc.pointer = 2;
         RegisterTape.GetInstance().setCellIndex(2);
         RegisterTape.GetInstance().setCellValue(0);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellIndex(), 2);
+        Assertions.assertEquals(2, RegisterTape.GetInstance().getCellIndex());
         Assertions.assertEquals(0, RegisterTape.GetInstance().getCellValue());
         Operation b = OperationFactory.GetInstance().create("]");
         b.run(cc);
@@ -182,7 +182,7 @@ public class AppTest {
         RegisterTape.GetInstance().setCellIndex(2);
         RegisterTape.GetInstance().setCellValue(1);
         b.run(cc);
-        Assertions.assertEquals(cc.pointer, 0);
+        Assertions.assertEquals(0, cc.pointer);
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { b.run(cc); });
     }
 
@@ -201,11 +201,11 @@ public class AppTest {
 
         Operation op2 = OperationFactory.GetInstance().create(".");
         op2.run(cc);
-        Assertions.assertEquals(outContent.toByteArray()[0], 49); //49 == '1'
-        Assertions.assertEquals(outContent.toByteArray()[1], 48); //49 == '0'
+        Assertions.assertEquals(49, outContent.toByteArray()[0]); //49 == '1'
+        Assertions.assertEquals(48, outContent.toByteArray()[1]); //49 == '0'
         op2.run(cc);
-        Assertions.assertEquals(outContent.toByteArray()[3], 49);
-        Assertions.assertEquals(outContent.toByteArray()[4], 48);
+        Assertions.assertEquals(49, outContent.toByteArray()[3]);
+        Assertions.assertEquals(49, outContent.toByteArray()[4]);
 
         restoreStreams();
     }
