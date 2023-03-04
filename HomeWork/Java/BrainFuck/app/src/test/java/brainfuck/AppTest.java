@@ -183,5 +183,7 @@ public class AppTest {
 
         op1.run(cc);
         Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 11);
+
+        cc.ChangeInputStreamFileForTest("CONSOLE");
     }
 }
