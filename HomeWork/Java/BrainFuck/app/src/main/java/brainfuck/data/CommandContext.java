@@ -1,6 +1,9 @@
 package brainfuck.data;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +23,7 @@ public class CommandContext {
     }
     /** 
      * Изменяет файл с кодом BrainFuck, на данный момент используется только в тестах. 
-     * @param path пусть до нового файла BrainFuck. 
+     * @param path путь до нового файла BrainFuck. 
      * @throws FileNotFoundException если файл не существует или не может быть прочитан. 
      */
     public void ChangeFileForTest(String path) throws FileNotFoundException {
@@ -29,6 +32,24 @@ public class CommandContext {
         registerTape.resetTape();
         stackWhile.resetStack();
         logger.info("File changed (" + path + ") " + commandBuffer.getFileSize() + " bytes");
+    }
+    /** 
+     * Изменяет поток ввода для записи в ячейки BrainFuck, на данный момент используется только в тестах. 
+     * @param path путь до файла. 
+     * @throws FileNotFoundException если файл не существует или не может быть прочитан. 
+     */
+    public void ChangeInputStreamFileForTest(String path) throws FileNotFoundException {
+        if (path == "CONSOLE") {
+            scanner = new Scanner(System.in);
+        }
+        else {
+            File file = new File(path);
+            if (!file.canRead()) {
+                logger.error("File " + path + " did not open");
+                throw new FileNotFoundException();
+            }
+            scanner = new Scanner(file);
+        }
     }
 
     /** Указатель на номер команды в файле. Как правило не должен изменяться вручную. */
@@ -39,4 +60,6 @@ public class CommandContext {
     public StackWhile stackWhile = StackWhile.GetInstance();
     /** Буфер команд. */
     public CommandBuffer commandBuffer = null;
+    /** Поток ввода(По умолчанию консольный ввод) */
+    public Scanner scanner = new Scanner(System.in);
 }
