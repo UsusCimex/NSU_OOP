@@ -1,6 +1,9 @@
 package brainfuck.logic;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +37,14 @@ public class OperationFactory {
                 Operation object = (Operation) clazz.getConstructor().newInstance();
                 map.put(objName, object);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
+            logger.error("Failed to load class file for factory!");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             logger.error("Failed to load classes for factory!");
+            e.printStackTrace();
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            logger.error("OperationFactory exception...");
             e.printStackTrace();
         }
     }
