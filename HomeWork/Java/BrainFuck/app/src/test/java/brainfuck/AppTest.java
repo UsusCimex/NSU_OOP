@@ -12,12 +12,8 @@ import brainfuck.operation.Operation;
 import brainfuck.data.RegisterTape;
 import brainfuck.data.StackWhile;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class AppTest {
