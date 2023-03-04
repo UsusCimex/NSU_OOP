@@ -2,7 +2,6 @@ package brainfuck.data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
