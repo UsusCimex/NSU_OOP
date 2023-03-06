@@ -175,10 +175,10 @@ public class AppTest {
         Operation op1 = OperationFactory.GetInstance().create(",");
         op1.run(cc);
 
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 10);
+        Assertions.assertEquals(10, RegisterTape.GetInstance().getCellValue());
 
         op1.run(cc);
-        Assertions.assertEquals(RegisterTape.GetInstance().getCellValue(), 11);
+        Assertions.assertEquals(11, RegisterTape.GetInstance().getCellValue());
 
         cc.ChangeInputStreamFileForTest("CONSOLE");
     }
