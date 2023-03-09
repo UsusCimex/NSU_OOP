@@ -9,24 +9,9 @@ public class RegisterTape {
     private static final Logger logger = LogManager.getLogger(RegisterTape.class);
     /** Максимальный размер данной ленты. Используется стандартное значение, присвоенное автором языка BrainFuck.*/
     private static final Integer TAPE_SIZE = 30000;
-    
-    /** Единаственный экземпляр класса RegisterTape(Singleton). */
-    private static RegisterTape instance = null;
-
-    /** 
-     * Получает единственный экземпляр класса RegisterTape. 
-     * @return единственный экземпляр класса. 
-     */
-    public static RegisterTape GetInstance() {
-        if (instance == null) {
-            logger.info("RegisterTape created!");
-            instance = new RegisterTape();
-        }
-        return instance;
-    }
 
     /** Создаёт единственный экземпляр класса. */
-    private RegisterTape() {
+    public RegisterTape() {
         arr = new Integer[TAPE_SIZE];
         resetTape();
     }

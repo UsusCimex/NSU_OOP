@@ -11,23 +11,9 @@ public class StackWhile {
     private static final Logger logger = LogManager.getLogger(StackWhile.class);
     /** Максимальный размер стека. */
     private final static Integer STACK_SIZE = 1000;
-    /** Единственный экземпляр класса StackWhile(Singleton). */
-    private static StackWhile instance = null;
-
-    /** 
-     * Получает единственный экземпляр класса StackWhile. 
-     * @return единственный экземпляр класса. 
-     */
-    public static StackWhile GetInstance() {
-        if (instance == null) {
-            logger.info("StackWhile created!");
-            instance = new StackWhile();
-        }
-        return instance;
-    }
 
     /** Создание единственного экземпляра класса StackWhile. */
-    private StackWhile() {
+    public StackWhile() {
         stack = new Loop[STACK_SIZE];
         resetStack();
     }

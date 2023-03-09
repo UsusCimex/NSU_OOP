@@ -74,7 +74,7 @@ public class CommandBuffer {
     }
 
     /** Файл */
-    File file = null;
+    private File file = null;
     /** Буфер  */
     private char[] buffer = new char[BUFFER_SIZE];
     /** Индекс с которого произошло последнее считывание с файла */
