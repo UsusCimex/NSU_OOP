@@ -4,106 +4,103 @@
 package brainfuck;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import brainfuck.data.CommandContext;
 import brainfuck.logic.OperationFactory;
 import brainfuck.operation.Operation;
-import brainfuck.data.RegisterTape;
-import brainfuck.data.StackWhile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.FileNotFoundException;
 
-@TestInstance(Lifecycle.PER_CLASS)
 public class AppTest {
     @Test 
     public void TestOperationPlus() throws FileNotFoundException {
         CommandContext cc = new CommandContext("src/test/resources/forTest.txt");
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
         
         Operation a = OperationFactory.GetInstance().getOperation("+");
         a.run(cc);
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(1, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(1, cc.registerTape.getCellValue());
 
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(3, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(3, cc.registerTape.getCellValue());
     }
 
     @Test 
     public void TestOperationMinus() throws FileNotFoundException {
         CommandContext cc = new CommandContext("src/test/resources/forTest.txt");
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
 
         Operation a = OperationFactory.GetInstance().getOperation("-");
         a.run(cc);
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(-1, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(-1, cc.registerTape.getCellValue());
 
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(-3, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(-3, cc.registerTape.getCellValue());
     }
 
     @Test 
     public void TestOperationNext() throws FileNotFoundException {
         CommandContext cc = new CommandContext("src/test/resources/forTest.txt");
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
 
         Operation a = OperationFactory.GetInstance().getOperation(">");
         a.run(cc);
 
-        Assertions.assertEquals(cc.registerTape.getCellIndex(), 1);
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(cc.registerTape.getCellIndex(), 1);
+        assertEquals(0, cc.registerTape.getCellValue());
 
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(3, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(3, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
     }
 
     @Test 
     public void TestOperationBack() throws FileNotFoundException {
         CommandContext cc = new CommandContext("src/test/resources/forTest.txt");
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
 
         Operation a = OperationFactory.GetInstance().getOperation(">");
         a.run(cc);
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(3, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(3, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
 
         a = OperationFactory.GetInstance().getOperation("<");
         a.run(cc);
 
-        Assertions.assertEquals(2, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(2, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
 
         a.run(cc);
         a.run(cc);
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
     }
     
     @Test 
@@ -111,34 +108,34 @@ public class AppTest {
         CommandContext cc = new CommandContext("src/test/resources/forTest.txt");
 
         assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellValue());
 
-        Assertions.assertEquals(cc.pointer, 0);
+        assertEquals(cc.pointer, 0);
         Operation a = OperationFactory.GetInstance().getOperation("[");
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { a.run(cc); } );
+        assertThrows(IndexOutOfBoundsException.class, () -> { a.run(cc); } );
 
         cc.ChangeFileForTest("src/test/resources/loopTest.txt");
         
         cc.pointer = 0;
         a.run(cc);
-        Assertions.assertEquals(3, cc.pointer);
+        assertEquals(3, cc.pointer);
 
         cc.pointer = 0;
         cc.registerTape.setCellIndex(0);
         cc.registerTape.setCellValue(1);
         a.run(cc);
-        Assertions.assertEquals(1, cc.pointer);
-        Assertions.assertEquals(0, cc.stackWhile.top().from());
-        Assertions.assertEquals(2, cc.stackWhile.top().to());
+        assertEquals(1, cc.pointer);
+        assertEquals(0, cc.stackWhile.top().from());
+        assertEquals(2, cc.stackWhile.top().to());
 
         cc.pointer = 2;
         cc.registerTape.setCellIndex(2);
         cc.registerTape.setCellValue(0);
-        Assertions.assertEquals(2, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(2, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
         Operation b = OperationFactory.GetInstance().getOperation("]");
         b.run(cc);
-        Assertions.assertEquals(cc.pointer, 3);
+        assertEquals(cc.pointer, 3);
 
         cc.pointer = 0;
         cc.registerTape.setCellIndex(0);
@@ -147,25 +144,25 @@ public class AppTest {
         cc.registerTape.setCellIndex(2);
         cc.registerTape.setCellValue(1);
         b.run(cc);
-        Assertions.assertEquals(0, cc.pointer);
-        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> { b.run(cc); });
+        assertEquals(0, cc.pointer);
+        assertThrows(IndexOutOfBoundsException.class, () -> { b.run(cc); });
     }
 
     @Test
     public void TestInput() throws FileNotFoundException {
         CommandContext cc = new CommandContext("src/test/resources/loopTest.txt");
 
-        Assertions.assertEquals(0, cc.registerTape.getCellIndex());
-        Assertions.assertEquals(0, cc.registerTape.getCellValue());
+        assertEquals(0, cc.registerTape.getCellIndex());
+        assertEquals(0, cc.registerTape.getCellValue());
 
         cc.ChangeInputStreamFileForTest("src/test/resources/forTest.txt");
 
         Operation op1 = OperationFactory.GetInstance().getOperation(",");
         op1.run(cc);
 
-        Assertions.assertEquals(10, cc.registerTape.getCellValue());
+        assertEquals(10, cc.registerTape.getCellValue());
 
         op1.run(cc);
-        Assertions.assertEquals(11, cc.registerTape.getCellValue());
+        assertEquals(11, cc.registerTape.getCellValue());
     }
 }
