@@ -54,9 +54,9 @@ public class CommandContext {
     /** Указатель на номер команды в файле. Как правило не должен изменяться вручную. */
     public int pointer = 0;
     /** Множество ячеек, с которым работает BrainFuck. */
-    public RegisterTape registerTape = RegisterTape.GetInstance();
+    public RegisterTape registerTape = new RegisterTape();
     /** Стэк циклов */
-    public StackWhile stackWhile = StackWhile.GetInstance();
+    public StackWhile stackWhile = new StackWhile();
     /** Буфер команд. */
     public CommandBuffer commandBuffer = null;
     /** Поток ввода(По умолчанию консольный ввод) */

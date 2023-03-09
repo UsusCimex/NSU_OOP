@@ -20,13 +20,12 @@ public class OperationFactory {
     /** Файл с настройками фабрики */
     private final InputStream file = getClass().getResourceAsStream("/operations.properties");
     //** Хранилище для объектов */
-    private Map<String, Operation> map = null;
+    private Map<String, Operation> map = new HashMap<>();
     /** Единственный экземпляр класса(Singleton) */
     private static OperationFactory instance = null;
 
     /** Создаёт единственный экземпляр, с операциями загруженными из файла настройки */
     private OperationFactory() {
-        map = new HashMap<>();
         Properties props = new Properties();
         try {
             props.load(file);
@@ -62,7 +61,7 @@ public class OperationFactory {
      * Возвращает ссылку на объект операции по имени. 
      * @param name имя операции. @return объект операции. 
      */
-    public Operation create(String name) {
+    public Operation getOperation(String name) {
         logger.info("Creating " + name + " object");
         return map.get(name);
     }

@@ -36,7 +36,7 @@ public class App {
                     context.pointer++;
                     continue;
                 }
-                Operation op = OperationFactory.GetInstance().create(cmd);
+                Operation op = OperationFactory.GetInstance().getOperation(cmd);
                 op.run(context);
             }
         }
