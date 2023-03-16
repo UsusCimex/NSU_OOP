@@ -40,7 +40,7 @@ public class StackWhile {
         pointer++;
         if (pointer >= STACK_SIZE) {
             logger.error("Stack pointer = " + pointer + ", max size = " + STACK_SIZE + ", push error");
-            throw new RuntimeException(); // Stack overflow
+            throw new RuntimeException("Stack overflow"); 
         }
         stack[pointer] = new Loop(fValue, sValue);
     }
