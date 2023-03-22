@@ -1,6 +1,7 @@
 package ru.nsu.pacman.generation;
 
 import ru.nsu.pacman.PacmanGame;
+import ru.nsu.pacman.enemy.Pacman;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -17,13 +18,17 @@ public class LevelData {
     public static final char SymbolPinkGhost = 'p';
     public static final char SymbolOrangeGhost = 'o';
     private PacmanGame.Coordinates pacmanCoord = null;
+    private int countFood = 0;
     private char[][] levelData = new char[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) { loadLevelDataFromFile(is); }
     public char[][] getLevelData() {
         return levelData;
     }
-    public void setLevelData(PacmanGame.Coordinates cord, char value) {
+    public void setValueLevelData(PacmanGame.Coordinates cord, char value) {
         levelData[(int)cord.x][(int)cord.y] = value;
+    }
+    public char getValueLevelData(PacmanGame.Coordinates cord) {
+        return levelData[(int)cord.x][(int)cord.y];
     }
     public PacmanGame.Coordinates getPacmanPosition() {
         if (pacmanCoord == null) return new PacmanGame.Coordinates(0,0);
@@ -32,9 +37,13 @@ public class LevelData {
     public void setPacmanPosition(PacmanGame.Coordinates coord) {
         pacmanCoord = coord;
     }
+    public int getCountFood() {
+        return countFood;
+    }
     private void loadLevelDataFromFile(InputStream is) {
         Scanner scanner = new Scanner(is);
 
+        countFood = 0;
         for (int row = 0; row < ARRAY_SIZE; ++row) {
             String line = scanner.nextLine();
             String[] symbols = line.split(" ");
@@ -42,6 +51,7 @@ public class LevelData {
             for (int col = 0; col < ARRAY_SIZE; ++col) {
                 levelData[col][row] = symbols[col].charAt(0);
                 if (levelData[col][row] == SymbolPacman) setPacmanPosition(new PacmanGame.Coordinates(col, row));
+                if (levelData[col][row] == SymbolFood) countFood += 1;
             }
         }
 
