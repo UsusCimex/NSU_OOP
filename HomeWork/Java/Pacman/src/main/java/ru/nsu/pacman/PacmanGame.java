@@ -15,6 +15,8 @@ import ru.nsu.pacman.enemy.Pacman;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
+import java.util.Objects;
+
 import static java.lang.Math.abs;
 
 public class PacmanGame extends Application {
@@ -37,15 +39,15 @@ public class PacmanGame extends Application {
         }
     }
 
-    private final Image pacmanRight = new Image(getClass().getResourceAsStream("sprites/pacman/right.gif"));
-    private final Image pacmanLeft = new Image(getClass().getResourceAsStream("sprites/pacman/left.gif"));
-    private final Image pacmanUp = new Image(getClass().getResourceAsStream("sprites/pacman/up.gif"));
-    private final Image pacmanDown = new Image(getClass().getResourceAsStream("sprites/pacman/down.gif"));
+    private final Image pacmanRight = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/right.gif")));
+    private final Image pacmanLeft = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/left.gif")));
+    private final Image pacmanUp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/up.gif")));
+    private final Image pacmanDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/down.gif")));
     private LevelData data;
     private ImageView pacmanView;
-    private int pacmanSize = 32;
+    private final int pacmanSize = 32;
     private WalkDir pacmanDir = WalkDir.NONE;
-    private double areaSize = 32 * 21; //After we start calculate this value automatic
+    private final double areaSize = 32 * 21; //After we start calculate this value automatic
 
     Pacman pacman;
 

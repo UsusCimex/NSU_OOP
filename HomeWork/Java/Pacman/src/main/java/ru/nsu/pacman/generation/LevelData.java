@@ -37,8 +37,8 @@ public class LevelData {
             String[] symbols = line.split(" ");
 
             for (int col = 0; col < ARRAY_SIZE; ++col) {
-                levelData[row][col] = symbols[col].charAt(0);
-                if (levelData[row][col] == SymbolPacman) setPacmanPosition(new PacmanGame.Coordinates(row, col));
+                levelData[col][row] = symbols[col].charAt(0);
+                if (levelData[col][row] == SymbolPacman) setPacmanPosition(new PacmanGame.Coordinates(col, row));
             }
         }
 

@@ -25,11 +25,11 @@ public class LevelBuilder {
                 if (status == 'W') { // after we make factory
                     Rectangle block = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
                     block.setFill(WALL_COLOR);
-                    gridPane.add(block, col, row);
+                    gridPane.add(block, row, col);
                 } else if (status == 'F') {
                     Circle circ = new Circle(BLOCK_SIZE, BLOCK_SIZE, 6);
                     circ.setFill(COIN_COLOR);
-                    gridPane.add(circ, col, row);
+                    gridPane.add(circ, row, col);
 
                     gridPane.setHalignment(circ, HPos.CENTER);
                     gridPane.setValignment(circ, VPos.CENTER);
