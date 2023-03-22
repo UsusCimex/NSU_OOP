@@ -22,6 +22,9 @@ public class LevelData {
     public char[][] getLevelData() {
         return levelData;
     }
+    public void setLevelData(PacmanGame.Coordinates cord, char value) {
+        levelData[(int)cord.x][(int)cord.y] = value;
+    }
     public PacmanGame.Coordinates getPacmanPosition() {
         if (pacmanCoord == null) return new PacmanGame.Coordinates(0,0);
         return pacmanCoord;

@@ -21,7 +21,7 @@ import static java.lang.Math.abs;
 
 public class PacmanGame extends Application {
 
-    public enum WalkDir {
+    public enum Orientation {
         UP,
         RIGHT,
         DOWN,
@@ -39,16 +39,24 @@ public class PacmanGame extends Application {
         }
     }
 
+    //Images
     private final Image pacmanRight = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/right.gif")));
     private final Image pacmanLeft = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/left.gif")));
     private final Image pacmanUp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/up.gif")));
     private final Image pacmanDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/down.gif")));
-    private LevelData data;
     private ImageView pacmanView;
-    private final int pacmanSize = 32;
-    private WalkDir pacmanDir = WalkDir.NONE;
-    private final double areaSize = 32 * 21; //After we start calculate this value automatic
 
+    private LevelData data;
+    private LevelBuilder builder;
+    private Pane root;
+
+    private final int CELL_SIZE = 32;
+    private final int CELL_N = 21; //After we start calculate this value automatic
+    private int currentLevel = 0;
+    private final int COUNT_LEVELS = 5;
+    private boolean inGame = false;
+
+    // Enemies
     Pacman pacman;
 
     public static void main(String[] args) {
@@ -57,17 +65,17 @@ public class PacmanGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        data = new LevelData(getClass().getResourceAsStream("levels/1.txt"));
-        LevelBuilder builder = new LevelBuilder();
-        Pane root = new Pane(builder.buildLevel(data));
+        data = generateNextLevel();
+        builder = new LevelBuilder();
+        root = new Pane(builder.buildLevel(data));
         Scene scene = new Scene(root);
         scene.setFill(Color.AQUA);
 
-        pacman = new Pacman(data.getPacmanPosition().x * pacmanSize, data.getPacmanPosition().y * pacmanSize);
+        pacman = new Pacman(new Coordinates(data.getPacmanPosition().x * CELL_SIZE, data.getPacmanPosition().y * CELL_SIZE));
 
         pacmanView = new ImageView(pacmanRight);
-        pacmanView.setFitWidth(pacmanSize);
-        pacmanView.setFitHeight(pacmanSize);
+        pacmanView.setFitWidth(CELL_SIZE);
+        pacmanView.setFitHeight(CELL_SIZE);
 
         root.getChildren().add(pacmanView);
         pacmanView.setLayoutX(pacman.getPosition().x);
@@ -75,21 +83,17 @@ public class PacmanGame extends Application {
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.UP) {
-                pacmanDir = WalkDir.UP;
-                pacmanView.setImage(pacmanUp);
+                pacman.changeNextOrientation(Orientation.UP);
             } else if (event.getCode() == KeyCode.DOWN) {
-                pacmanDir = WalkDir.DOWN;
-                pacmanView.setImage(pacmanDown);
+                pacman.changeNextOrientation(Orientation.DOWN);
             } else if (event.getCode() == KeyCode.LEFT) {
-                pacmanDir = WalkDir.LEFT;
-                pacmanView.setImage(pacmanLeft);
+                pacman.changeNextOrientation(Orientation.LEFT);
             } else if (event.getCode() == KeyCode.RIGHT) {
-                pacmanDir = WalkDir.RIGHT;
-                pacmanView.setImage(pacmanRight);
+                pacman.changeNextOrientation(Orientation.RIGHT);
             }
         });
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), e -> update()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> update()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
@@ -97,52 +101,80 @@ public class PacmanGame extends Application {
         primaryStage.show();
     }
 
+    private boolean PacmanInCenterCell() {
+        return ( abs(pacman.getPosition().x - (data.getPacmanPosition().x * CELL_SIZE)) >= CELL_SIZE ||
+                abs(pacman.getPosition().y - (data.getPacmanPosition().y * CELL_SIZE)) >= CELL_SIZE );
+    }
+
+    private boolean PacmanCanRotate() {
+        Coordinates curPosition = data.getPacmanPosition();
+        if ((pacman.getNextOrientation() == Orientation.UP) && (data.getLevelData()[(int)curPosition.x][(int)curPosition.y - 1] != LevelData.SymbolWall)) {
+            return true;
+        } else if ((pacman.getNextOrientation() == Orientation.LEFT) && (data.getLevelData()[(int)curPosition.x - 1][(int)curPosition.y] != LevelData.SymbolWall)) {
+            return true;
+        } else if ((pacman.getNextOrientation() == Orientation.RIGHT) && (data.getLevelData()[(int)curPosition.x + 1][(int)curPosition.y] != LevelData.SymbolWall)) {
+            return true;
+        } else if ((pacman.getNextOrientation() == Orientation.DOWN) && (data.getLevelData()[(int)curPosition.x][(int)curPosition.y + 1] != LevelData.SymbolWall)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private boolean PacmanCanMove() {
+        Coordinates curPosition = data.getPacmanPosition();
+        if ((pacman.getCurrentOrientation() == Orientation.UP) && (data.getLevelData()[(int)curPosition.x][(int)curPosition.y - 1] != LevelData.SymbolWall)) {
+            return true;
+        } else if ((pacman.getCurrentOrientation() == Orientation.LEFT) && (data.getLevelData()[(int)curPosition.x - 1][(int)curPosition.y] != LevelData.SymbolWall)) {
+            return true;
+        } else if ((pacman.getCurrentOrientation() == Orientation.RIGHT) && (data.getLevelData()[(int)curPosition.x + 1][(int)curPosition.y] != LevelData.SymbolWall)) {
+            return true;
+        } else if ((pacman.getCurrentOrientation() == Orientation.DOWN) && (data.getLevelData()[(int)curPosition.x][(int)curPosition.y + 1] != LevelData.SymbolWall)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void update() {
-        System.out.println("========START UPDATE========");
-        Coordinates curPos = data.getPacmanPosition();
-        System.out.println("I'm here: " + curPos.x + " " + curPos.y);
-        System.out.println("NEAR ME : L = " + data.getLevelData()[(int)curPos.x - 1][(int)curPos.y] +
-                            ", R = " + data.getLevelData()[(int)curPos.x + 1][(int)curPos.y] +
-                            ", U = " + data.getLevelData()[(int)curPos.x][(int)curPos.y - 1] +
-                            ", D = " + data.getLevelData()[(int)curPos.x][(int)curPos.y + 1]);
-        if ((pacmanDir == WalkDir.UP) && (data.getLevelData()[(int)curPos.x][(int)curPos.y - 1] == LevelData.SymbolWall)) {
-            return;
-        } else if ((pacmanDir == WalkDir.LEFT) && (data.getLevelData()[(int)curPos.x - 1][(int)curPos.y] == LevelData.SymbolWall)) {
-            return;
-        } else if ((pacmanDir == WalkDir.RIGHT) && (data.getLevelData()[(int)curPos.x + 1][(int)curPos.y] == LevelData.SymbolWall)) {
-            return;
-        } else if ((pacmanDir == WalkDir.DOWN) && (data.getLevelData()[(int)curPos.x][(int)curPos.y + 1] == LevelData.SymbolWall)) {
-            return;
-        }
+        if (PacmanInCenterCell() && pacman.getCurrentOrientation() != Orientation.NONE) {
+            Coordinates oldPosition = data.getPacmanPosition();
+            Coordinates newPosition = null;
+            if (pacman.getCurrentOrientation() == Orientation.UP) {
+                newPosition = new Coordinates(oldPosition.x, oldPosition.y - 1);
+            } else if (pacman.getCurrentOrientation() == Orientation.LEFT) {
+                newPosition = new Coordinates(oldPosition.x - 1, oldPosition.y);
+            } else if (pacman.getCurrentOrientation() == Orientation.RIGHT) {
+                newPosition = new Coordinates(oldPosition.x + 1, oldPosition.y);
+            } else if (pacman.getCurrentOrientation() == Orientation.DOWN) {
+                newPosition = new Coordinates(oldPosition.x, oldPosition.y + 1);
+            }
 
-        pacman.move(pacmanDir);
-
-        pacmanView.setLayoutX(pacman.getPosition().x);
-        pacmanView.setLayoutY(pacman.getPosition().y);
-
-        System.out.println("Double: " + pacman.getPosition().x + " " + pacman.getPosition().y);
-        System.out.println("Table: " + curPos.x + " " + curPos.y);
-        System.out.println("Diff: " + abs(pacman.getPosition().x - (curPos.x * pacmanSize)));
-
-        if (abs(pacman.getPosition().x - (curPos.x * pacmanSize)) >= pacmanSize) {
-            data.getLevelData()[(int)curPos.x][(int)curPos.y] = LevelData.SymbolEmpty;
-            if (pacmanDir == WalkDir.LEFT) {
-                data.getLevelData()[(int)curPos.x - 1][(int)curPos.y] = LevelData.SymbolPacman;
-                data.setPacmanPosition(new Coordinates(curPos.x - 1, curPos.y));
-            } else if (pacmanDir == WalkDir.RIGHT) {
-                data.getLevelData()[(int)curPos.x + 1][(int)curPos.y] = LevelData.SymbolPacman;
-                data.setPacmanPosition(new Coordinates(curPos.x + 1, curPos.y));
+            pacman.setPosition(new Coordinates(newPosition.x * CELL_SIZE, newPosition.y * CELL_SIZE));
+            data.setLevelData(oldPosition, LevelData.SymbolEmpty);
+            data.setLevelData(newPosition, LevelData.SymbolPacman);
+            data.setPacmanPosition(newPosition);
+            if (PacmanCanRotate()) {
+                pacman.changeCurrentOrientation();
             }
         }
-        if (abs(pacman.getPosition().y - (curPos.y * pacmanSize)) >= pacmanSize) {
-            data.getLevelData()[(int)curPos.x][(int)curPos.y] = LevelData.SymbolEmpty;
-            if (pacmanDir == WalkDir.UP) {
-                data.getLevelData()[(int)curPos.x][(int)curPos.y - 1] = LevelData.SymbolPacman;
-                data.setPacmanPosition(new Coordinates(curPos.x, curPos.y - 1));
-            } else if (pacmanDir == WalkDir.DOWN) {
-                data.getLevelData()[(int)curPos.x][(int)curPos.y + 1] = LevelData.SymbolPacman;
-                data.setPacmanPosition(new Coordinates(curPos.x, curPos.y + 1));
-            }
+
+        if (PacmanCanMove()) {
+            pacman.move();
+            pacmanView.setLayoutX(pacman.getPosition().x);
+            pacmanView.setLayoutY(pacman.getPosition().y);
+        } else {
+            pacman.changeCurrentOrientation();
         }
+    }
+
+    private LevelData generateNextLevel() {
+        currentLevel += 1;
+        if (currentLevel == 1) return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
+        else if (currentLevel == 2) return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
+        else if (currentLevel == 3) return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
+        else if (currentLevel == 4) return new LevelData(getClass().getResourceAsStream("levels/4.txt"));
+        else if (currentLevel == 5) return new LevelData(getClass().getResourceAsStream("levels/5.txt"));
+        else inGame = false;
+        return null;
     }
 }
