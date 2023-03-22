@@ -7,22 +7,47 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import ru.nsu.pacman.enemy.Pacman;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
+import static java.lang.Math.abs;
+
 public class PacmanGame extends Application {
 
-    private ImageView characterView;
+    public enum WalkDir {
+        UP,
+        RIGHT,
+        DOWN,
+        LEFT,
+        NONE
+    };
+
+    public static class Coordinates {
+        public double x;
+        public double y;
+
+        public Coordinates(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    private final Image pacmanRight = new Image(getClass().getResourceAsStream("sprites/pacman/right.gif"));
+    private final Image pacmanLeft = new Image(getClass().getResourceAsStream("sprites/pacman/left.gif"));
+    private final Image pacmanUp = new Image(getClass().getResourceAsStream("sprites/pacman/up.gif"));
+    private final Image pacmanDown = new Image(getClass().getResourceAsStream("sprites/pacman/down.gif"));
+    private LevelData data;
+    private ImageView pacmanView;
     private int pacmanSize = 32;
-    private double posX = 0, posY = 0;
-    private double dX, dY;
-    private double pacmanSpeed = 2.5;
-    private double areaSize;
+    private WalkDir pacmanDir = WalkDir.NONE;
+    private double areaSize = 32 * 21; //After we start calculate this value automatic
+
+    Pacman pacman;
 
     public static void main(String[] args) {
         launch(args);
@@ -30,38 +55,39 @@ public class PacmanGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        LevelData data = new LevelData(getClass().getResourceAsStream("levels/1.txt"));
+        data = new LevelData(getClass().getResourceAsStream("levels/1.txt"));
         LevelBuilder builder = new LevelBuilder();
         Pane root = new Pane(builder.buildLevel(data));
         Scene scene = new Scene(root);
         scene.setFill(Color.AQUA);
 
-        areaSize = 32 * 21; //temp//
+        pacman = new Pacman(data.getPacmanPosition().x * pacmanSize, data.getPacmanPosition().y * pacmanSize);
 
-        Image characterImage = new Image(getClass().getResourceAsStream("sprites/pacman/pRight.gif"));
-        characterView = new ImageView(characterImage);
-        characterView.setFitWidth(pacmanSize);
-        characterView.setFitHeight(pacmanSize);
+        pacmanView = new ImageView(pacmanRight);
+        pacmanView.setFitWidth(pacmanSize);
+        pacmanView.setFitHeight(pacmanSize);
 
-        root.getChildren().add(characterView);
+        root.getChildren().add(pacmanView);
+        pacmanView.setLayoutX(pacman.getPosition().x);
+        pacmanView.setLayoutY(pacman.getPosition().y);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.UP) {
-                dX = 0;
-                dY = -pacmanSpeed;
+                pacmanDir = WalkDir.UP;
+                pacmanView.setImage(pacmanUp);
             } else if (event.getCode() == KeyCode.DOWN) {
-                dX = 0;
-                dY = pacmanSpeed;
+                pacmanDir = WalkDir.DOWN;
+                pacmanView.setImage(pacmanDown);
             } else if (event.getCode() == KeyCode.LEFT) {
-                dX = -pacmanSpeed;
-                dY = 0;
+                pacmanDir = WalkDir.LEFT;
+                pacmanView.setImage(pacmanLeft);
             } else if (event.getCode() == KeyCode.RIGHT) {
-                dX = pacmanSpeed;
-                dY = 0;
+                pacmanDir = WalkDir.RIGHT;
+                pacmanView.setImage(pacmanRight);
             }
         });
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> update()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), e -> update()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
@@ -70,15 +96,51 @@ public class PacmanGame extends Application {
     }
 
     private void update() {
-        posX += dX;
-        posY += dY;
+        System.out.println("========START UPDATE========");
+        Coordinates curPos = data.getPacmanPosition();
+        System.out.println("I'm here: " + curPos.x + " " + curPos.y);
+        System.out.println("NEAR ME : L = " + data.getLevelData()[(int)curPos.x - 1][(int)curPos.y] +
+                            ", R = " + data.getLevelData()[(int)curPos.x + 1][(int)curPos.y] +
+                            ", U = " + data.getLevelData()[(int)curPos.x][(int)curPos.y - 1] +
+                            ", D = " + data.getLevelData()[(int)curPos.x][(int)curPos.y + 1]);
+        if ((pacmanDir == WalkDir.UP) && (data.getLevelData()[(int)curPos.x][(int)curPos.y - 1] == LevelData.SymbolWall)) {
+            return;
+        } else if ((pacmanDir == WalkDir.LEFT) && (data.getLevelData()[(int)curPos.x - 1][(int)curPos.y] == LevelData.SymbolWall)) {
+            return;
+        } else if ((pacmanDir == WalkDir.RIGHT) && (data.getLevelData()[(int)curPos.x + 1][(int)curPos.y] == LevelData.SymbolWall)) {
+            return;
+        } else if ((pacmanDir == WalkDir.DOWN) && (data.getLevelData()[(int)curPos.x][(int)curPos.y + 1] == LevelData.SymbolWall)) {
+            return;
+        }
 
-        if (posX < 0) posX = 0;
-        if (posY < 0) posY = 0;
-        if (posX > areaSize - pacmanSize) posX = areaSize - pacmanSize;
-        if (posY > areaSize - pacmanSize) posY = areaSize - pacmanSize;
+        pacman.move(pacmanDir);
 
-        characterView.setLayoutX(posX);
-        characterView.setLayoutY(posY);
+        pacmanView.setLayoutX(pacman.getPosition().x);
+        pacmanView.setLayoutY(pacman.getPosition().y);
+
+        System.out.println("Double: " + pacman.getPosition().x + " " + pacman.getPosition().y);
+        System.out.println("Table: " + curPos.x + " " + curPos.y);
+        System.out.println("Diff: " + abs(pacman.getPosition().x - (curPos.x * pacmanSize)));
+
+        if (abs(pacman.getPosition().x - (curPos.x * pacmanSize)) >= pacmanSize) {
+            data.getLevelData()[(int)curPos.x][(int)curPos.y] = LevelData.SymbolEmpty;
+            if (pacmanDir == WalkDir.LEFT) {
+                data.getLevelData()[(int)curPos.x - 1][(int)curPos.y] = LevelData.SymbolPacman;
+                data.setPacmanPosition(new Coordinates(curPos.x - 1, curPos.y));
+            } else if (pacmanDir == WalkDir.RIGHT) {
+                data.getLevelData()[(int)curPos.x + 1][(int)curPos.y] = LevelData.SymbolPacman;
+                data.setPacmanPosition(new Coordinates(curPos.x + 1, curPos.y));
+            }
+        }
+        if (abs(pacman.getPosition().y - (curPos.y * pacmanSize)) >= pacmanSize) {
+            data.getLevelData()[(int)curPos.x][(int)curPos.y] = LevelData.SymbolEmpty;
+            if (pacmanDir == WalkDir.UP) {
+                data.getLevelData()[(int)curPos.x][(int)curPos.y - 1] = LevelData.SymbolPacman;
+                data.setPacmanPosition(new Coordinates(curPos.x, curPos.y - 1));
+            } else if (pacmanDir == WalkDir.DOWN) {
+                data.getLevelData()[(int)curPos.x][(int)curPos.y + 1] = LevelData.SymbolPacman;
+                data.setPacmanPosition(new Coordinates(curPos.x, curPos.y + 1));
+            }
+        }
     }
 }
