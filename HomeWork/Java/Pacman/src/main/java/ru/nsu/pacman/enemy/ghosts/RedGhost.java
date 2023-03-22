@@ -1,4 +1,10 @@
 package ru.nsu.pacman.enemy.ghosts;
 
-public class RedGhost {
+import ru.nsu.pacman.enemy.Enemy;
+
+public class RedGhost implements Enemy {
+    @Override
+    public void move() {
+
+    }
 }

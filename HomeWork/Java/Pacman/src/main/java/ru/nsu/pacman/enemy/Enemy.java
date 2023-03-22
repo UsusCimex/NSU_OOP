@@ -1,2 +1,5 @@
-package ru.nsu.pacman.enemy;public interface Enemy {
+package ru.nsu.pacman.enemy;
+
+public interface Enemy {
+    void move();
 }
