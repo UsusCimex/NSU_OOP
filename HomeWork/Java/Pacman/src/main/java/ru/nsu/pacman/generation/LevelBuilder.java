@@ -11,7 +11,7 @@ public class LevelBuilder {
     private static final int GRID_SIZE = 21;
     private static final int BLOCK_SIZE = 32;
     private static final Color WALL_COLOR = Color.BLUE;
-    private static final Color COIN_COLOR = Color.YELLOW;
+    private static final Color COIN_COLOR = Color.WHITE;
     public LevelBuilder() {}
 
     public GridPane buildLevel(LevelData levelData) {
