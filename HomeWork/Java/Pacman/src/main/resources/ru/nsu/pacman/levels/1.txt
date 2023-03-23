@@ -6,7 +6,7 @@ W F F F F F F F F F W F F F F F F F F F W
 W F W W W F W W F W W W F W W F W W W F W
 W F F F F F F F F F r F F F F F F F F F W
 W W W W F W W F W W B W W F W W F W W W W
-E F F F F W W F W g b p W F W W F F F F E
+E F F F F W W F W o b p W F W W F F F F E
 W W W W F W W F W W W W W F W W F W W W W
 E E E W F F F F F E W E F F F F F W E E E
 E E E W F W W W W E P E W W W W F W E E E

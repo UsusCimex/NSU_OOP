@@ -21,12 +21,12 @@ public class LevelBuilder {
 
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                char status = levelData.getLevelData()[row][col];
-                if (status == 'W') { // after we make factory
+                LevelData.Symbols status = levelData.getLevelData()[row][col];
+                if (status == LevelData.Symbols.Wall) { // after we make factory
                     Rectangle block = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
                     block.setFill(WALL_COLOR);
                     gridPane.add(block, row, col);
-                } else if (status == 'F') {
+                } else if (status == LevelData.Symbols.Food) {
                     Circle circ = new Circle(BLOCK_SIZE, BLOCK_SIZE, 6);
                     circ.setFill(COIN_COLOR);
                     gridPane.add(circ, row, col);

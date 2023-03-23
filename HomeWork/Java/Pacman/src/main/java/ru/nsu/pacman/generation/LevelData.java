@@ -8,26 +8,28 @@ import java.util.Scanner;
 
 public class LevelData {
     private static final int ARRAY_SIZE = 21;
-    public static final char SymbolPacman = 'P';
-    public static final char SymbolEmpty = 'E';
-    public static final char SymbolWall = 'W';
-    public static final char SymbolFood = 'F';
-    public static final char SymbolBarrier = 'B';
-    public static final char SymbolRedGhost = 'r';
-    public static final char SymbolBlueGhost = 'b';
-    public static final char SymbolPinkGhost = 'p';
-    public static final char SymbolOrangeGhost = 'o';
+    public enum Symbols {
+        Pacman,
+        Empty,
+        Wall,
+        Food,
+        Barrier,
+        RedGhost,
+        BlueGhost,
+        PinkGhost,
+        OrangeGhost
+    }
     private PacmanGame.Coordinates pacmanCoord = null;
     private int countFood = 0;
-    private char[][] levelData = new char[ARRAY_SIZE][ARRAY_SIZE];
-    public LevelData(InputStream is) { loadLevelDataFromFile(is); }
-    public char[][] getLevelData() {
+    private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
+    public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
+    public Symbols[][] getLevelData() {
         return levelData;
     }
-    public void setValueLevelData(PacmanGame.Coordinates cord, char value) {
+    public void setValueLevelData(PacmanGame.Coordinates cord, Symbols value) {
         levelData[(int)cord.x][(int)cord.y] = value;
     }
-    public char getValueLevelData(PacmanGame.Coordinates cord) {
+    public Symbols getValueLevelData(PacmanGame.Coordinates cord) {
         return levelData[(int)cord.x][(int)cord.y];
     }
     public PacmanGame.Coordinates getPacmanPosition() {
@@ -40,7 +42,7 @@ public class LevelData {
     public int getCountFood() {
         return countFood;
     }
-    private void loadLevelDataFromFile(InputStream is) {
+    private void loadLevelDataFromFile(InputStream is) throws Exception {
         Scanner scanner = new Scanner(is);
 
         countFood = 0;
@@ -49,9 +51,21 @@ public class LevelData {
             String[] symbols = line.split(" ");
 
             for (int col = 0; col < ARRAY_SIZE; ++col) {
-                levelData[col][row] = symbols[col].charAt(0);
-                if (levelData[col][row] == SymbolPacman) setPacmanPosition(new PacmanGame.Coordinates(col, row));
-                if (levelData[col][row] == SymbolFood) countFood += 1;
+                char symbol = symbols[col].charAt(0);
+                switch (symbol) {
+                    case ('P') -> levelData[col][row] = Symbols.Pacman;
+                    case ('E') -> levelData[col][row] = Symbols.Empty;
+                    case ('W') -> levelData[col][row] = Symbols.Wall;
+                    case ('F') -> levelData[col][row] = Symbols.Food;
+                    case ('B') -> levelData[col][row] = Symbols.Barrier;
+                    case ('r') -> levelData[col][row] = Symbols.RedGhost;
+                    case ('b') -> levelData[col][row] = Symbols.BlueGhost;
+                    case ('p') -> levelData[col][row] = Symbols.PinkGhost;
+                    case ('o') -> levelData[col][row] = Symbols.OrangeGhost;
+                    default -> throw new Exception("Symbol not found");
+                }
+                if (levelData[col][row] == Symbols.Pacman) setPacmanPosition(new PacmanGame.Coordinates(col, row));
+                if (levelData[col][row] == Symbols.Food) countFood += 1;
             }
         }
 
