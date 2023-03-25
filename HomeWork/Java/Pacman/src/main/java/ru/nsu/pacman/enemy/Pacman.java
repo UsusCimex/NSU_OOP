@@ -1,5 +1,7 @@
 package ru.nsu.pacman.enemy;
 
+import javafx.scene.Node;
+import javafx.scene.layout.GridPane;
 import ru.nsu.pacman.PacmanGame;
 import ru.nsu.pacman.generation.LevelData;
 
@@ -10,15 +12,18 @@ import static ru.nsu.pacman.PacmanGame.Coordinates;
 import static ru.nsu.pacman.PacmanGame.Orientation;
 
 public class Pacman implements Enemy {
-    private LevelData data;
+    private GridPane area = null;
+    private LevelData data = null;
+    private int foodEat = 0;
     private PacmanGame.Orientation curentOrientation = PacmanGame.Orientation.NONE;
     private PacmanGame.Orientation nextOrientation = PacmanGame.Orientation.NONE;
     private double speed = 2;
     private double positionX, positionY;
-    public Pacman(PacmanGame.Coordinates startPosition, LevelData data) {
+    public Pacman(PacmanGame.Coordinates startPosition, GridPane area, LevelData data) {
         this.positionX = startPosition.x;
         this.positionY = startPosition.y;
 
+        this.area = area;
         this.data = data;
     }
     public PacmanGame.Coordinates getPosition() {
@@ -27,6 +32,10 @@ public class Pacman implements Enemy {
     public void setPosition(PacmanGame.Coordinates newPosition) {
         positionX = newPosition.x;
         positionY = newPosition.y;
+    }
+
+    public int getFoodEat() {
+        return foodEat;
     }
     public void changeNextOrientation(PacmanGame.Orientation orientation) {
         nextOrientation = orientation;
@@ -90,6 +99,15 @@ public class Pacman implements Enemy {
         return false;
     }
 
+    private void removeNodeFromArea(Coordinates cord) {
+        for (Node node : area.getChildren()) {
+            if (GridPane.getColumnIndex(node) == (int)cord.x && GridPane.getRowIndex(node) == (int)cord.y) {
+                area.getChildren().remove(node);
+                break;
+            }
+        }
+    }
+
     @Override
     public void move() {
         if (pacmanInCenterCell() && getCurrentOrientation() != Orientation.NONE) {
@@ -105,8 +123,15 @@ public class Pacman implements Enemy {
                 newPosition = new Coordinates(oldPosition.x, oldPosition.y + 1);
             }
 
+            if (data.getValueLevelData(newPosition) == LevelData.Symbols.Food) {
+                System.out.println("I'm eat " + foodEat);
+                removeNodeFromArea(newPosition);
+                foodEat += 1;
+            }
+
             setPosition(new Coordinates(newPosition.x * CELL_SIZE, newPosition.y * CELL_SIZE));
             data.setValueLevelData(oldPosition, LevelData.Symbols.Empty);
+            data.setValueLevelData(newPosition, LevelData.Symbols.Pacman);
             data.setPacmanPosition(newPosition);
             if (pacmanCanRotate()) {
                 changeCurrentOrientation();

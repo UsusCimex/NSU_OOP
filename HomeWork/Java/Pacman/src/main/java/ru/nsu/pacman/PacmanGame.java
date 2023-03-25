@@ -45,16 +45,13 @@ public class PacmanGame extends Application {
     private final Image pacmanUp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/up.gif")));
     private final Image pacmanDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/down.gif")));
     private ImageView pacmanView;
-
-    private LevelData data;
     private GridPane area = null;
 
     public static final int CELL_SIZE = 32;
     public static final int CELL_N = 21;
     private int currentLevel = 0;
     public static final int COUNT_LEVELS = 5;
-    private int foodEat = 0;
-    private int maxFood = 0;
+    private int maxFood = 5;
     private boolean inGame = false;
 
     // Enemies
@@ -66,14 +63,14 @@ public class PacmanGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        data = generateNextLevel();
+        LevelData data = generateNextLevel();
         LevelBuilder builder = new LevelBuilder();
         area = builder.buildLevel(data);
         Pane root = new Pane(area);
         Scene scene = new Scene(root);
         scene.setFill(Color.AQUA);
 
-        pacman = new Pacman(new Coordinates(data.getPacmanPosition().x * CELL_SIZE, data.getPacmanPosition().y * CELL_SIZE), data);
+        pacman = new Pacman(new Coordinates(data.getPacmanPosition().x * CELL_SIZE, data.getPacmanPosition().y * CELL_SIZE), area, data);
         maxFood = data.getCountFood();
 
         pacmanView = new ImageView(pacmanRight);
@@ -102,37 +99,31 @@ public class PacmanGame extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
 
-    private void removeNodeFromArea(int row, int col) {
-        for (Node node : area.getChildren()) {
-            if (GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == col) {
-                area.getChildren().remove(node);
-                break;
-            }
-        }
+        inGame = true;
     }
 
     private void update() {
-        pacman.move();
+        if (inGame) {
+            pacman.move();
 
-        if (data.getValueLevelData(data.getPacmanPosition()) == LevelData.Symbols.Food) {
-            removeNodeFromArea((int)data.getPacmanPosition().y, (int)data.getPacmanPosition().x);
-            foodEat += 1;
-        }
-        data.setValueLevelData(data.getPacmanPosition(), LevelData.Symbols.Pacman);
+            pacmanView.setLayoutX(pacman.getPosition().x);
+            pacmanView.setLayoutY(pacman.getPosition().y);
 
-        pacmanView.setLayoutX(pacman.getPosition().x);
-        pacmanView.setLayoutY(pacman.getPosition().y);
+            if (pacman.getCurrentOrientation() == Orientation.UP) {
+                pacmanView.setImage(pacmanUp);
+            } else if (pacman.getCurrentOrientation() == Orientation.LEFT) {
+                pacmanView.setImage(pacmanLeft);
+            } else if (pacman.getCurrentOrientation() == Orientation.RIGHT) {
+                pacmanView.setImage(pacmanRight);
+            } else if (pacman.getCurrentOrientation() == Orientation.DOWN) {
+                pacmanView.setImage(pacmanDown);
+            }
 
-        if (pacman.getCurrentOrientation() == Orientation.UP) {
-            pacmanView.setImage(pacmanUp);
-        } else if (pacman.getCurrentOrientation() == Orientation.LEFT) {
-            pacmanView.setImage(pacmanLeft);
-        } else if (pacman.getCurrentOrientation() == Orientation.RIGHT) {
-            pacmanView.setImage(pacmanRight);
-        } else if (pacman.getCurrentOrientation() == Orientation.DOWN) {
-            pacmanView.setImage(pacmanDown);
+            if (pacman.getFoodEat() == maxFood) {
+                inGame = false;
+                System.out.println("GAME OVER :D");
+            }
         }
     }
 
