@@ -42,6 +42,7 @@ public class LevelData {
     public int getCountFood() {
         return countFood;
     }
+
     private void loadLevelDataFromFile(InputStream is) throws Exception {
         Scanner scanner = new Scanner(is);
 
@@ -68,7 +69,6 @@ public class LevelData {
                 if (levelData[col][row] == Symbols.Food) countFood += 1;
             }
         }
-
         scanner.close();
     }
 }
