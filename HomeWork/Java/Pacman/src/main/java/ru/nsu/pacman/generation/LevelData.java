@@ -4,6 +4,7 @@ import ru.nsu.pacman.PacmanGame;
 import ru.nsu.pacman.enemy.Pacman;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class LevelData {
@@ -19,25 +20,14 @@ public class LevelData {
         PinkGhost,
         OrangeGhost
     }
-    private PacmanGame.Coordinates pacmanCoord = null;
     private int countFood = 0;
     private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
-    public Symbols[][] getLevelData() {
-        return levelData;
-    }
     public void setValueLevelData(PacmanGame.Coordinates cord, Symbols value) {
         levelData[(int)cord.x][(int)cord.y] = value;
     }
     public Symbols getValueLevelData(PacmanGame.Coordinates cord) {
         return levelData[(int)cord.x][(int)cord.y];
-    }
-    public PacmanGame.Coordinates getPacmanPosition() {
-        if (pacmanCoord == null) return new PacmanGame.Coordinates(0,0);
-        return pacmanCoord;
-    }
-    public void setPacmanPosition(PacmanGame.Coordinates coord) {
-        pacmanCoord = coord;
     }
     public int getCountFood() {
         return countFood;
@@ -65,7 +55,6 @@ public class LevelData {
                     case ('o') -> levelData[col][row] = Symbols.OrangeGhost;
                     default -> throw new Exception("Symbol not found");
                 }
-                if (levelData[col][row] == Symbols.Pacman) setPacmanPosition(new PacmanGame.Coordinates(col, row));
                 if (levelData[col][row] == Symbols.Food) countFood += 1;
             }
         }

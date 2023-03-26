@@ -17,7 +17,9 @@ import ru.nsu.pacman.enemy.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class PacmanGame extends Application {
 
@@ -44,6 +46,7 @@ public class PacmanGame extends Application {
     private final Image pacmanLeftIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/left.gif")));
     private final Image pacmanUpIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/up.gif")));
     private final Image pacmanDownIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/down.gif")));
+    private final Image pacmanStoppedIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/stopped.png")));
 
     private final Image redGhostIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif")));
     private GridPane area = null;
@@ -54,6 +57,7 @@ public class PacmanGame extends Application {
     public static final int COUNT_LEVELS = 5;
     private int maxFood = 5;
     private boolean inGame = false;
+    private boolean pause = false;
 
     // Enemies
     private Pacman pacman;
@@ -65,8 +69,20 @@ public class PacmanGame extends Application {
         launch(args);
     }
 
+    private ArrayList<Coordinates> getPositionsInData(LevelData data, LevelData.Symbols symbol) {
+        ArrayList<Coordinates> arr = new ArrayList<>();
+        for (int col = 0; col < CELL_N; ++col) {
+            for (int row = 0; row < CELL_N; ++row) {
+                if (data.getValueLevelData(new Coordinates(col, row)) == LevelData.Symbols.Pacman) {
+                    arr.add(new Coordinates(col, row));
+                }
+            }
+        }
+        return arr;
+    }
+
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
         LevelData data = generateNextLevel();
         LevelBuilder builder = new LevelBuilder();
         area = builder.buildLevel(data);
@@ -75,7 +91,10 @@ public class PacmanGame extends Application {
         scene.setFill(Color.AQUA);
         maxFood = data.getCountFood();
 
-        pacman = new Pacman(new Coordinates(data.getPacmanPosition().x * CELL_SIZE, data.getPacmanPosition().y * CELL_SIZE), area, data);
+        if (getPositionsInData(data, LevelData.Symbols.Pacman).size() != 1) {
+            throw new Exception("There can only be one pacman in the game");
+        }
+        pacman = new Pacman(getPositionsInData(data, LevelData.Symbols.Pacman).get(0), area, data);
 //        redGhost = new RedGhost(new Coordinates(5 * CELL_SIZE,5 * CELL_SIZE), area, data); //factory
 
         pacmanView = new ImageView(pacmanRightIMG);
@@ -101,6 +120,9 @@ public class PacmanGame extends Application {
                 pacman.changeNextOrientation(Orientation.LEFT);
             } else if (event.getCode() == KeyCode.RIGHT) {
                 pacman.changeNextOrientation(Orientation.RIGHT);
+            } else if (event.getCode() == KeyCode.ESCAPE) {
+                pause = !pause;
+                pacmanView.setImage(pacmanStoppedIMG);
             }
         });
 
@@ -115,7 +137,7 @@ public class PacmanGame extends Application {
     }
 
     private void update() {
-        if (inGame) {
+        if (inGame && !pause) {
             //PacmanAnimation
             pacman.move();
 
@@ -130,6 +152,8 @@ public class PacmanGame extends Application {
                 pacmanView.setImage(pacmanRightIMG);
             } else if (pacman.getCurrentOrientation() == Orientation.DOWN) {
                 pacmanView.setImage(pacmanDownIMG);
+            } else {
+                pacmanView.setImage(pacmanStoppedIMG);
             }
 
             if (pacman.getFoodEat() == maxFood) {
