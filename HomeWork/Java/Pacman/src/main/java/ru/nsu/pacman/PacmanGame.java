@@ -3,7 +3,6 @@ package ru.nsu.pacman;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import ru.nsu.pacman.enemy.Pacman;
+import ru.nsu.pacman.enemy.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
@@ -40,11 +40,12 @@ public class PacmanGame extends Application {
     }
 
     //Images
-    private final Image pacmanRight = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/right.gif")));
-    private final Image pacmanLeft = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/left.gif")));
-    private final Image pacmanUp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/up.gif")));
-    private final Image pacmanDown = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/down.gif")));
-    private ImageView pacmanView;
+    private final Image pacmanRightIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/right.gif")));
+    private final Image pacmanLeftIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/left.gif")));
+    private final Image pacmanUpIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/up.gif")));
+    private final Image pacmanDownIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/down.gif")));
+
+    private final Image redGhostIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif")));
     private GridPane area = null;
 
     public static final int CELL_SIZE = 32;
@@ -55,7 +56,10 @@ public class PacmanGame extends Application {
     private boolean inGame = false;
 
     // Enemies
-    Pacman pacman;
+    private Pacman pacman;
+    private ImageView pacmanView;
+    private RedGhost redGhost;
+    private ImageView redGhostView;
 
     public static void main(String[] args) {
         launch(args);
@@ -69,17 +73,24 @@ public class PacmanGame extends Application {
         Pane root = new Pane(area);
         Scene scene = new Scene(root);
         scene.setFill(Color.AQUA);
-
-        pacman = new Pacman(new Coordinates(data.getPacmanPosition().x * CELL_SIZE, data.getPacmanPosition().y * CELL_SIZE), area, data);
         maxFood = data.getCountFood();
 
-        pacmanView = new ImageView(pacmanRight);
+        pacman = new Pacman(new Coordinates(data.getPacmanPosition().x * CELL_SIZE, data.getPacmanPosition().y * CELL_SIZE), area, data);
+//        redGhost = new RedGhost(new Coordinates(5 * CELL_SIZE,5 * CELL_SIZE), area, data); //factory
+
+        pacmanView = new ImageView(pacmanRightIMG);
         pacmanView.setFitWidth(CELL_SIZE);
         pacmanView.setFitHeight(CELL_SIZE);
+//        redGhostView = new ImageView(redGhostIMG); //After we use factory
+//        redGhostView.setFitWidth(CELL_SIZE);
+//        redGhostView.setFitHeight(CELL_SIZE);
 
         root.getChildren().add(pacmanView);
         pacmanView.setLayoutX(pacman.getPosition().x);
         pacmanView.setLayoutY(pacman.getPosition().y);
+//        root.getChildren().add(redGhostView); //factory
+//        redGhostView.setLayoutX(redGhost.getPosition().x);
+//        redGhostView.setLayoutY(redGhost.getPosition().y);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.UP) {
@@ -105,25 +116,42 @@ public class PacmanGame extends Application {
 
     private void update() {
         if (inGame) {
+            //PacmanAnimation
             pacman.move();
 
             pacmanView.setLayoutX(pacman.getPosition().x);
             pacmanView.setLayoutY(pacman.getPosition().y);
 
             if (pacman.getCurrentOrientation() == Orientation.UP) {
-                pacmanView.setImage(pacmanUp);
+                pacmanView.setImage(pacmanUpIMG);
             } else if (pacman.getCurrentOrientation() == Orientation.LEFT) {
-                pacmanView.setImage(pacmanLeft);
+                pacmanView.setImage(pacmanLeftIMG);
             } else if (pacman.getCurrentOrientation() == Orientation.RIGHT) {
-                pacmanView.setImage(pacmanRight);
+                pacmanView.setImage(pacmanRightIMG);
             } else if (pacman.getCurrentOrientation() == Orientation.DOWN) {
-                pacmanView.setImage(pacmanDown);
+                pacmanView.setImage(pacmanDownIMG);
             }
 
             if (pacman.getFoodEat() == maxFood) {
                 inGame = false;
                 System.out.println("GAME OVER :D");
             }
+
+            //GhostsAnimation
+//            redGhost.move();
+//
+//            redGhostView.setLayoutX(redGhostView.getPosition().x);
+//            redGhostView.setLayoutY(redGhostView.getPosition().y);
+//
+//            if (redGhost.getCurrentOrientation() == Orientation.UP) {
+//                redGhostView.setImage(redGhostIMG);
+//            } else if (redGhost.getCurrentOrientation() == Orientation.LEFT) {
+//                redGhostView.setImage(redGhostIMG);
+//            } else if (redGhost.getCurrentOrientation() == Orientation.RIGHT) {
+//                redGhostView.setImage(redGhostIMG);
+//            } else if (redGhost.getCurrentOrientation() == Orientation.DOWN) {
+//                redGhostView.setImage(redGhostIMG);
+//            }
         }
     }
 
