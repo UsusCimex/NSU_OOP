@@ -1,0 +1,5 @@
+ru.nsu.pacman.enemy.Pacman             = P
+ru.nsu.pacman.enemy.ghosts.RedGhost    = r
+ru.nsu.pacman.enemy.ghosts.OrangeGhost = o
+ru.nsu.pacman.enemy.ghosts.PinkGhost   = p
+ru.nsu.pacman.enemy.ghosts.BlueGhost   = b

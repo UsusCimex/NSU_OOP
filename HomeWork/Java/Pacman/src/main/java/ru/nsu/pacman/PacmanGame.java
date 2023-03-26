@@ -12,14 +12,19 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import ru.nsu.pacman.enemy.Enemy;
+import ru.nsu.pacman.enemy.EnemyFactory;
 import ru.nsu.pacman.enemy.Pacman;
+import ru.nsu.pacman.enemy.ghosts.BlueGhost;
 import ru.nsu.pacman.enemy.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+
+import static java.lang.Math.*;
 
 public class PacmanGame extends Application {
 
@@ -40,6 +45,21 @@ public class PacmanGame extends Application {
             this.y = y;
         }
     }
+    
+    public static class EnemyData {
+        public Enemy enemy;
+        public ImageView imageView = new ImageView();
+        
+        public EnemyData(Enemy enemy) {
+            this.enemy = enemy;
+
+            this.imageView.setFitWidth(CELL_SIZE);
+            this.imageView.setFitHeight(CELL_SIZE);
+
+            this.imageView.setLayoutX(enemy.getPosition().x);
+            this.imageView.setLayoutY(enemy.getPosition().y);
+        }
+    }
 
     //Images
     private final Image pacmanRightIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/right.gif")));
@@ -58,12 +78,8 @@ public class PacmanGame extends Application {
     private int maxFood = 5;
     private boolean inGame = false;
     private boolean pause = false;
-
-    // Enemies
-    private Pacman pacman;
-    private ImageView pacmanView;
-    private RedGhost redGhost;
-    private ImageView redGhostView;
+    EnemyData pacman;
+    ArrayList<EnemyData> enemies;
 
     public static void main(String[] args) {
         launch(args);
@@ -73,12 +89,24 @@ public class PacmanGame extends Application {
         ArrayList<Coordinates> arr = new ArrayList<>();
         for (int col = 0; col < CELL_N; ++col) {
             for (int row = 0; row < CELL_N; ++row) {
-                if (data.getValueLevelData(new Coordinates(col, row)) == LevelData.Symbols.Pacman) {
+                if (data.getValueLevelData(new Coordinates(col, row)) == symbol) {
                     arr.add(new Coordinates(col, row));
                 }
             }
         }
         return arr;
+    }
+    private ArrayList<EnemyData> getAllEnemies(LevelData data) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        ArrayList<EnemyData> result = new ArrayList<EnemyData>();
+        for (int col = 0; col < CELL_N; ++col) {
+            for (int row = 0; row < CELL_N; ++row) {
+                Enemy enemy = EnemyFactory.getInstance().createEnemy(data.getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), area, data);
+                if (enemy != null && enemy.getClass() != Pacman.class) {
+                    result.add(new EnemyData(enemy));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -94,35 +122,27 @@ public class PacmanGame extends Application {
         if (getPositionsInData(data, LevelData.Symbols.Pacman).size() != 1) {
             throw new Exception("There can only be one pacman in the game");
         }
-        pacman = new Pacman(getPositionsInData(data, LevelData.Symbols.Pacman).get(0), area, data);
-//        redGhost = new RedGhost(new Coordinates(5 * CELL_SIZE,5 * CELL_SIZE), area, data); //factory
+        pacman = new EnemyData(new Pacman(getPositionsInData(data, LevelData.Symbols.Pacman).get(0), area, data));
+        pacman.imageView.setImage(pacmanStoppedIMG);
+        enemies = getAllEnemies(data);
 
-        pacmanView = new ImageView(pacmanRightIMG);
-        pacmanView.setFitWidth(CELL_SIZE);
-        pacmanView.setFitHeight(CELL_SIZE);
-//        redGhostView = new ImageView(redGhostIMG); //After we use factory
-//        redGhostView.setFitWidth(CELL_SIZE);
-//        redGhostView.setFitHeight(CELL_SIZE);
-
-        root.getChildren().add(pacmanView);
-        pacmanView.setLayoutX(pacman.getPosition().x);
-        pacmanView.setLayoutY(pacman.getPosition().y);
-//        root.getChildren().add(redGhostView); //factory
-//        redGhostView.setLayoutX(redGhost.getPosition().x);
-//        redGhostView.setLayoutY(redGhost.getPosition().y);
+        root.getChildren().add(pacman.imageView);
+        for(int i = 0; i < enemies.size(); ++i) {
+            root.getChildren().add(enemies.get(i).imageView);
+        }
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.UP) {
-                pacman.changeNextOrientation(Orientation.UP);
+                pacman.enemy.changeNextOrientation(Orientation.UP);
             } else if (event.getCode() == KeyCode.DOWN) {
-                pacman.changeNextOrientation(Orientation.DOWN);
+                pacman.enemy.changeNextOrientation(Orientation.DOWN);
             } else if (event.getCode() == KeyCode.LEFT) {
-                pacman.changeNextOrientation(Orientation.LEFT);
+                pacman.enemy.changeNextOrientation(Orientation.LEFT);
             } else if (event.getCode() == KeyCode.RIGHT) {
-                pacman.changeNextOrientation(Orientation.RIGHT);
+                pacman.enemy.changeNextOrientation(Orientation.RIGHT);
             } else if (event.getCode() == KeyCode.ESCAPE) {
                 pause = !pause;
-                pacmanView.setImage(pacmanStoppedIMG);
+                pacman.imageView.setImage(pacmanStoppedIMG);
             }
         });
 
@@ -136,46 +156,61 @@ public class PacmanGame extends Application {
         inGame = true;
     }
 
+    private double getDistance(Enemy enemyA, Enemy enemyB) {
+        return max(abs(enemyA.getPosition().x - enemyB.getPosition().x), abs(enemyA.getPosition().y - enemyB.getPosition().y));
+    }
+
     private void update() {
         if (inGame && !pause) {
             //PacmanAnimation
-            pacman.move();
+            pacman.enemy.move();
 
-            pacmanView.setLayoutX(pacman.getPosition().x);
-            pacmanView.setLayoutY(pacman.getPosition().y);
+            pacman.imageView.setLayoutX(pacman.enemy.getPosition().x);
+            pacman.imageView.setLayoutY(pacman.enemy.getPosition().y);
 
-            if (pacman.getCurrentOrientation() == Orientation.UP) {
-                pacmanView.setImage(pacmanUpIMG);
-            } else if (pacman.getCurrentOrientation() == Orientation.LEFT) {
-                pacmanView.setImage(pacmanLeftIMG);
-            } else if (pacman.getCurrentOrientation() == Orientation.RIGHT) {
-                pacmanView.setImage(pacmanRightIMG);
-            } else if (pacman.getCurrentOrientation() == Orientation.DOWN) {
-                pacmanView.setImage(pacmanDownIMG);
+            if (pacman.enemy.getCurrentOrientation() == Orientation.UP) {
+                pacman.imageView.setImage(pacmanUpIMG);
+            } else if (pacman.enemy.getCurrentOrientation() == Orientation.LEFT) {
+                pacman.imageView.setImage(pacmanLeftIMG);
+            } else if (pacman.enemy.getCurrentOrientation() == Orientation.RIGHT) {
+                pacman.imageView.setImage(pacmanRightIMG);
+            } else if (pacman.enemy.getCurrentOrientation() == Orientation.DOWN) {
+                pacman.imageView.setImage(pacmanDownIMG);
             } else {
-                pacmanView.setImage(pacmanStoppedIMG);
+                pacman.imageView.setImage(pacmanStoppedIMG);
             }
 
-            if (pacman.getFoodEat() == maxFood) {
-                inGame = false;
-                System.out.println("GAME OVER :D");
-            }
+//            if (pacman.enemy.getFoodEat() == maxFood) { //fix it later
+//                inGame = false;
+//                System.out.println("GAME OVER :D");
+//            }
 
             //GhostsAnimation
-//            redGhost.move();
-//
-//            redGhostView.setLayoutX(redGhostView.getPosition().x);
-//            redGhostView.setLayoutY(redGhostView.getPosition().y);
-//
-//            if (redGhost.getCurrentOrientation() == Orientation.UP) {
-//                redGhostView.setImage(redGhostIMG);
-//            } else if (redGhost.getCurrentOrientation() == Orientation.LEFT) {
-//                redGhostView.setImage(redGhostIMG);
-//            } else if (redGhost.getCurrentOrientation() == Orientation.RIGHT) {
-//                redGhostView.setImage(redGhostIMG);
-//            } else if (redGhost.getCurrentOrientation() == Orientation.DOWN) {
-//                redGhostView.setImage(redGhostIMG);
-//            }
+            for (int i = 0; i < enemies.size(); ++i) {
+                EnemyData ghost = enemies.get(i);
+
+                ghost.enemy.move();
+
+                ghost.imageView.setLayoutX(ghost.enemy.getPosition().x);
+                ghost.imageView.setLayoutY(ghost.enemy.getPosition().y);
+
+                if (ghost.enemy.getCurrentOrientation() == Orientation.UP) {
+                    ghost.imageView.setImage(redGhostIMG);
+                } else if (ghost.enemy.getCurrentOrientation() == Orientation.LEFT) {
+                    ghost.imageView.setImage(redGhostIMG);
+                } else if (ghost.enemy.getCurrentOrientation() == Orientation.RIGHT) {
+                    ghost.imageView.setImage(redGhostIMG);
+                } else if (ghost.enemy.getCurrentOrientation() == Orientation.DOWN) {
+                    ghost.imageView.setImage(redGhostIMG);
+                }
+
+                //Check mob collision
+                if (getDistance(pacman.enemy, ghost.enemy) <= CELL_SIZE) {
+                    System.out.println("YOU LOSE!");
+                    inGame = false;
+                    break;
+                }
+            }
         }
     }
 
@@ -185,8 +220,6 @@ public class PacmanGame extends Application {
             if (currentLevel == 1) return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
             else if (currentLevel == 2) return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
             else if (currentLevel == 3) return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
-            else if (currentLevel == 4) return new LevelData(getClass().getResourceAsStream("levels/4.txt"));
-            else if (currentLevel == 5) return new LevelData(getClass().getResourceAsStream("levels/5.txt"));
             else inGame = false;
         } catch (Exception ex) {
             ex.getStackTrace();
