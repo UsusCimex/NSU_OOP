@@ -1,11 +1,11 @@
 package ru.nsu.pacman.generation;
 
-import ru.nsu.pacman.PacmanGame;
-import ru.nsu.pacman.enemy.Pacman;
+import ru.nsu.pacman.Game;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Scanner;
+
+import static ru.nsu.pacman.Controller.Coordinates;
 
 public class LevelData {
     private static final int ARRAY_SIZE = 21;
@@ -24,10 +24,10 @@ public class LevelData {
     private int eatedFood = 0;
     private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
-    public void setValueLevelData(PacmanGame.Coordinates cord, Symbols value) {
+    public void setValueLevelData(Coordinates cord, Symbols value) {
         levelData[(int)cord.x][(int)cord.y] = value;
     }
-    public Symbols getValueLevelData(PacmanGame.Coordinates cord) {
+    public Symbols getValueLevelData(Coordinates cord) {
         if (cord.x < 0 || cord.x >= ARRAY_SIZE || cord.y < 0 || cord.y >= ARRAY_SIZE) {
             return Symbols.Empty;
         }
@@ -36,7 +36,7 @@ public class LevelData {
     public int getCountFood() {
         return countFood;
     }
-    public void eatFood(PacmanGame.Coordinates cord) {
+    public void eatFood(Coordinates cord) {
         if (getValueLevelData(cord) == Symbols.Food) {
             setValueLevelData(cord, Symbols.Empty);
             eatedFood++;

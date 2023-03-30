@@ -6,7 +6,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import ru.nsu.pacman.PacmanGame;
+import ru.nsu.pacman.Game;
+
+import static ru.nsu.pacman.Controller.Coordinates;
 
 public class LevelBuilder {
     private static final int GRID_SIZE = 21;
@@ -22,8 +24,8 @@ public class LevelBuilder {
 
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                LevelData.Symbols status = levelData.getValueLevelData(new PacmanGame.Coordinates(row, col));
-                if (status == LevelData.Symbols.Wall) { // after we make factory
+                LevelData.Symbols status = levelData.getValueLevelData(new Coordinates(row, col));
+                if (status == LevelData.Symbols.Wall) {
                     Rectangle block = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
                     block.setFill(WALL_COLOR);
                     gridPane.add(block, row, col);

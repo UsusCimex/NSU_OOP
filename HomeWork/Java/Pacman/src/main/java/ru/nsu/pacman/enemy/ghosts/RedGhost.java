@@ -1,16 +1,15 @@
 package ru.nsu.pacman.enemy.ghosts;
 
 import javafx.scene.layout.GridPane;
-import ru.nsu.pacman.PacmanGame;
 import ru.nsu.pacman.enemy.Enemy;
 import ru.nsu.pacman.generation.LevelData;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import static ru.nsu.pacman.PacmanGame.CELL_N;
-import static ru.nsu.pacman.PacmanGame.Coordinates;
-import static ru.nsu.pacman.PacmanGame.Orientation;
+import static ru.nsu.pacman.Game.CELL_N;
+import static ru.nsu.pacman.Controller.Coordinates;
+import static ru.nsu.pacman.Controller.Orientation;
 
 public class RedGhost extends Enemy {
     public RedGhost(Coordinates startPosition, GridPane area, LevelData data) {
@@ -81,13 +80,13 @@ public class RedGhost extends Enemy {
             }
         }
 
-        if (curentOrientation == PacmanGame.Orientation.UP) {
+        if (curentOrientation == Orientation.UP) {
             position.y -= speed;
-        } else if (curentOrientation == PacmanGame.Orientation.RIGHT) {
+        } else if (curentOrientation == Orientation.RIGHT) {
             position.x += speed;
-        } else if (curentOrientation == PacmanGame.Orientation.DOWN) {
+        } else if (curentOrientation == Orientation.DOWN) {
             position.y += speed;
-        } else if (curentOrientation == PacmanGame.Orientation.LEFT) {
+        } else if (curentOrientation == Orientation.LEFT) {
             position.x -= speed;
         }
     }

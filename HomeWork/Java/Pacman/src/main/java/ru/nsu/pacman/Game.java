@@ -3,13 +3,15 @@ package ru.nsu.pacman;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import ru.nsu.pacman.enemy.Enemy;
@@ -26,83 +28,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static java.lang.Math.*;
+import static ru.nsu.pacman.Controller.Orientation;
+import static ru.nsu.pacman.Controller.Coordinates;
+import static ru.nsu.pacman.Controller.EnemyData;
 
-public class PacmanGame extends Application {
-
-    public enum Orientation {
-        UP,
-        RIGHT,
-        DOWN,
-        LEFT,
-        NONE
-    }
-
-    public static class Coordinates {
-        public double x;
-        public double y;
-
-        public Coordinates(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-    
-    public static class EnemyData {
-        public Enemy body;
-        public ImageView view = new ImageView();
-
-        private Image passiveIMG;
-        private Image leftIMG;
-        private Image rightIMG;
-        private Image upIMG;
-        private Image downIMG;
-
-        public EnemyData(Enemy enemy) {
-            body = enemy;
-
-            view.setFitWidth(CELL_SIZE);
-            view.setFitHeight(CELL_SIZE);
-
-            view.setLayoutX(enemy.getPosition().x);
-            view.setLayoutY(enemy.getPosition().y);
-        }
-
-        public void setImages(Image passive, Image left, Image right, Image up, Image down) {
-            passiveIMG = passive;
-            leftIMG = left;
-            rightIMG = right;
-            upIMG = up;
-            downIMG = down;
-        }
-
-        public void changeOrientationVew() {
-            if (body.getCurrentOrientation() == Orientation.UP) {
-                view.setImage(upIMG);
-            } else if (body.getCurrentOrientation() == Orientation.LEFT) {
-                view.setImage(leftIMG);
-            } else if (body.getCurrentOrientation() == Orientation.RIGHT) {
-                view.setImage(rightIMG);
-            } else if (body.getCurrentOrientation() == Orientation.DOWN) {
-                view.setImage(downIMG);
-            } else {
-                view.setImage(passiveIMG);
-            }
-        }
-    }
-    private GridPane area = null;
-    LevelData data = null;
-
+public class Game extends Application {
     public static final int CELL_SIZE = 32;
     public static final int CELL_N = 21;
+
+    private GridPane area = null;
+    private LevelData data = null;
+    private StackPane root = null;
     private int currentLevel = 0;
     private boolean inGame = false;
+    private boolean waitMode = false;
+    private boolean lose = false;
     private boolean pause = false;
-    EnemyData pacman;
-    ArrayList<EnemyData> enemies;
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+    private EnemyData pacman;
+    private ArrayList<EnemyData> enemies;
 
     private ArrayList<EnemyData> getAllEnemies(LevelData data) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         ArrayList<EnemyData> result = new ArrayList<EnemyData>();
@@ -158,18 +101,18 @@ public class PacmanGame extends Application {
 
     private boolean addAllEnemiesInRoot(Pane root) {
         boolean pacmanChecker = false;
-        for(int i = 0; i < enemies.size(); ++i) {
-            if (enemies.get(i).body.getClass() == Pacman.class) {
+        for (EnemyData enemy : enemies) {
+            if (enemy.body.getClass() == Pacman.class) {
                 if (!pacmanChecker) {
                     System.out.println("PACMAN ADDED!");
-                    pacman = enemies.get(i);
+                    pacman = enemy;
                     pacmanChecker = true;
                 } else {
                     System.out.println("In game play only 1 PACMAN!");
                     return false;
                 }
             }
-            root.getChildren().add(enemies.get(i).view);
+            root.getChildren().add(enemy.view);
         }
         if (!pacmanChecker) {
             System.out.println("PACMAN NOT FOUND!");
@@ -179,19 +122,27 @@ public class PacmanGame extends Application {
     }
     @Override
     public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("PacmanGame");
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png")));
+        primaryStage.getIcons().add(icon);
+
         data = generateNextLevel();
         LevelBuilder builder = new LevelBuilder();
         area = builder.buildLevel(data);
-        Pane root = new Pane(area);
+        Pane gamePane = new Pane(area);
+
+        root = new StackPane();
+        root.getChildren().add(gamePane);
+        root.setStyle("-fx-background-color: AQUA;");
+
         Scene scene = new Scene(root);
-        scene.setFill(Color.AQUA);
 
         enemies = getAllEnemies(data);
 
         if (!settingIMG()) {
             return;
         }
-        if (!addAllEnemiesInRoot(root)) {
+        if (!addAllEnemiesInRoot(gamePane)) {
             return;
         }
 
@@ -205,6 +156,7 @@ public class PacmanGame extends Application {
             } else if (event.getCode() == KeyCode.RIGHT) {
                 pacman.body.changeNextOrientation(Orientation.RIGHT);
             } else if (event.getCode() == KeyCode.ESCAPE) {
+                waitMode = false;
                 pause = !pause;
             }
         });
@@ -223,12 +175,62 @@ public class PacmanGame extends Application {
         return max(abs(enemyA.getPosition().x - enemyB.getPosition().x), abs(enemyA.getPosition().y - enemyB.getPosition().y));
     }
 
+    private void printWin() {
+        Text text1 = new Text("You WIN");
+        text1.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 80));
+        text1.setFill(Color.YELLOW);
+
+        Text text2 = new Text("Press ENTER to continue!");
+        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
+        text2.setFill(Color.YELLOW);
+
+        VBox vbox = new VBox(text1, text2);
+        vbox.setAlignment(Pos.CENTER);
+
+        root.getChildren().add(vbox);
+    }
+
+    private void printLose() {
+        Text text1 = new Text("You LOSE");
+        text1.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 80));
+        text1.setFill(Color.YELLOW);
+        text1.setStroke(Color.BLACK);
+        text1.setStrokeWidth(2.0);
+
+        Text text2 = new Text("Press ESC to exit!");
+        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
+        text2.setFill(Color.YELLOW);
+        text2.setStroke(Color.BLACK);
+        text2.setStrokeWidth(2.0);
+
+        VBox vbox = new VBox(text1, text2);
+        vbox.setAlignment(Pos.CENTER);
+
+        root.getChildren().add(vbox);
+    }
+    private void printPause() {
+        Text text1 = new Text("Game in pause!");
+        text1.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
+        text1.setFill(Color.YELLOW);
+        text1.setStroke(Color.BLACK);
+        text1.setStrokeWidth(2.0);
+
+        Text text2 = new Text("Press ESC to continue!");
+        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 40));
+        text2.setFill(Color.YELLOW);
+        text2.setStroke(Color.BLACK);
+        text2.setStrokeWidth(2.0);
+
+        VBox vbox = new VBox(text1, text2);
+        vbox.setAlignment(Pos.CENTER);
+
+        root.getChildren().add(vbox);
+    }
+
     private void update() {
         if (inGame && !pause) {
             //GhostsAnimation
-            for (int i = 0; i < enemies.size(); ++i) {
-                EnemyData enemy = enemies.get(i);
-
+            for (EnemyData enemy : enemies) {
                 enemy.body.move();
 
                 enemy.view.setLayoutX(enemy.body.getPosition().x);
@@ -241,6 +243,7 @@ public class PacmanGame extends Application {
                     if (getDistance(pacman.body, enemy.body) <= CELL_SIZE * 0.8) {
                         System.out.println("YOU LOSE!");
                         inGame = false;
+                        lose = true;
                         break;
                     }
                 }
@@ -249,8 +252,20 @@ public class PacmanGame extends Application {
             //Check finish
             if (data.getEatedFood() == data.getCountFood()) {
                 inGame = false;
+                lose = false;
                 System.out.println("YOU WIN!");
             }
+        } else if (!inGame && !waitMode) {
+            waitMode = true;
+            if (lose) {
+                printLose();
+            }
+            else {
+                printWin();
+            }
+        } else if (pause && !waitMode) {
+            waitMode = true;
+            printPause();
         }
     }
 

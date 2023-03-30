@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nsu.pacman.menu.MainMenu">
+   <children>
+      <Text layoutX="114.0" layoutY="82.0" strokeWidth="0.0" text="Pacman" textAlignment="CENTER" underline="true" wrappingWidth="371.3333435058594">
+         <font>
+            <Font name="OCR A Extended" size="96.0" />
+         </font>
+      </Text>
+      <Button fx:id="startButton" layoutX="160.0" layoutY="180.0" mnemonicParsing="false" onAction="#starte" prefHeight="86.0" prefWidth="279.0" style="-fx-background-color: aqua; -fx-border-width: 4; -fx-border-color: black;" text="Start" underline="true">
+         <font>
+            <Font name="OCR A Extended" size="42.0" />
+         </font>
+      </Button>
+      <TextField alignment="CENTER" layoutX="160.0" layoutY="110.0" prefHeight="51.0" prefWidth="279.0" promptText="Enter your name" />
+      <Button fx:id="recordButton" layoutX="31.0" layoutY="284.0" mnemonicParsing="false" onAction="#record" prefHeight="86.0" prefWidth="249.0" style="-fx-background-color: aqua; -fx-border-color: black; -fx-border-width: 4;" text="Records" underline="true">
+         <font>
+            <Font name="OCR A Extended" size="42.0" />
+         </font>
+      </Button>
+      <Button fx:id="quitButton" layoutX="318.0" layoutY="284.0" mnemonicParsing="false" onAction="#quit" prefHeight="86.0" prefWidth="249.0" style="-fx-background-color: aqua; -fx-border-color: black; -fx-border-width: 4;" text="Quit" underline="true">
+         <font>
+            <Font name="OCR A Extended" size="42.0" />
+         </font>
+      </Button>
+      <ImageView fitHeight="99.0" fitWidth="100.0" layoutX="26.0" layoutY="151.0">
+         <image>
+            <Image url="@../sprites/pacman/right.gif" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="99.0" fitWidth="100.0" layoutX="469.0" layoutY="151.0">
+         <image>
+            <Image url="@../sprites/ghosts/red/right.gif" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
