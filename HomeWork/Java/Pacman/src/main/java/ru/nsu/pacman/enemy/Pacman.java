@@ -5,7 +5,6 @@ import javafx.scene.layout.GridPane;
 import ru.nsu.pacman.PacmanGame;
 import ru.nsu.pacman.generation.LevelData;
 
-import static java.lang.Math.abs;
 import static ru.nsu.pacman.PacmanGame.CELL_SIZE;
 import static ru.nsu.pacman.PacmanGame.CELL_N;
 import static ru.nsu.pacman.PacmanGame.Coordinates;

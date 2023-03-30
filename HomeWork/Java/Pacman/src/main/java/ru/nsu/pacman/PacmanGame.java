@@ -31,7 +31,7 @@ public class PacmanGame extends Application {
         DOWN,
         LEFT,
         NONE
-    };
+    }
 
     public static class Coordinates {
         public double x;
