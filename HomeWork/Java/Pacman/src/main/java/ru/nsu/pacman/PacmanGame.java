@@ -15,12 +15,9 @@ import javafx.util.Duration;
 import ru.nsu.pacman.enemy.Enemy;
 import ru.nsu.pacman.enemy.EnemyFactory;
 import ru.nsu.pacman.enemy.Pacman;
-import ru.nsu.pacman.enemy.ghosts.BlueGhost;
-import ru.nsu.pacman.enemy.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -70,12 +67,11 @@ public class PacmanGame extends Application {
 
     private final Image redGhostIMG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif")));
     private GridPane area = null;
+    LevelData data = null;
 
     public static final int CELL_SIZE = 32;
     public static final int CELL_N = 21;
     private int currentLevel = 0;
-    public static final int COUNT_LEVELS = 5;
-    private int maxFood = 5;
     private boolean inGame = false;
     private boolean pause = false;
     EnemyData pacman;
@@ -111,13 +107,12 @@ public class PacmanGame extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        LevelData data = generateNextLevel();
+        data = generateNextLevel();
         LevelBuilder builder = new LevelBuilder();
         area = builder.buildLevel(data);
         Pane root = new Pane(area);
         Scene scene = new Scene(root);
         scene.setFill(Color.AQUA);
-        maxFood = data.getCountFood();
 
         if (getPositionsInData(data, LevelData.Symbols.Pacman).size() != 1) {
             throw new Exception("There can only be one pacman in the game");
@@ -180,10 +175,10 @@ public class PacmanGame extends Application {
                 pacman.imageView.setImage(pacmanStoppedIMG);
             }
 
-//            if (pacman.enemy.getFoodEat() == maxFood) { //fix it later
-//                inGame = false;
-//                System.out.println("GAME OVER :D");
-//            }
+            if (data.getEatedFood() == data.getCountFood()) {
+                inGame = false;
+                System.out.println("YOU WIN!");
+            }
 
             //GhostsAnimation
             for (int i = 0; i < enemies.size(); ++i) {
@@ -205,7 +200,7 @@ public class PacmanGame extends Application {
                 }
 
                 //Check mob collision
-                if (getDistance(pacman.enemy, ghost.enemy) <= CELL_SIZE) {
+                if (getDistance(pacman.enemy, ghost.enemy) <= CELL_SIZE * 0.8) {
                     System.out.println("YOU LOSE!");
                     inGame = false;
                     break;

@@ -1,26 +1,13 @@
 package ru.nsu.pacman.enemy.ghosts;
 
+import javafx.scene.layout.GridPane;
 import ru.nsu.pacman.PacmanGame;
 import ru.nsu.pacman.enemy.Enemy;
+import ru.nsu.pacman.generation.LevelData;
 
-public class OrangeGhost implements Enemy {
-    @Override
-    public PacmanGame.Coordinates getPosition() {
-        return null;
-    }
+public class OrangeGhost extends Enemy {
 
-    @Override
-    public PacmanGame.Orientation getCurrentOrientation() {
-        return null;
-    }
-
-    @Override
-    public void changeNextOrientation(PacmanGame.Orientation newOrientation) {
-
-    }
-
-    @Override
-    public void move() {
-
+    public OrangeGhost(PacmanGame.Coordinates startPosition, GridPane area, LevelData data) {
+        super(startPosition, area, data);
     }
 }

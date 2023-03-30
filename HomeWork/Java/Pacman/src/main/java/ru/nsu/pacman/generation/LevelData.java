@@ -21,6 +21,7 @@ public class LevelData {
         OrangeGhost
     }
     private int countFood = 0;
+    private int eatedFood = 0;
     private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
     public void setValueLevelData(PacmanGame.Coordinates cord, Symbols value) {
@@ -35,6 +36,13 @@ public class LevelData {
     public int getCountFood() {
         return countFood;
     }
+    public void eatFood(PacmanGame.Coordinates cord) {
+        if (getValueLevelData(cord) == Symbols.Food) {
+            setValueLevelData(cord, Symbols.Empty);
+            eatedFood++;
+        }
+    }
+    public int getEatedFood() { return eatedFood; }
     public static Symbols convertStringToSymbol(String symbol) throws Exception {
         return switch (symbol) {
             case ("P") -> Symbols.Pacman;

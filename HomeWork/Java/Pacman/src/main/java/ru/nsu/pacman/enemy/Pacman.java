@@ -11,99 +11,12 @@ import static ru.nsu.pacman.PacmanGame.CELL_N;
 import static ru.nsu.pacman.PacmanGame.Coordinates;
 import static ru.nsu.pacman.PacmanGame.Orientation;
 
-public class Pacman implements Enemy {
-    private GridPane area = null;
-    private LevelData data = null;
-    private int foodEat = 0;
+public class Pacman extends Enemy {
     private double distanceToEatFood = 12;
-    private PacmanGame.Orientation curentOrientation = PacmanGame.Orientation.NONE;
-    private PacmanGame.Orientation nextOrientation = PacmanGame.Orientation.NONE;
-    private double speed = 2.5;
-    private Coordinates position;
-    private Coordinates cellPosition;
-    public Pacman(PacmanGame.Coordinates startPosition, GridPane area, LevelData data) {
-        this.cellPosition = startPosition;
-        this.position = new Coordinates(startPosition.x * CELL_SIZE, startPosition.y * CELL_SIZE);
 
-        this.area = area;
-        this.data = data;
-    }
-    @Override
-    public PacmanGame.Coordinates getPosition() {
-        return position;
-    }
-    public void setPosition(PacmanGame.Coordinates newPosition) {
-        cellPosition = newPosition;
-        position = new Coordinates(newPosition.x * CELL_SIZE, newPosition.y * CELL_SIZE);
-    }
-
-    public int getFoodEat() {
-        return foodEat;
-    }
-    @Override
-    public void changeNextOrientation(PacmanGame.Orientation orientation) {
-        nextOrientation = orientation;
-    }
-    public void changeCurrentOrientation() {
-        curentOrientation = nextOrientation;
-        nextOrientation = PacmanGame.Orientation.NONE;
-    }
-    @Override
-    public PacmanGame.Orientation getCurrentOrientation() {
-        return curentOrientation;
-    }
-    public PacmanGame.Orientation getNextOrientation() {
-        return nextOrientation;
-    }
-
-    public boolean pacmanInNewCell() {
-        return ( abs(position.x - (cellPosition.x * CELL_SIZE)) >= CELL_SIZE ||
-                abs(position.y - (cellPosition.y * CELL_SIZE)) >= CELL_SIZE);
-    }
-
-    public boolean pacmanCanRotate() {
-        if ((nextOrientation == PacmanGame.Orientation.UP) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall)) {
-            return true;
-        } else if ((nextOrientation == PacmanGame.Orientation.LEFT) && (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
-            return true;
-        } else if ((nextOrientation == PacmanGame.Orientation.RIGHT) && (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
-            return true;
-        } else if ((nextOrientation == PacmanGame.Orientation.DOWN) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean pacmanCanMove() {
-        if ((curentOrientation == PacmanGame.Orientation.UP) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall)) {
-            return true;
-        } else if ((curentOrientation == PacmanGame.Orientation.LEFT) && (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
-            return true;
-        } else if ((curentOrientation == PacmanGame.Orientation.RIGHT) && (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
-            return true;
-        } else if ((curentOrientation == PacmanGame.Orientation.DOWN) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall)) {
-            return true;
-        }
-
-        if (((cellPosition.x * CELL_SIZE - position.x) != 0) || ((cellPosition.y * CELL_SIZE - position.y) != 0)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean pacmanInBorder() {
-        if ((curentOrientation == PacmanGame.Orientation.LEFT) && ((int)cellPosition.x == 0)) {
-            return true;
-        } else if ((curentOrientation == PacmanGame.Orientation.UP) && ((int)cellPosition.y == 0)) {
-            return true;
-        } else if ((curentOrientation == PacmanGame.Orientation.RIGHT) && ((int)cellPosition.x == CELL_N - 1)) {
-            return true;
-        } else if ((curentOrientation == PacmanGame.Orientation.DOWN) && ((int)cellPosition.y == CELL_N - 1)) {
-            return true;
-        }
-        return false;
+    public Pacman(Coordinates startPosition, GridPane area, LevelData data) {
+        super(startPosition, area, data);
+        speed = 2.5;
     }
 
     private void removeNodeFromArea(Coordinates cord) {
@@ -116,7 +29,9 @@ public class Pacman implements Enemy {
     }
 
     private boolean pacmanCanEatFood() {
-        if (pacmanInBorder()) return false;
+        if (enemyInBorder()) {
+            return false;
+        }
         if (getCurrentOrientation() == Orientation.LEFT && ((position.x - (cellPosition.x - 1) * CELL_SIZE) <= distanceToEatFood)) {
             return data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) == LevelData.Symbols.Food;
         } else if (getCurrentOrientation() == Orientation.RIGHT && (((cellPosition.x + 1) * CELL_SIZE - position.x) <= distanceToEatFood)) {
@@ -131,7 +46,7 @@ public class Pacman implements Enemy {
     }
     @Override
     public void move() {
-        if (pacmanCanMove()) {
+        if (enemyCanMove()) {
             if (curentOrientation == PacmanGame.Orientation.UP) {
                 position.y -= speed;
             }
@@ -149,24 +64,23 @@ public class Pacman implements Enemy {
         }
 
         if (pacmanCanEatFood()) {
-            System.out.println("I'm eat " + foodEat);
             if (getCurrentOrientation() == Orientation.LEFT) {
                 removeNodeFromArea(new Coordinates(cellPosition.x - 1, cellPosition.y));
-                data.setValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y), LevelData.Symbols.Empty);
+                data.eatFood(new Coordinates(cellPosition.x - 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.UP) {
                 removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y - 1));
-                data.setValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1), LevelData.Symbols.Empty);
+                data.eatFood(new Coordinates(cellPosition.x, cellPosition.y - 1));
             } else if (getCurrentOrientation() == Orientation.RIGHT) {
                 removeNodeFromArea(new Coordinates(cellPosition.x + 1, cellPosition.y));
-                data.setValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y), LevelData.Symbols.Empty);
+                data.eatFood(new Coordinates(cellPosition.x + 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.DOWN) {
                 removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y + 1));
-                data.setValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1), LevelData.Symbols.Empty);
+                data.eatFood(new Coordinates(cellPosition.x, cellPosition.y + 1));
             }
-            foodEat += 1;
+            System.out.println("FOOD: " + data.getEatedFood() + "/" + data.getCountFood());
         }
 
-        if (pacmanInNewCell() && getCurrentOrientation() != Orientation.NONE) {
+        if (enemyInNewCell() && getCurrentOrientation() != Orientation.NONE) {
             Coordinates newPosition = null;
             if (getCurrentOrientation() == Orientation.UP) {
                 newPosition = new Coordinates(cellPosition.x, cellPosition.y - 1);
@@ -181,7 +95,7 @@ public class Pacman implements Enemy {
             setPosition(newPosition);
             data.setValueLevelData(cellPosition, LevelData.Symbols.Empty);
             data.setValueLevelData(newPosition, LevelData.Symbols.Pacman);
-            if (pacmanCanRotate()) {
+            if (enemyCanRotate()) {
                 changeCurrentOrientation();
             }
         }
@@ -193,8 +107,7 @@ public class Pacman implements Enemy {
             changeCurrentOrientation();
         }
 
-        if (pacmanInBorder()) {
-            //Make after Animation go to for the board
+        if (enemyInBorder()) {
             if (getCurrentOrientation() == Orientation.RIGHT) {
                 setPosition(new Coordinates(0, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.LEFT) {
