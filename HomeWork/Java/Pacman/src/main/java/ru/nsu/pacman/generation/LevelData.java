@@ -1,11 +1,17 @@
 package ru.nsu.pacman.generation;
 
+import ru.nsu.pacman.Controller;
 import ru.nsu.pacman.Game;
+import ru.nsu.pacman.enemy.Enemy;
+import ru.nsu.pacman.enemy.EnemyFactory;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import static ru.nsu.pacman.Controller.Coordinates;
+import static ru.nsu.pacman.Game.CELL_N;
 
 public class LevelData {
     private static final int ARRAY_SIZE = 21;
@@ -22,6 +28,7 @@ public class LevelData {
     }
     private int countFood = 0;
     private int eatedFood = 0;
+    private ArrayList<Controller.EnemyData> allEnemies = null;
     private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
     public void setValueLevelData(Coordinates cord, Symbols value) {
@@ -56,6 +63,20 @@ public class LevelData {
             case ("o") -> Symbols.OrangeGhost;
             default -> throw new Exception("Symbol not found");
         };
+    }
+    public ArrayList<Controller.EnemyData> getAllEnemies() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        if (allEnemies != null) return allEnemies;
+
+        allEnemies = new ArrayList<Controller.EnemyData>();
+        for (int col = 0; col < CELL_N; ++col) {
+            for (int row = 0; row < CELL_N; ++row) {
+                Enemy enemy = EnemyFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);
+                if (enemy != null) {
+                    allEnemies.add(new Controller.EnemyData(enemy));
+                }
+            }
+        }
+        return allEnemies;
     }
     private void loadLevelDataFromFile(InputStream is) throws Exception {
         Scanner scanner = new Scanner(is);

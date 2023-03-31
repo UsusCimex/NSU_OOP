@@ -14,8 +14,8 @@ import static ru.nsu.pacman.Controller.Orientation;
 
 //Always running after Pacman
 public class RedGhost extends Enemy {
-    public RedGhost(Coordinates startPosition, GridPane area, LevelData data) {
-        super(startPosition, area, data);
+    public RedGhost(Coordinates startPosition, LevelData data) {
+        super(startPosition, data);
         speed = 1.5;
     }
     @Override

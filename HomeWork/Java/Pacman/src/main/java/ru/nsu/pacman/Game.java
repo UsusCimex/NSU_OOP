@@ -23,7 +23,9 @@ import ru.nsu.pacman.enemy.ghosts.PinkGhost;
 import ru.nsu.pacman.enemy.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
+import ru.nsu.pacman.menu.MainMenu;
 
+import java.io.ObjectInputFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -36,68 +38,12 @@ public class Game extends Application {
     public static final int CELL_SIZE = 32;
     public static final int CELL_N = 21;
 
-    private GridPane area = null;
     private LevelData data = null;
-    private StackPane root = null;
+    private Scene scene = null;
     private int currentLevel = 0;
-    private boolean inGame = false;
-    private boolean waitMode = false;
-    private boolean lose = false;
-    private boolean pause = false;
+    private Controller.GameStatus status = Controller.GameStatus.NONE;
     private EnemyData pacman;
     private ArrayList<EnemyData> enemies;
-
-    private ArrayList<EnemyData> getAllEnemies(LevelData data) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        ArrayList<EnemyData> result = new ArrayList<EnemyData>();
-        for (int col = 0; col < CELL_N; ++col) {
-            for (int row = 0; row < CELL_N; ++row) {
-                Enemy enemy = EnemyFactory.getInstance().createEnemy(data.getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), area, data);
-                if (enemy != null) {
-                    result.add(new EnemyData(enemy));
-                }
-            }
-        }
-        return result;
-    }
-    private boolean settingIMG() {
-        for (EnemyData enemy : enemies) {
-            if (enemy.body.getClass().equals(Pacman.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/stopped.png"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/left.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/up.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/pacman/down.gif"))));
-            } else if (enemy.body.getClass().equals(RedGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))));
-            } else if (enemy.body.getClass().equals(BlueGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))));
-            } else if (enemy.body.getClass().equals(OrangeGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))));
-            } else if (enemy.body.getClass().equals(PinkGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(getClass().getResourceAsStream("sprites/ghosts/red/right.gif"))));
-            } else {
-                System.out.println("Enemy not found! Add new enemy in setting IMG");
-                return false;
-            }
-        }
-        return true;
-    }
 
     private boolean addAllEnemiesInRoot(Pane root) {
         boolean pacmanChecker = false;
@@ -128,24 +74,38 @@ public class Game extends Application {
 
         data = generateNextLevel();
         LevelBuilder builder = new LevelBuilder();
-        area = builder.buildLevel(data);
+        GridPane area = builder.buildLevel(data);
+        area.setId("area");
         Pane gamePane = new Pane(area);
+        gamePane.setId("gamePane");
 
-        root = new StackPane();
+        StackPane root = new StackPane();
         root.getChildren().add(gamePane);
         root.setStyle("-fx-background-color: AQUA;");
 
-        Scene scene = new Scene(root);
+        Graphic.setMainRoot(root);
 
-        enemies = getAllEnemies(data);
+        scene = new Scene(root);
 
-        if (!settingIMG()) {
+        enemies = data.getAllEnemies();
+
+        if (!Graphic.settingIMG(enemies) || !addAllEnemiesInRoot(gamePane)) {
             return;
         }
-        if (!addAllEnemiesInRoot(gamePane)) {
-            return;
-        }
 
+        setDefaultControl();
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> update()));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        status = Controller.GameStatus.GAME;
+    }
+
+    private void setDefaultControl() {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.UP) {
                 pacman.body.changeNextOrientation(Orientation.UP);
@@ -156,116 +116,79 @@ public class Game extends Application {
             } else if (event.getCode() == KeyCode.RIGHT) {
                 pacman.body.changeNextOrientation(Orientation.RIGHT);
             } else if (event.getCode() == KeyCode.ESCAPE) {
-                waitMode = false;
-                pause = !pause;
+                status = Controller.GameStatus.PAUSE;
             }
         });
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> update()));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-        inGame = true;
     }
 
     private double getDistance(Enemy enemyA, Enemy enemyB) {
         return max(abs(enemyA.getPosition().x - enemyB.getPosition().x), abs(enemyA.getPosition().y - enemyB.getPosition().y));
     }
 
-    private void printWin() {
-        Text text1 = new Text("You WIN");
-        text1.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 80));
-        text1.setFill(Color.YELLOW);
-
-        Text text2 = new Text("Press ENTER to continue!");
-        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
-        text2.setFill(Color.YELLOW);
-
-        VBox vbox = new VBox(text1, text2);
-        vbox.setAlignment(Pos.CENTER);
-
-        root.getChildren().add(vbox);
-    }
-
-    private void printLose() {
-        Text text1 = new Text("You LOSE");
-        text1.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 80));
-        text1.setFill(Color.YELLOW);
-        text1.setStroke(Color.BLACK);
-        text1.setStrokeWidth(2.0);
-
-        Text text2 = new Text("Press ESC to exit!");
-        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
-        text2.setFill(Color.YELLOW);
-        text2.setStroke(Color.BLACK);
-        text2.setStrokeWidth(2.0);
-
-        VBox vbox = new VBox(text1, text2);
-        vbox.setAlignment(Pos.CENTER);
-
-        root.getChildren().add(vbox);
-    }
-    private void printPause() {
-        Text text1 = new Text("Game in pause!");
-        text1.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
-        text1.setFill(Color.YELLOW);
-        text1.setStroke(Color.BLACK);
-        text1.setStrokeWidth(2.0);
-
-        Text text2 = new Text("Press ESC to continue!");
-        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 40));
-        text2.setFill(Color.YELLOW);
-        text2.setStroke(Color.BLACK);
-        text2.setStrokeWidth(2.0);
-
-        VBox vbox = new VBox(text1, text2);
-        vbox.setAlignment(Pos.CENTER);
-
-        root.getChildren().add(vbox);
-    }
-
     private void update() {
-        if (inGame && !pause) {
+        if (status == Controller.GameStatus.GAME) {
             //GhostsAnimation
             for (EnemyData enemy : enemies) {
                 enemy.body.move();
-
-                enemy.view.setLayoutX(enemy.body.getPosition().x);
-                enemy.view.setLayoutY(enemy.body.getPosition().y);
-
-                enemy.changeOrientationVew();
+                Graphic.rewriteEnemy(enemy);
 
                 //Check mob collision
                 if (enemy.body.getClass() != Pacman.class) {
                     if (getDistance(pacman.body, enemy.body) <= CELL_SIZE * 0.8) {
-                        System.out.println("YOU LOSE!");
-                        inGame = false;
-                        lose = true;
-                        break;
+                        status = Controller.GameStatus.LOSE;
+                        return;
                     }
                 }
             }
 
             //Check finish
             if (data.getEatedFood() == data.getCountFood()) {
-                inGame = false;
-                lose = false;
-                System.out.println("YOU WIN!");
+                status = Controller.GameStatus.WIN;
             }
-        } else if (!inGame && !waitMode) {
-            waitMode = true;
-            if (lose) {
-                printLose();
+        } else {
+            Graphic.printText(status);
+            if (status == Controller.GameStatus.LOSE) {
+                scene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        Graphic.removeText();
+
+                        MainMenu mainMenu = new MainMenu();
+                        try {
+                            mainMenu.start(new Stage());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        Stage stage = (Stage) scene.getWindow();
+                        stage.close();
+                    }
+                });
+            } else if (status == Controller.GameStatus.WIN) {
+                scene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ENTER) {
+                        Graphic.removeText();
+
+                        MainMenu mainMenu = new MainMenu();
+                        try {
+                            mainMenu.start(new Stage());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        Stage stage = (Stage) scene.getWindow();
+                        stage.close();
+                    }
+                });
+            } else if (status == Controller.GameStatus.PAUSE) {
+                scene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        Graphic.removeText();
+
+                        setDefaultControl();
+                        status = Controller.GameStatus.GAME;
+                    }
+                });
             }
-            else {
-                printWin();
-            }
-        } else if (pause && !waitMode) {
-            waitMode = true;
-            printPause();
         }
     }
 
@@ -275,7 +198,7 @@ public class Game extends Application {
             if (currentLevel == 1) return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
             else if (currentLevel == 2) return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
             else if (currentLevel == 3) return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
-            else inGame = false;
+            else status = Controller.GameStatus.NONE;
         } catch (Exception ex) {
             ex.getStackTrace();
         }

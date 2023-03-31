@@ -10,7 +10,6 @@ import static ru.nsu.pacman.Game.CELL_SIZE;
 import static ru.nsu.pacman.Controller.Coordinates;
 
 public abstract class Enemy {
-    protected GridPane area = null;
     protected LevelData data = null;
     protected Controller.Orientation curentOrientation = Controller.Orientation.NONE;
     protected Controller.Orientation nextOrientation = Controller.Orientation.NONE;
@@ -18,11 +17,10 @@ public abstract class Enemy {
     protected Coordinates position;
     protected Coordinates cellPosition;
 
-    public Enemy(Coordinates startPosition, GridPane area, LevelData data) {
+    public Enemy(Coordinates startPosition, LevelData data) {
         this.cellPosition = startPosition;
         this.position = new Coordinates(startPosition.x * CELL_SIZE, startPosition.y * CELL_SIZE);
 
-        this.area = area;
         this.data = data;
     }
 

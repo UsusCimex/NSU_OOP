@@ -4,12 +4,21 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import ru.nsu.pacman.enemy.Enemy;
 
-public class Controller {
+import java.util.HashMap;
+
+public abstract class Controller {
     public enum Orientation {
         UP,
         RIGHT,
         DOWN,
         LEFT,
+        NONE
+    }
+    public enum GameStatus {
+        GAME,
+        PAUSE,
+        WIN,
+        LOSE,
         NONE
     }
     public static class Coordinates {
@@ -48,19 +57,14 @@ public class Controller {
             upIMG = up;
             downIMG = down;
         }
-
-        public void changeOrientationVew() {
-            if (body.getCurrentOrientation() == Orientation.UP) {
-                view.setImage(upIMG);
-            } else if (body.getCurrentOrientation() == Orientation.LEFT) {
-                view.setImage(leftIMG);
-            } else if (body.getCurrentOrientation() == Orientation.RIGHT) {
-                view.setImage(rightIMG);
-            } else if (body.getCurrentOrientation() == Orientation.DOWN) {
-                view.setImage(downIMG);
-            } else {
-                view.setImage(passiveIMG);
-            }
+        public Image getImages(Orientation orientation) {
+            return switch (orientation) {
+                case NONE -> passiveIMG;
+                case UP -> upIMG;
+                case DOWN -> downIMG;
+                case LEFT -> leftIMG;
+                case RIGHT -> rightIMG;
+            };
         }
     }
 }

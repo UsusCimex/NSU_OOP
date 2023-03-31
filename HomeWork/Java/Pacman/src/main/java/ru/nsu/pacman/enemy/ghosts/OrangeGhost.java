@@ -8,7 +8,7 @@ import static ru.nsu.pacman.Controller.Coordinates;
 //trying to get to the place where the pacman is moving
 public class OrangeGhost extends Enemy {
 
-    public OrangeGhost(Coordinates startPosition, GridPane area, LevelData data) {
-        super(startPosition, area, data);
+    public OrangeGhost(Coordinates startPosition, LevelData data) {
+        super(startPosition, data);
     }
 }

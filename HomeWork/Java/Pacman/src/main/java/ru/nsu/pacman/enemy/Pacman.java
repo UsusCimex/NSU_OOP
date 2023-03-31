@@ -2,6 +2,7 @@ package ru.nsu.pacman.enemy;
 
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
+import ru.nsu.pacman.Graphic;
 import ru.nsu.pacman.generation.LevelData;
 
 import static ru.nsu.pacman.Game.CELL_SIZE;
@@ -12,18 +13,9 @@ import static ru.nsu.pacman.Controller.Orientation;
 public class Pacman extends Enemy {
     private double distanceToEatFood = 12;
 
-    public Pacman(Coordinates startPosition, GridPane area, LevelData data) {
-        super(startPosition, area, data);
+    public Pacman(Coordinates startPosition, LevelData data) {
+        super(startPosition, data);
         speed = 2.5;
-    }
-
-    private void removeNodeFromArea(Coordinates cord) {
-        for (Node node : area.getChildren()) {
-            if (GridPane.getColumnIndex(node) == (int)cord.x && GridPane.getRowIndex(node) == (int)cord.y) {
-                area.getChildren().remove(node);
-                break;
-            }
-        }
     }
 
     private boolean pacmanCanEatFood() {
@@ -63,16 +55,16 @@ public class Pacman extends Enemy {
 
         if (pacmanCanEatFood()) {
             if (getCurrentOrientation() == Orientation.LEFT) {
-                removeNodeFromArea(new Coordinates(cellPosition.x - 1, cellPosition.y));
+                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x - 1, cellPosition.y));
                 data.eatFood(new Coordinates(cellPosition.x - 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.UP) {
-                removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y - 1));
+                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y - 1));
                 data.eatFood(new Coordinates(cellPosition.x, cellPosition.y - 1));
             } else if (getCurrentOrientation() == Orientation.RIGHT) {
-                removeNodeFromArea(new Coordinates(cellPosition.x + 1, cellPosition.y));
+                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x + 1, cellPosition.y));
                 data.eatFood(new Coordinates(cellPosition.x + 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.DOWN) {
-                removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y + 1));
+                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y + 1));
                 data.eatFood(new Coordinates(cellPosition.x, cellPosition.y + 1));
             }
             System.out.println("FOOD: " + data.getEatedFood() + "/" + data.getCountFood());

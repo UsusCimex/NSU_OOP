@@ -14,8 +14,8 @@ import static ru.nsu.pacman.Game.CELL_N;
 //Runs randomly, but he moves fast
 public class PinkGhost extends Enemy {
 
-    public PinkGhost(Coordinates startPosition, GridPane area, LevelData data) {
-        super(startPosition, area, data);
+    public PinkGhost(Coordinates startPosition, LevelData data) {
+        super(startPosition, data);
         speed = 2.5;
     }
     private ArrayList<Controller.Orientation> getAvailableOrientations() {

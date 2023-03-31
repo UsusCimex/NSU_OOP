@@ -41,9 +41,9 @@ public class EnemyFactory {
         return instance;
     }
 
-    public Enemy createEnemy(LevelData.Symbols symbol, Coordinates startPosition, GridPane area, LevelData data) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public Enemy createEnemy(LevelData.Symbols symbol, Coordinates startPosition, LevelData data) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (map.containsKey(symbol)) {
-            return (Enemy) map.get(symbol).getConstructor(Coordinates.class, GridPane.class, LevelData.class).newInstance(startPosition, area, data);
+            return (Enemy) map.get(symbol).getConstructor(Coordinates.class, LevelData.class).newInstance(startPosition, data);
         } else {
             return null;
         }
