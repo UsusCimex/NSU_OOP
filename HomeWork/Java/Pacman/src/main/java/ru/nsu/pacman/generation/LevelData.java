@@ -1,7 +1,6 @@
 package ru.nsu.pacman.generation;
 
 import ru.nsu.pacman.Controller;
-import ru.nsu.pacman.Game;
 import ru.nsu.pacman.enemy.Enemy;
 import ru.nsu.pacman.enemy.EnemyFactory;
 

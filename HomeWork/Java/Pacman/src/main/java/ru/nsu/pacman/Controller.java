@@ -4,8 +4,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import ru.nsu.pacman.enemy.Enemy;
 
-import java.util.HashMap;
-
 public abstract class Controller {
     public enum Orientation {
         UP,

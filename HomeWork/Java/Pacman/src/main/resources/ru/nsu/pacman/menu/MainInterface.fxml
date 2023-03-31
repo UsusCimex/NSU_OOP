@@ -20,7 +20,7 @@
             <Font name="OCR A Extended" size="42.0" />
          </font>
       </Button>
-      <TextField alignment="CENTER" layoutX="160.0" layoutY="110.0" prefHeight="51.0" prefWidth="279.0" promptText="Enter your name" />
+      <TextField fx:id="nameEnter" alignment="CENTER" layoutX="160.0" layoutY="110.0" prefHeight="51.0" prefWidth="279.0" promptText="Enter your name" />
       <Button fx:id="recordButton" layoutX="31.0" layoutY="284.0" mnemonicParsing="false" onAction="#record" prefHeight="86.0" prefWidth="249.0" style="-fx-background-color: aqua; -fx-border-color: black; -fx-border-width: 4;" text="Records" underline="true">
          <font>
             <Font name="OCR A Extended" size="42.0" />

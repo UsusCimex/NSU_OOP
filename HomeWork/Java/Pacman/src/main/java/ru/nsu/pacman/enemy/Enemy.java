@@ -1,6 +1,5 @@
 package ru.nsu.pacman.enemy;
 
-import javafx.scene.layout.GridPane;
 import ru.nsu.pacman.Controller;
 import ru.nsu.pacman.generation.LevelData;
 

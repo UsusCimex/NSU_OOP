@@ -6,7 +6,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import ru.nsu.pacman.Game;
 
 import static ru.nsu.pacman.Controller.Coordinates;
 

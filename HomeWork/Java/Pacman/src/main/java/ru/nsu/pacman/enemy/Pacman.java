@@ -1,7 +1,5 @@
 package ru.nsu.pacman.enemy;
 
-import javafx.scene.Node;
-import javafx.scene.layout.GridPane;
 import ru.nsu.pacman.Graphic;
 import ru.nsu.pacman.generation.LevelData;
 
@@ -82,6 +80,7 @@ public class Pacman extends Enemy {
                 newPosition = new Coordinates(cellPosition.x, cellPosition.y + 1);
             }
 
+            assert newPosition != null;
             setPosition(newPosition);
             if (enemyCanRotate()) {
                 changeCurrentOrientation();

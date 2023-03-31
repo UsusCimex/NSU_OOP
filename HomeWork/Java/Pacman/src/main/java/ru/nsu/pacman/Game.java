@@ -3,35 +3,22 @@ package ru.nsu.pacman;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import ru.nsu.pacman.enemy.Enemy;
-import ru.nsu.pacman.enemy.EnemyFactory;
 import ru.nsu.pacman.enemy.Pacman;
-import ru.nsu.pacman.enemy.ghosts.BlueGhost;
-import ru.nsu.pacman.enemy.ghosts.OrangeGhost;
-import ru.nsu.pacman.enemy.ghosts.PinkGhost;
-import ru.nsu.pacman.enemy.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 import ru.nsu.pacman.menu.MainMenu;
 
-import java.io.ObjectInputFilter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static java.lang.Math.*;
 import static ru.nsu.pacman.Controller.Orientation;
-import static ru.nsu.pacman.Controller.Coordinates;
 import static ru.nsu.pacman.Controller.EnemyData;
 
 public class Game extends Application {

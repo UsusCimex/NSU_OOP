@@ -15,10 +15,6 @@ import java.util.Objects;
 
 public class MainMenu extends Application {
     @FXML
-    private Button recordButton;
-    @FXML
-    private Button startButton;
-    @FXML
     private Button quitButton;
 
     public static void main(String[] args) {
