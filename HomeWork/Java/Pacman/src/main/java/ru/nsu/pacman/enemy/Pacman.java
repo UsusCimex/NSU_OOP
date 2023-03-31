@@ -91,8 +91,6 @@ public class Pacman extends Enemy {
             }
 
             setPosition(newPosition);
-            data.setValueLevelData(cellPosition, LevelData.Symbols.Empty);
-            data.setValueLevelData(newPosition, LevelData.Symbols.Pacman);
             if (enemyCanRotate()) {
                 changeCurrentOrientation();
             }
