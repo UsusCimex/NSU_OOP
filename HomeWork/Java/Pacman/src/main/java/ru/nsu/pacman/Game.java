@@ -18,8 +18,8 @@ import ru.nsu.pacman.menu.MainMenu;
 import java.util.*;
 
 import static java.lang.Math.*;
-import static ru.nsu.pacman.Controller.Orientation;
-import static ru.nsu.pacman.Controller.EnemyData;
+import static ru.nsu.pacman.GameData.Orientation;
+import static ru.nsu.pacman.GameData.EnemyData;
 
 public class Game extends Application {
     public static final int CELL_SIZE = 32;
@@ -28,7 +28,7 @@ public class Game extends Application {
     private LevelData data = null;
     private Scene scene = null;
     private int currentLevel = 0;
-    private Controller.GameStatus status = Controller.GameStatus.NONE;
+    private GameData.GameStatus status = GameData.GameStatus.NONE;
     private EnemyData pacman;
     private ArrayList<EnemyData> enemies;
 
@@ -89,7 +89,7 @@ public class Game extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        status = Controller.GameStatus.GAME;
+        status = GameData.GameStatus.GAME;
     }
 
     private void setDefaultControl() {
@@ -103,7 +103,7 @@ public class Game extends Application {
             } else if (event.getCode() == KeyCode.RIGHT) {
                 pacman.body.changeNextOrientation(Orientation.RIGHT);
             } else if (event.getCode() == KeyCode.ESCAPE) {
-                status = Controller.GameStatus.PAUSE;
+                status = GameData.GameStatus.PAUSE;
             }
         });
     }
@@ -113,7 +113,7 @@ public class Game extends Application {
     }
 
     private void update() {
-        if (status == Controller.GameStatus.GAME) {
+        if (status == GameData.GameStatus.GAME) {
             //GhostsAnimation
             for (EnemyData enemy : enemies) {
                 enemy.body.move();
@@ -122,7 +122,7 @@ public class Game extends Application {
                 //Check mob collision
                 if (enemy.body.getClass() != Pacman.class) {
                     if (getDistance(pacman.body, enemy.body) <= CELL_SIZE * 0.8) {
-                        status = Controller.GameStatus.LOSE;
+                        status = GameData.GameStatus.LOSE;
                         return;
                     }
                 }
@@ -130,11 +130,11 @@ public class Game extends Application {
 
             //Check finish
             if (data.getEatedFood() == data.getCountFood()) {
-                status = Controller.GameStatus.WIN;
+                status = GameData.GameStatus.WIN;
             }
         } else {
             Graphic.printText(status);
-            if (status == Controller.GameStatus.LOSE) {
+            if (status == GameData.GameStatus.LOSE) {
                 scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         Graphic.removeText();
@@ -150,7 +150,7 @@ public class Game extends Application {
                         stage.close();
                     }
                 });
-            } else if (status == Controller.GameStatus.WIN) {
+            } else if (status == GameData.GameStatus.WIN) {
                 scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ENTER) {
                         Graphic.removeText();
@@ -166,13 +166,13 @@ public class Game extends Application {
                         stage.close();
                     }
                 });
-            } else if (status == Controller.GameStatus.PAUSE) {
+            } else if (status == GameData.GameStatus.PAUSE) {
                 scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         Graphic.removeText();
 
                         setDefaultControl();
-                        status = Controller.GameStatus.GAME;
+                        status = GameData.GameStatus.GAME;
                     }
                 });
             }
@@ -185,7 +185,7 @@ public class Game extends Application {
             if (currentLevel == 1) return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
             else if (currentLevel == 2) return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
             else if (currentLevel == 3) return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
-            else status = Controller.GameStatus.NONE;
+            else status = GameData.GameStatus.NONE;
         } catch (Exception ex) {
             ex.getStackTrace();
         }

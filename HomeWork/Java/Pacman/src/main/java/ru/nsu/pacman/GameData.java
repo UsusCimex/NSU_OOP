@@ -4,7 +4,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import ru.nsu.pacman.enemy.Enemy;
 
-public abstract class Controller {
+public abstract class GameData {
     public enum Orientation {
         UP,
         RIGHT,

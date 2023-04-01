@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
-import static ru.nsu.pacman.Controller.Coordinates;
+import static ru.nsu.pacman.GameData.Coordinates;
 
 public class LevelBuilder {
     private static final int GRID_SIZE = 21;

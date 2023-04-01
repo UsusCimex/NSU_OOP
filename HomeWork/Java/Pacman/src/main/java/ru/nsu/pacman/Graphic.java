@@ -22,10 +22,10 @@ import java.util.Objects;
 public abstract class Graphic {
     private static StackPane root = null;
     private static boolean textIsWriten = false;
-    private static Controller.GameStatus curTextStatus = Controller.GameStatus.NONE;
+    private static GameData.GameStatus curTextStatus = GameData.GameStatus.NONE;
 
-    public static boolean settingIMG(ArrayList<Controller.EnemyData> enemies) {
-        for (Controller.EnemyData enemy : enemies) {
+    public static boolean settingIMG(ArrayList<GameData.EnemyData> enemies) {
+        for (GameData.EnemyData enemy : enemies) {
             if (enemy.body.getClass().equals(Pacman.class)) {
                 enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/stopped.png"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/left.gif"))),
@@ -67,7 +67,7 @@ public abstract class Graphic {
     private static GridPane getArea() {
         return (GridPane) root.lookup("#gamePane #area");
     }
-    public static void removeNodeFromArea(Controller.Coordinates cord) {
+    public static void removeNodeFromArea(GameData.Coordinates cord) {
         GridPane area = getArea();
         for (Node node : area.getChildren()) {
             if (GridPane.getColumnIndex(node) == (int)cord.x && GridPane.getRowIndex(node) == (int)cord.y) {
@@ -77,7 +77,7 @@ public abstract class Graphic {
         }
     }
 
-    public static void rewriteEnemy(Controller.EnemyData enemy) {
+    public static void rewriteEnemy(GameData.EnemyData enemy) {
         enemy.view.setLayoutX(enemy.body.getPosition().x);
         enemy.view.setLayoutY(enemy.body.getPosition().y);
 
@@ -85,28 +85,28 @@ public abstract class Graphic {
     }
     public static void removeText() {
         if (textIsWriten) {
-            if (curTextStatus == Controller.GameStatus.WIN) {
+            if (curTextStatus == GameData.GameStatus.WIN) {
                 VBox text = (VBox) root.lookup("#winText");
                 root.getChildren().remove(text);
-            } else if (curTextStatus == Controller.GameStatus.LOSE) {
+            } else if (curTextStatus == GameData.GameStatus.LOSE) {
                 VBox text = (VBox) root.lookup("#loseText");
                 root.getChildren().remove(text);
-            } else if (curTextStatus == Controller.GameStatus.PAUSE) {
+            } else if (curTextStatus == GameData.GameStatus.PAUSE) {
                 VBox text = (VBox) root.lookup("#pauseText");
                 root.getChildren().remove(text);
             }
 
-            curTextStatus = Controller.GameStatus.NONE;
+            curTextStatus = GameData.GameStatus.NONE;
             textIsWriten = false;
         }
     }
-    public static void printText(Controller.GameStatus status) {
+    public static void printText(GameData.GameStatus status) {
         if (!textIsWriten) {
-            if (status == Controller.GameStatus.WIN) {
+            if (status == GameData.GameStatus.WIN) {
                 printWin();
-            } else if (status == Controller.GameStatus.LOSE) {
+            } else if (status == GameData.GameStatus.LOSE) {
                 printLose();
-            } else if (status == Controller.GameStatus.PAUSE) {
+            } else if (status == GameData.GameStatus.PAUSE) {
                 printPause();
             }
 

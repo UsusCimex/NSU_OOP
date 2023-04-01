@@ -1,16 +1,9 @@
 package ru.nsu.pacman.enemy.ghosts;
 
-import javafx.scene.layout.GridPane;
-import ru.nsu.pacman.Controller;
 import ru.nsu.pacman.enemy.Enemy;
 import ru.nsu.pacman.generation.LevelData;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import static ru.nsu.pacman.Game.CELL_N;
-import static ru.nsu.pacman.Controller.Coordinates;
-import static ru.nsu.pacman.Controller.Orientation;
+import static ru.nsu.pacman.GameData.Coordinates;
 
 //Always running after Pacman
 public class RedGhost extends Enemy {

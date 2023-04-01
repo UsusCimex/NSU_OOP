@@ -1,17 +1,17 @@
 package ru.nsu.pacman.enemy;
 
-import ru.nsu.pacman.Controller;
+import ru.nsu.pacman.GameData;
 import ru.nsu.pacman.generation.LevelData;
 
 import static java.lang.Math.abs;
 import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.Game.CELL_SIZE;
-import static ru.nsu.pacman.Controller.Coordinates;
+import static ru.nsu.pacman.GameData.Coordinates;
 
 public abstract class Enemy {
     protected LevelData data = null;
-    protected Controller.Orientation curentOrientation = Controller.Orientation.NONE;
-    protected Controller.Orientation nextOrientation = Controller.Orientation.NONE;
+    protected GameData.Orientation curentOrientation = GameData.Orientation.NONE;
+    protected GameData.Orientation nextOrientation = GameData.Orientation.NONE;
     protected double speed = 1;
     protected Coordinates position;
     protected Coordinates cellPosition;
@@ -30,17 +30,17 @@ public abstract class Enemy {
         cellPosition = newPosition;
         position = new Coordinates(newPosition.x * CELL_SIZE, newPosition.y * CELL_SIZE);
     }
-    public Controller.Orientation getCurrentOrientation() {
+    public GameData.Orientation getCurrentOrientation() {
         return curentOrientation;
     }
     public void changeCurrentOrientation() {
         curentOrientation = nextOrientation;
-        nextOrientation = Controller.Orientation.NONE;
+        nextOrientation = GameData.Orientation.NONE;
     }
-    public Controller.Orientation getNextOrientation() {
+    public GameData.Orientation getNextOrientation() {
         return nextOrientation;
     }
-    public void changeNextOrientation(Controller.Orientation newOrientation) {
+    public void changeNextOrientation(GameData.Orientation newOrientation) {
         nextOrientation = newOrientation;
     }
     public boolean enemyInNewCell() {
@@ -48,13 +48,13 @@ public abstract class Enemy {
                 abs(position.y - (cellPosition.y * CELL_SIZE)) >= CELL_SIZE);
     }
     public boolean enemyCanMove() {
-        if ((curentOrientation == Controller.Orientation.UP) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall)) {
+        if ((curentOrientation == GameData.Orientation.UP) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall)) {
             return true;
-        } else if ((curentOrientation == Controller.Orientation.LEFT) && (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
+        } else if ((curentOrientation == GameData.Orientation.LEFT) && (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
             return true;
-        } else if ((curentOrientation == Controller.Orientation.RIGHT) && (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
+        } else if ((curentOrientation == GameData.Orientation.RIGHT) && (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
             return true;
-        } else if ((curentOrientation == Controller.Orientation.DOWN) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall)) {
+        } else if ((curentOrientation == GameData.Orientation.DOWN) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall)) {
             return true;
         }
 
@@ -65,39 +65,39 @@ public abstract class Enemy {
         return false;
     }
     public boolean enemyCanRotate() {
-        if ((nextOrientation == Controller.Orientation.UP) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall)) {
+        if ((nextOrientation == GameData.Orientation.UP) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall)) {
             return true;
-        } else if ((nextOrientation == Controller.Orientation.LEFT) && (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
+        } else if ((nextOrientation == GameData.Orientation.LEFT) && (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
             return true;
-        } else if ((nextOrientation == Controller.Orientation.RIGHT) && (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
+        } else if ((nextOrientation == GameData.Orientation.RIGHT) && (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
             return true;
-        } else if ((nextOrientation == Controller.Orientation.DOWN) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall)) {
+        } else if ((nextOrientation == GameData.Orientation.DOWN) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall)) {
             return true;
         } else {
             return false;
         }
     }
     public boolean enemyInBorder() {
-        if ((curentOrientation == Controller.Orientation.LEFT) && ((int)cellPosition.x == 0)) {
+        if ((curentOrientation == GameData.Orientation.LEFT) && ((int)cellPosition.x == 0)) {
             return true;
-        } else if ((curentOrientation == Controller.Orientation.UP) && ((int)cellPosition.y == 0)) {
+        } else if ((curentOrientation == GameData.Orientation.UP) && ((int)cellPosition.y == 0)) {
             return true;
-        } else if ((curentOrientation == Controller.Orientation.RIGHT) && ((int)cellPosition.x == CELL_N - 1)) {
+        } else if ((curentOrientation == GameData.Orientation.RIGHT) && ((int)cellPosition.x == CELL_N - 1)) {
             return true;
-        } else if ((curentOrientation == Controller.Orientation.DOWN) && ((int)cellPosition.y == CELL_N - 1)) {
+        } else if ((curentOrientation == GameData.Orientation.DOWN) && ((int)cellPosition.y == CELL_N - 1)) {
             return true;
         }
         return false;
     }
     public void move() {
         if (enemyCanMove()) {
-            if (curentOrientation == Controller.Orientation.UP) {
+            if (curentOrientation == GameData.Orientation.UP) {
                 position.y -= speed;
-            } else if (curentOrientation == Controller.Orientation.RIGHT) {
+            } else if (curentOrientation == GameData.Orientation.RIGHT) {
                 position.x += speed;
-            } else if (curentOrientation == Controller.Orientation.DOWN) {
+            } else if (curentOrientation == GameData.Orientation.DOWN) {
                 position.y += speed;
-            } else if (curentOrientation == Controller.Orientation.LEFT) {
+            } else if (curentOrientation == GameData.Orientation.LEFT) {
                 position.x -= speed;
             }
         } else {
