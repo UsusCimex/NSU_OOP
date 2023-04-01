@@ -61,6 +61,7 @@ public class MainMenu extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("PacmanGame");
+        primaryStage.setResizable(false);
         Image icon = new Image(Objects.requireNonNull(Game.class.getResourceAsStream("icon.png")));
         primaryStage.getIcons().add(icon);
 

@@ -57,6 +57,7 @@ public class RecordsTable extends Application {
         Image icon = new Image(Objects.requireNonNull(Game.class.getResourceAsStream("icon.png")));
         primaryStage.getIcons().add(icon);
         primaryStage.setTitle("Pacman");
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 

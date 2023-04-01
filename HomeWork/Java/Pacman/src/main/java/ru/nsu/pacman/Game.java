@@ -72,21 +72,10 @@ public class Game extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("PacmanGame");
+        primaryStage.setResizable(false);
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png")));
         primaryStage.getIcons().add(icon);
-
-        LevelBuilder builder = new LevelBuilder();
-        GridPane area = builder.buildLevel(data);
-        area.setId("area");
-        Pane gamePane = new Pane(area);
-        gamePane.setId("gamePane");
-
-        StackPane root = new StackPane();
-        root.getChildren().add(gamePane);
-        root.setStyle("-fx-background-color: AQUA;");
-
-        Graphic.setMainRoot(root);
-
+        StackPane root = Graphic.generateMainRoot(data);
         scene = new Scene(root);
 
         enemies = data.getAllEnemies();
@@ -135,6 +124,9 @@ public class Game extends Application {
 
     private void update() {
         if (status == GameData.GameStatus.GAME) {
+            Graphic.rewriteScore(player.getScore() + data.getEatedFood());
+            Graphic.rewriteLives(lives);
+            Graphic.rewriteName(player.getName());
             //GhostsAnimation
             for (EnemyData enemy : enemies) {
                 enemy.body.move();

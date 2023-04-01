@@ -3,10 +3,7 @@ package ru.nsu.pacman;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -16,6 +13,7 @@ import ru.nsu.pacman.enemy.ghosts.BlueGhost;
 import ru.nsu.pacman.enemy.ghosts.OrangeGhost;
 import ru.nsu.pacman.enemy.ghosts.PinkGhost;
 import ru.nsu.pacman.enemy.ghosts.RedGhost;
+import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
 import java.util.ArrayList;
@@ -76,7 +74,36 @@ public abstract class Graphic {
             gamePane.getChildren().remove(enemy.view);
         }
     }
-    public static void setMainRoot(StackPane root) { Graphic.root = root; }
+    public static StackPane generateMainRoot(LevelData data) {
+        LevelBuilder builder = new LevelBuilder();
+        GridPane area = builder.buildLevel(data);
+        area.setId("area");
+
+        Pane gamePane = new Pane(area);
+        gamePane.setId("gamePane");
+        Text name = new Text();
+        name.setFont(Font.font("OCR A Extended", 25));
+        name.setId("name");
+        Text countLives = new Text();
+        countLives.setFont(Font.font("OCR A Extended", 25));
+        countLives.setId("countLives");
+        Text score = new Text();
+        score.setFont(Font.font("OCR A Extended", 25));
+        score.setId("score");
+
+        HBox infoPain = new HBox(name, countLives, score);
+        infoPain.setSpacing(20);
+        infoPain.setAlignment(Pos.CENTER);
+        infoPain.setId("infoPain");
+
+        VBox mainPain = new VBox(gamePane, infoPain);
+        mainPain.setId("mainPain");
+
+        root = new StackPane();
+        root.getChildren().add(mainPain);
+        root.setStyle("-fx-background-color: AQUA;");
+        return root;
+    }
     private static GridPane getArea() {
         return (GridPane) root.lookup("#gamePane #area");
     }
@@ -94,6 +121,18 @@ public abstract class Graphic {
         enemy.view.setLayoutY(enemy.body.getPosition().y);
 
         enemy.view.setImage(enemy.getImages(enemy.body.getCurrentOrientation()));
+    }
+    public static void rewriteScore(int score) {
+        Text scoreText = (Text)root.lookup("#mainPain #infoPain #score");
+        scoreText.setText("Score: " + score);
+    }
+    public static void rewriteLives(int lives) {
+        Text textLives = (Text)root.lookup("#mainPain #infoPain #countLives");
+        textLives.setText("Lives: " + lives);
+    }
+    public static void rewriteName(String name) {
+        Text textLives = (Text)root.lookup("#mainPain #infoPain #name");
+        textLives.setText("Nickname: " + name);
     }
     public static void removeText() {
         if (textIsWriten) {
