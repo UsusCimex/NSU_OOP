@@ -36,35 +36,38 @@ public class Game extends Application {
     private boolean waitMode = false;
     private ArrayList<EnemyData> enemies = null;
     private GameData.PlayerRecord player = null;
+    private int lives = 5;
 
 
-    public Game(GameData.PlayerRecord player, int level) throws Exception {
+    public Game(GameData.PlayerRecord player, int level, int countLives) throws Exception {
         this.player = player;
         this.curLevel = level;
+        this.lives = countLives;
         data = generateLevel(level);
 
         start(new Stage());
     }
+    private EnemyData searchPacman() {
+        if (enemies == null) enemies = data.getAllEnemies();
 
-    private boolean addAllEnemiesInRoot(Pane root) {
         boolean pacmanChecker = false;
-        for (EnemyData enemy : enemies) {
+        EnemyData tempPacman = null;
+        for (GameData.EnemyData enemy : enemies) {
             if (enemy.body.getClass() == Pacman.class) {
                 if (!pacmanChecker) {
-                    pacman = enemy;
+                    tempPacman = enemy;
                     pacmanChecker = true;
                 } else {
                     System.err.println("In game play only 1 PACMAN!");
-                    return false;
+                    throw new RuntimeException();
                 }
             }
-            root.getChildren().add(enemy.view);
         }
         if (!pacmanChecker) {
             System.err.println("PACMAN NOT FOUND!");
-            return false;
+            throw new RuntimeException();
         }
-        return true;
+        return tempPacman;
     }
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -87,16 +90,22 @@ public class Game extends Application {
         scene = new Scene(root);
 
         enemies = data.getAllEnemies();
+        pacman = searchPacman();
 
-        if (!Graphic.settingIMG(enemies) || !addAllEnemiesInRoot(gamePane)) {
-            return;
-        }
+        Graphic.settingIMG(enemies);
+        Graphic.addAllEnemiesInGamePane(enemies);
 
         setDefaultControl();
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> update()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+
+        Timeline timeToDestroyBarriers = new Timeline(new KeyFrame(Duration.seconds(10), event -> {
+            data.removeAllBarriers();
+        }));
+        timeToDestroyBarriers.setCycleCount(1);
+        timeToDestroyBarriers.play();
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -134,7 +143,12 @@ public class Game extends Application {
                 //Check mob collision
                 if (enemy.body.getClass() != Pacman.class) {
                     if (getDistance(pacman.body, enemy.body) <= CELL_SIZE * 0.8) {
-                        status = GameData.GameStatus.LOSE;
+                        lives--;
+                        if (lives == 0) {
+                            status = GameData.GameStatus.LOSE;
+                        } else {
+                            status = GameData.GameStatus.WAITRESPAWN;
+                        }
                         return;
                     }
                 }
@@ -147,7 +161,40 @@ public class Game extends Application {
         } else if (!waitMode){
             waitMode = true;
             Graphic.printText(status);
-            if (status == GameData.GameStatus.LOSE) {
+            if (status == GameData.GameStatus.WAITRESPAWN) {
+                scene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ENTER) {
+                        Graphic.removeText();
+                        setDefaultControl();
+
+                        Graphic.removeAllEnemiesInGamePane(enemies);
+                        data.resetAllEnemies();
+                        enemies = data.getAllEnemies();
+                        pacman = data.getPacman();
+
+                        Graphic.settingIMG(enemies);
+                        Graphic.addAllEnemiesInGamePane(enemies);
+
+                        status = GameData.GameStatus.GAME;
+                        waitMode = false;
+                    } else if (event.getCode() == KeyCode.ESCAPE) {
+                        Graphic.removeText();
+
+                        try {
+                            player.addToScore(data.getEatedFood());
+                            RecordsTable.addPlayerRecord(player);
+
+                            MainMenu mainMenu = new MainMenu();
+                            mainMenu.start(new Stage());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        Stage stage = (Stage) scene.getWindow();
+                        stage.close();
+                    }
+                });
+            } else if (status == GameData.GameStatus.LOSE) {
                 scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         Graphic.removeText();
@@ -178,7 +225,7 @@ public class Game extends Application {
                                 mainMenu.start(new Stage());
                             } else {
                                 player.addToScore(data.getEatedFood());
-                                new Game(player, curLevel + 1);
+                                new Game(player, curLevel + 1, lives + 1);
                             }
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -193,7 +240,7 @@ public class Game extends Application {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         setDefaultControl();
                         Graphic.removeText();
-                        
+
                         status = GameData.GameStatus.GAME;
                         waitMode = false;
                     }

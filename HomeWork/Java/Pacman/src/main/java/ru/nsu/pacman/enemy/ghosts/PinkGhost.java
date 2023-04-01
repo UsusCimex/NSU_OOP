@@ -15,23 +15,7 @@ public class PinkGhost extends Enemy {
 
     public PinkGhost(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
-        speed = 2.5;
-    }
-    private ArrayList<GameData.Orientation> getAvailableOrientations() {
-        ArrayList<GameData.Orientation> availableOrientations = new ArrayList<>();
-        if (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall) {
-            availableOrientations.add(GameData.Orientation.LEFT);
-        }
-        if (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall) {
-            availableOrientations.add(GameData.Orientation.RIGHT);
-        }
-        if (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall) {
-            availableOrientations.add(GameData.Orientation.UP);
-        }
-        if (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall) {
-            availableOrientations.add(GameData.Orientation.DOWN);
-        }
-        return availableOrientations;
+        speed = 2.2;
     }
     private GameData.Orientation getRandomOrientation() {
         ArrayList<GameData.Orientation> availableOrientations = getAvailableOrientations();

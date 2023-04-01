@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -15,6 +16,7 @@ import ru.nsu.pacman.enemy.ghosts.BlueGhost;
 import ru.nsu.pacman.enemy.ghosts.OrangeGhost;
 import ru.nsu.pacman.enemy.ghosts.PinkGhost;
 import ru.nsu.pacman.enemy.ghosts.RedGhost;
+import ru.nsu.pacman.generation.LevelData;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -24,7 +26,7 @@ public abstract class Graphic {
     private static boolean textIsWriten = false;
     private static GameData.GameStatus curTextStatus = GameData.GameStatus.NONE;
 
-    public static boolean settingIMG(ArrayList<GameData.EnemyData> enemies) {
+    public static void settingIMG(ArrayList<GameData.EnemyData> enemies) {
         for (GameData.EnemyData enemy : enemies) {
             if (enemy.body.getClass().equals(Pacman.class)) {
                 enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/stopped.png"))),
@@ -39,29 +41,40 @@ public abstract class Graphic {
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))));
             } else if (enemy.body.getClass().equals(BlueGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))));
+                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))));
             } else if (enemy.body.getClass().equals(OrangeGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))));
+                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))));
             } else if (enemy.body.getClass().equals(PinkGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))));
+                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))));
             } else {
-                System.out.println("Enemy not found! Add new enemy in setting IMG");
-                return false;
+                System.err.println("Enemy not found! Add new enemy in setting IMG");
+                throw new RuntimeException();
             }
         }
-        return true;
+    }
+    public static void addAllEnemiesInGamePane(ArrayList<GameData.EnemyData> enemies) {
+        Pane gamePane = (Pane) root.lookup("#gamePane");
+        for (GameData.EnemyData enemy : enemies) {
+            gamePane.getChildren().add(enemy.view);
+        }
+    }
+    public static void removeAllEnemiesInGamePane(ArrayList<GameData.EnemyData> enemies) {
+        Pane gamePane = (Pane) root.lookup("#gamePane");
+        for (GameData.EnemyData enemy : enemies) {
+            gamePane.getChildren().remove(enemy.view);
+        }
     }
     public static void setMainRoot(StackPane root) { Graphic.root = root; }
     private static GridPane getArea() {
@@ -76,7 +89,6 @@ public abstract class Graphic {
             }
         }
     }
-
     public static void rewriteEnemy(GameData.EnemyData enemy) {
         enemy.view.setLayoutX(enemy.body.getPosition().x);
         enemy.view.setLayoutY(enemy.body.getPosition().y);
@@ -94,6 +106,9 @@ public abstract class Graphic {
             } else if (curTextStatus == GameData.GameStatus.PAUSE) {
                 VBox text = (VBox) root.lookup("#pauseText");
                 root.getChildren().remove(text);
+            } else if (curTextStatus == GameData.GameStatus.WAITRESPAWN) {
+                VBox text = (VBox) root.lookup("#respawnText");
+                root.getChildren().remove(text);
             }
 
             curTextStatus = GameData.GameStatus.NONE;
@@ -104,6 +119,8 @@ public abstract class Graphic {
         if (!textIsWriten) {
             if (status == GameData.GameStatus.WIN) {
                 printWin();
+            } else if (status == GameData.GameStatus.WAITRESPAWN) {
+                printRespawn();
             } else if (status == GameData.GameStatus.LOSE) {
                 printLose();
             } else if (status == GameData.GameStatus.PAUSE) {
@@ -120,7 +137,7 @@ public abstract class Graphic {
         text1.setFill(Color.YELLOW);
 
         Text text2 = new Text("Press ENTER to continue!");
-        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
+        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 40));
         text2.setFill(Color.YELLOW);
 
         VBox vbox = new VBox(text1, text2);
@@ -138,13 +155,38 @@ public abstract class Graphic {
         text1.setStrokeWidth(2.0);
 
         Text text2 = new Text("Press ESC to exit!");
-        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 60));
+        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 40));
         text2.setFill(Color.YELLOW);
         text2.setStroke(Color.BLACK);
         text2.setStrokeWidth(2.0);
 
         VBox vbox = new VBox(text1, text2);
         vbox.setId("loseText");
+        vbox.setAlignment(Pos.CENTER);
+
+        root.getChildren().add(vbox);
+    }
+    private static void printRespawn() {
+        Text text1 = new Text("You DEAD");
+        text1.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 80));
+        text1.setFill(Color.YELLOW);
+        text1.setStroke(Color.BLACK);
+        text1.setStrokeWidth(2.0);
+
+        Text text2 = new Text("Press ENTER to respawn!");
+        text2.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 40));
+        text2.setFill(Color.YELLOW);
+        text2.setStroke(Color.BLACK);
+        text2.setStrokeWidth(2.0);
+
+        Text text3 = new Text("Press ESC to exit!");
+        text3.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 40));
+        text3.setFill(Color.YELLOW);
+        text3.setStroke(Color.BLACK);
+        text3.setStrokeWidth(2.0);
+
+        VBox vbox = new VBox(text1, text2, text3);
+        vbox.setId("respawnText");
         vbox.setAlignment(Pos.CENTER);
 
         root.getChildren().add(vbox);

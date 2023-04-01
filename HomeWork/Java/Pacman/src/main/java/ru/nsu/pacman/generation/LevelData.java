@@ -1,8 +1,11 @@
 package ru.nsu.pacman.generation;
 
+import ru.nsu.pacman.Game;
 import ru.nsu.pacman.GameData;
+import ru.nsu.pacman.Graphic;
 import ru.nsu.pacman.enemy.Enemy;
 import ru.nsu.pacman.enemy.EnemyFactory;
+import ru.nsu.pacman.enemy.Pacman;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +17,7 @@ import static ru.nsu.pacman.Game.CELL_N;
 
 public class LevelData {
     private static final int ARRAY_SIZE = 21;
+
     public enum Symbols {
         Pacman,
         Empty,
@@ -39,6 +43,17 @@ public class LevelData {
         }
         return levelData[(int)cord.x][(int)cord.y];
     }
+    public void removeAllBarriers() {
+        for (int col = 0; col < CELL_N; ++col) {
+            for (int row = 0; row < CELL_N; ++row) {
+                Coordinates coordinates = new Coordinates(col, row);
+                if (getValueLevelData(coordinates) == Symbols.Barrier) {
+                    setValueLevelData(coordinates, Symbols.Empty);
+                    Graphic.removeNodeFromArea(coordinates);
+                }
+            }
+        }
+    }
     public int getCountFood() {
         return countFood;
     }
@@ -63,19 +78,38 @@ public class LevelData {
             default -> throw new Exception("Symbol not found");
         };
     }
-    public ArrayList<GameData.EnemyData> getAllEnemies() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public ArrayList<GameData.EnemyData> getAllEnemies() {
         if (allEnemies != null) return allEnemies;
 
-        allEnemies = new ArrayList<GameData.EnemyData>();
-        for (int col = 0; col < CELL_N; ++col) {
-            for (int row = 0; row < CELL_N; ++row) {
-                Enemy enemy = EnemyFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);
-                if (enemy != null) {
-                    allEnemies.add(new GameData.EnemyData(enemy));
+        try {
+            allEnemies = new ArrayList<GameData.EnemyData>();
+            for (int col = 0; col < CELL_N; ++col) {
+                for (int row = 0; row < CELL_N; ++row) {
+                    Enemy enemy = EnemyFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);
+                    if (enemy != null) {
+                        allEnemies.add(new GameData.EnemyData(enemy));
+                    }
                 }
             }
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException ex) {
+            ex.getStackTrace();
         }
         return allEnemies;
+    }
+    public void resetAllEnemies() {
+        allEnemies = null;
+    }
+    public GameData.EnemyData getPacman() {
+        if (allEnemies == null) {
+            allEnemies = getAllEnemies();
+        }
+
+        for (GameData.EnemyData enemy : allEnemies) {
+            if (enemy.body.getClass().equals(Pacman.class)) {
+                return enemy;
+            }
+        }
+        return null;
     }
     private void loadLevelDataFromFile(InputStream is) throws Exception {
         Scanner scanner = new Scanner(is);

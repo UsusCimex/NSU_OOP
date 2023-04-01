@@ -17,6 +17,7 @@ public abstract class GameData {
         PAUSE,
         WIN,
         LOSE,
+        WAITRESPAWN,
         NONE
     }
     public static class Coordinates {

@@ -17,6 +17,7 @@ import java.util.Objects;
 
 public class MainMenu extends Application {
     private final static int FIRSTLEVEL = 1;
+    private final static int FIRSTLIVES = 5;
     @FXML
     private TextField nameEnter;
     @FXML
@@ -43,12 +44,12 @@ public class MainMenu extends Application {
             System.err.println("You use invalid symbols!");
             return;
         }
-        if (playerName.length() > 15) {
-            System.err.println("Please use not more 15 symbols");
+        if (playerName.length() < 3 || playerName.length() > 15) {
+            System.err.println("Allowed nickname length: 3-15 characters");
             return;
         }
 
-        new Game(new GameData.PlayerRecord(playerName, 0), FIRSTLEVEL);
+        new Game(new GameData.PlayerRecord(playerName, 0), FIRSTLEVEL, FIRSTLIVES);
         quit(actionEvent);
     }
     @FXML

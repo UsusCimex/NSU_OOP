@@ -3,7 +3,9 @@ package ru.nsu.pacman.enemy;
 import ru.nsu.pacman.GameData;
 import ru.nsu.pacman.generation.LevelData;
 
-import static java.lang.Math.abs;
+import java.util.ArrayList;
+
+import static java.lang.Math.*;
 import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.Game.CELL_SIZE;
 import static ru.nsu.pacman.GameData.Coordinates;
@@ -47,14 +49,19 @@ public abstract class Enemy {
         return ( abs(position.x - (cellPosition.x * CELL_SIZE)) >= CELL_SIZE ||
                 abs(position.y - (cellPosition.y * CELL_SIZE)) >= CELL_SIZE);
     }
+    private boolean isStopBlock(LevelData.Symbols symbol) {
+        if (symbol == LevelData.Symbols.Wall) return true;
+        else if (symbol == LevelData.Symbols.Barrier) return true;
+        else return false;
+    }
     public boolean enemyCanMove() {
-        if ((curentOrientation == GameData.Orientation.UP) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) != LevelData.Symbols.Wall)) {
+        if ((curentOrientation == GameData.Orientation.UP) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)))) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.LEFT) && (data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
+        } else if ((curentOrientation == GameData.Orientation.LEFT) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)))) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.RIGHT) && (data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) != LevelData.Symbols.Wall)) {
+        } else if ((curentOrientation == GameData.Orientation.RIGHT) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)))) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.DOWN) && (data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) != LevelData.Symbols.Wall)) {
+        } else if ((curentOrientation == GameData.Orientation.DOWN) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)))) {
             return true;
         }
 
@@ -88,6 +95,28 @@ public abstract class Enemy {
             return true;
         }
         return false;
+    }
+    protected ArrayList<GameData.Orientation> getAvailableOrientations() {
+        ArrayList<GameData.Orientation> availableOrientations = new ArrayList<>();
+        if (!isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)))) {
+            availableOrientations.add(GameData.Orientation.LEFT);
+        }
+        if (!isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)))) {
+            availableOrientations.add(GameData.Orientation.RIGHT);
+        }
+        if (!isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)))) {
+            availableOrientations.add(GameData.Orientation.UP);
+        }
+        if (!isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)))) {
+            availableOrientations.add(GameData.Orientation.DOWN);
+        }
+        if (availableOrientations.size() == 0) {
+            availableOrientations.add(GameData.Orientation.NONE);
+        }
+        return availableOrientations;
+    }
+    public double getDistanceTo(Enemy enemy) {
+        return sqrt(pow(getPosition().x - enemy.getPosition().x, 2) + pow(getPosition().y - enemy.getPosition().y, 2));
     }
     public void move() {
         if (enemyCanMove()) {
