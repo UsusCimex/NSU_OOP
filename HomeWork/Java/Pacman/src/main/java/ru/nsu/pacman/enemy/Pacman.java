@@ -65,7 +65,6 @@ public class Pacman extends Enemy {
                 Graphic.removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y + 1));
                 data.eatFood(new Coordinates(cellPosition.x, cellPosition.y + 1));
             }
-            System.out.println("FOOD: " + data.getEatedFood() + "/" + data.getCountFood());
         }
 
         if (enemyInNewCell() && getCurrentOrientation() != Orientation.NONE) {

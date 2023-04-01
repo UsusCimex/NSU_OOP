@@ -65,4 +65,22 @@ public abstract class GameData {
             };
         }
     }
+    public static class PlayerRecord {
+        private String name;
+        private int score = 0;
+
+        public PlayerRecord(String name, int score) {
+            this.name = name;
+            this.score = score;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getScore() {
+            return score;
+        }
+        public void addToScore(int value) { score += value; }
+    }
 }

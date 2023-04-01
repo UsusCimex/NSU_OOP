@@ -12,22 +12,23 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import ru.nsu.pacman.Game;
+import ru.nsu.pacman.GameData.PlayerRecord;
 
 import java.io.*;
 import java.util.*;
 
 public class RecordsTable extends Application {
-    private static final int MAX_RECORDS = 10;
+    private static final int MAX_PlayerRecordS = 10;
     @Override
     public void start(Stage primaryStage) throws IOException {
-        ArrayList<Record> records = loadRecords();
+        ArrayList<PlayerRecord> PlayerRecords = loadPlayerRecords();
 
         VBox vbox = new VBox();
         vbox.setSpacing(15);
         vbox.setAlignment(Pos.CENTER);
 
-        for (int i = 0; i < records.size(); ++i) {
-            Text text = new Text(records.get(i).name + " " + records.get(i).score);
+        for (int i = 0; i < PlayerRecords.size(); ++i) {
+            Text text = new Text(PlayerRecords.get(i).getName() + " " + PlayerRecords.get(i).getScore());
             text.setFont(new Font("Times new roman", 25));
             vbox.getChildren().add(text);
         }
@@ -51,7 +52,7 @@ public class RecordsTable extends Application {
         });
         vbox.getChildren().add(buttonQuit);
 
-        Scene scene = new Scene(vbox, 250, 550);
+        Scene scene = new Scene(vbox, 300, 550);
         primaryStage.setScene(scene);
         Image icon = new Image(Objects.requireNonNull(Game.class.getResourceAsStream("icon.png")));
         primaryStage.getIcons().add(icon);
@@ -59,16 +60,16 @@ public class RecordsTable extends Application {
         primaryStage.show();
     }
 
-    private static ArrayList<Record> loadRecords() throws IOException {
+    private static ArrayList<PlayerRecord> loadPlayerRecords() throws IOException {
         File file = new File("records.txt");
         if (!file.exists()) {
             file.createNewFile();
             FileWriter writer = new FileWriter(file);
-            writer.write("NO_RECORD,0");
+            writer.write("NO_RECORD,0\n");
             writer.close();
         }
 
-        ArrayList<Record> records = new ArrayList<Record>();
+        ArrayList<PlayerRecord> PlayerRecords = new ArrayList<PlayerRecord>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -76,55 +77,37 @@ public class RecordsTable extends Application {
                 if (parts.length == 2) {
                     String name = parts[0].trim();
                     int score = Integer.parseInt(parts[1].trim());
-                    records.add(new Record(name, score));
+                    PlayerRecords.add(new PlayerRecord(name, score));
                 }
-                if (records.size() >= MAX_RECORDS) {
+                if (PlayerRecords.size() >= MAX_PlayerRecordS) {
                     break;
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error loading records: " + e.getMessage());
+            System.err.println("Error loading record: " + e.getMessage());
         }
-        return records;
+        return PlayerRecords;
     }
-    public static void addRecord(Record record) throws IOException {
-        List<Record> records = loadRecords();
-        records.add(record);
-        Collections.sort(records, new Comparator<Record>() {
+    public static void addPlayerRecord(PlayerRecord PlayerRecord) throws IOException {
+        List<PlayerRecord> PlayerRecords = loadPlayerRecords();
+        PlayerRecords.add(PlayerRecord);
+        Collections.sort(PlayerRecords, new Comparator<PlayerRecord>() {
             @Override
-            public int compare(Record o1, Record o2) {
-                return o2.score - o1.score;
+            public int compare(PlayerRecord o1, PlayerRecord o2) {
+                return o2.getScore() - o1.getScore();
             }
         });
 
-        if (records.size() > 10) {
-            records = records.subList(0, 10);
+        if (PlayerRecords.size() > 10) {
+            PlayerRecords = PlayerRecords.subList(0, 10);
         }
 
         File file = new File("records.txt");
-        FileWriter writer = new FileWriter(file, true);
+        FileWriter writer = new FileWriter(file);
 
-        for (Record rec : records) {
+        for (PlayerRecord rec : PlayerRecords) {
             writer.write(rec.getName() + "," + rec.getScore() + "\n");
         }
         writer.close();
-    }
-
-    private static class Record {
-        private String name;
-        private int score;
-
-        public Record(String name, int score) {
-            this.name = name;
-            this.score = score;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getScore() {
-            return score;
-        }
     }
 }

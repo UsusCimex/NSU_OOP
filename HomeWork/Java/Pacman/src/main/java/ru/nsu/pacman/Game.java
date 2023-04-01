@@ -14,7 +14,9 @@ import ru.nsu.pacman.enemy.Pacman;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 import ru.nsu.pacman.menu.MainMenu;
+import ru.nsu.pacman.menu.RecordsTable;
 
+import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.*;
@@ -27,28 +29,39 @@ public class Game extends Application {
 
     private LevelData data = null;
     private Scene scene = null;
-    private int currentLevel = 0;
+    private final static int MAXLEVEL = 3;
+    private int curLevel = 0;
     private GameData.GameStatus status = GameData.GameStatus.NONE;
-    private EnemyData pacman;
-    private ArrayList<EnemyData> enemies;
+    private EnemyData pacman = null;
+    private boolean waitMode = false;
+    private ArrayList<EnemyData> enemies = null;
+    private GameData.PlayerRecord player = null;
+
+
+    public Game(GameData.PlayerRecord player, int level) throws Exception {
+        this.player = player;
+        this.curLevel = level;
+        data = generateLevel(level);
+
+        start(new Stage());
+    }
 
     private boolean addAllEnemiesInRoot(Pane root) {
         boolean pacmanChecker = false;
         for (EnemyData enemy : enemies) {
             if (enemy.body.getClass() == Pacman.class) {
                 if (!pacmanChecker) {
-                    System.out.println("PACMAN ADDED!");
                     pacman = enemy;
                     pacmanChecker = true;
                 } else {
-                    System.out.println("In game play only 1 PACMAN!");
+                    System.err.println("In game play only 1 PACMAN!");
                     return false;
                 }
             }
             root.getChildren().add(enemy.view);
         }
         if (!pacmanChecker) {
-            System.out.println("PACMAN NOT FOUND!");
+            System.err.println("PACMAN NOT FOUND!");
             return false;
         }
         return true;
@@ -59,7 +72,6 @@ public class Game extends Application {
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png")));
         primaryStage.getIcons().add(icon);
 
-        data = generateNextLevel();
         LevelBuilder builder = new LevelBuilder();
         GridPane area = builder.buildLevel(data);
         area.setId("area");
@@ -132,15 +144,19 @@ public class Game extends Application {
             if (data.getEatedFood() == data.getCountFood()) {
                 status = GameData.GameStatus.WIN;
             }
-        } else {
+        } else if (!waitMode){
+            waitMode = true;
             Graphic.printText(status);
             if (status == GameData.GameStatus.LOSE) {
                 scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         Graphic.removeText();
 
-                        MainMenu mainMenu = new MainMenu();
                         try {
+                            player.addToScore(data.getEatedFood());
+                            RecordsTable.addPlayerRecord(player);
+
+                            MainMenu mainMenu = new MainMenu();
                             mainMenu.start(new Stage());
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -154,10 +170,16 @@ public class Game extends Application {
                 scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ENTER) {
                         Graphic.removeText();
-
-                        MainMenu mainMenu = new MainMenu();
                         try {
-                            mainMenu.start(new Stage());
+                            if (curLevel == MAXLEVEL) {
+                                RecordsTable.addPlayerRecord(player);
+
+                                MainMenu mainMenu = new MainMenu();
+                                mainMenu.start(new Stage());
+                            } else {
+                                player.addToScore(data.getEatedFood());
+                                new Game(player, curLevel + 1);
+                            }
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -169,23 +191,23 @@ public class Game extends Application {
             } else if (status == GameData.GameStatus.PAUSE) {
                 scene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
-                        Graphic.removeText();
-
                         setDefaultControl();
+                        Graphic.removeText();
+                        
                         status = GameData.GameStatus.GAME;
+                        waitMode = false;
                     }
                 });
             }
         }
     }
 
-    private LevelData generateNextLevel() {
-        currentLevel += 1;
+    private LevelData generateLevel(int level) {
         try {
-            if (currentLevel == 1) return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
-            else if (currentLevel == 2) return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
-            else if (currentLevel == 3) return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
-            else status = GameData.GameStatus.NONE;
+            if (level == 1) return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
+            else if (level == 2) return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
+            else if (level == 3) return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
+            else throw new Exception("level not found!");
         } catch (Exception ex) {
             ex.getStackTrace();
         }

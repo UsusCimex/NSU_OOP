@@ -7,13 +7,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import ru.nsu.pacman.Game;
+import ru.nsu.pacman.GameData;
 
 import java.util.Objects;
 
 public class MainMenu extends Application {
+    private final static int FIRSTLEVEL = 1;
+    @FXML
+    private TextField nameEnter;
     @FXML
     private Button quitButton;
 
@@ -29,9 +34,21 @@ public class MainMenu extends Application {
     }
     @FXML
     public void starte(ActionEvent actionEvent) throws Exception {
-        Game game = new Game();
-        game.start(new Stage());
+        String playerName = nameEnter.getText();
+        if (playerName.trim().isEmpty()) {
+            System.err.println("Enter NAME!");
+            return;
+        }
+        if (!playerName.matches("[a-zA-Z0-9]*")) {
+            System.err.println("You use invalid symbols!");
+            return;
+        }
+        if (playerName.length() > 15) {
+            System.err.println("Please use not more 15 symbols");
+            return;
+        }
 
+        new Game(new GameData.PlayerRecord(playerName, 0), FIRSTLEVEL);
         quit(actionEvent);
     }
     @FXML
