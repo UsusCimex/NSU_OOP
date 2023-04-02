@@ -90,9 +90,7 @@ public class Game extends Application {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
-        Timeline timeToDestroyBarriers = new Timeline(new KeyFrame(Duration.seconds(10), event -> {
-            data.removeAllBarriers();
-        }));
+        Timeline timeToDestroyBarriers = new Timeline(new KeyFrame(Duration.seconds(10), event -> data.removeAllBarriers()));
         timeToDestroyBarriers.setCycleCount(1);
         timeToDestroyBarriers.play();
 
