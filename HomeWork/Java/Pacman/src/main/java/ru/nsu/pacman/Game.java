@@ -11,12 +11,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import ru.nsu.pacman.enemy.Enemy;
 import ru.nsu.pacman.enemy.Pacman;
-import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 import ru.nsu.pacman.menu.MainMenu;
 import ru.nsu.pacman.menu.RecordsTable;
 
-import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.*;
@@ -70,7 +68,7 @@ public class Game extends Application {
         return tempPacman;
     }
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         primaryStage.setTitle("PacmanGame");
         primaryStage.setResizable(false);
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png")));
@@ -209,6 +207,7 @@ public class Game extends Application {
                         Graphic.removeText();
                         try {
                             if (curLevel == MAXLEVEL) {
+                                player.addToScore(data.getEatedFood());
                                 RecordsTable.addPlayerRecord(player);
 
                                 MainMenu mainMenu = new MainMenu();
