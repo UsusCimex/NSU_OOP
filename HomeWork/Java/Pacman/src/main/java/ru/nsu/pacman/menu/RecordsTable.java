@@ -27,8 +27,8 @@ public class RecordsTable extends Application {
         vbox.setSpacing(15);
         vbox.setAlignment(Pos.CENTER);
 
-        for (int i = 0; i < PlayerRecords.size(); ++i) {
-            Text text = new Text(PlayerRecords.get(i).getName() + " " + PlayerRecords.get(i).getScore());
+        for (PlayerRecord playerRecord : PlayerRecords) {
+            Text text = new Text(playerRecord.getName() + " " + playerRecord.getScore());
             text.setFont(new Font("Times new roman", 25));
             vbox.getChildren().add(text);
         }
@@ -92,7 +92,7 @@ public class RecordsTable extends Application {
     public static void addPlayerRecord(PlayerRecord PlayerRecord) throws IOException {
         List<PlayerRecord> PlayerRecords = loadPlayerRecords();
         PlayerRecords.add(PlayerRecord);
-        Collections.sort(PlayerRecords, new Comparator<PlayerRecord>() {
+        PlayerRecords.sort(new Comparator<PlayerRecord>() {
             @Override
             public int compare(PlayerRecord o1, PlayerRecord o2) {
                 return o2.getScore() - o1.getScore();

@@ -27,7 +27,16 @@ public class OrangeGhost extends Entity {
 
         if (getDistanceTo(data.getPacman().body) > shortSightedness) {
             Random random = new Random();
-            return availableOrientations.get(random.nextInt(availableOrientations.size()));
+            nextOrientation = availableOrientations.get(random.nextInt(availableOrientations.size()));
+
+            if (nextOrientation == GameData.Orientation.UP && currentOrientation == GameData.Orientation.DOWN ||
+                    nextOrientation == GameData.Orientation.DOWN && currentOrientation == GameData.Orientation.UP ||
+                    nextOrientation == GameData.Orientation.LEFT && currentOrientation == GameData.Orientation.RIGHT ||
+                    nextOrientation == GameData.Orientation.RIGHT && currentOrientation == GameData.Orientation.LEFT) {
+                return availableOrientations.get(random.nextInt(availableOrientations.size()));
+            }
+
+            return nextOrientation;
         }
 
         ArrayList<GameData.Orientation> priorityOrientations = new ArrayList<>();

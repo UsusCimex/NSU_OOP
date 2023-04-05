@@ -11,11 +11,10 @@ import java.util.Random;
 import static ru.nsu.pacman.GameData.Coordinates;
 //Tries to get closer to Pacman, but keeps a long distance
 public class BlueGhost extends Entity {
-
     private final double longSightedness = 125;
     public BlueGhost(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
-        speed = 1.9;
+        speed = 1.94;
     }
     @Override
     public GameData.Orientation getNextOrientation() {
@@ -30,7 +29,16 @@ public class BlueGhost extends Entity {
 
         if (getDistanceTo(data.getPacman().body) < longSightedness) {
             Random random = new Random();
-            return availableOrientations.get(random.nextInt(availableOrientations.size()));
+            nextOrientation = availableOrientations.get(random.nextInt(availableOrientations.size()));
+
+            if (nextOrientation == GameData.Orientation.UP && currentOrientation == GameData.Orientation.DOWN ||
+                    nextOrientation == GameData.Orientation.DOWN && currentOrientation == GameData.Orientation.UP ||
+                    nextOrientation == GameData.Orientation.LEFT && currentOrientation == GameData.Orientation.RIGHT ||
+                    nextOrientation == GameData.Orientation.RIGHT && currentOrientation == GameData.Orientation.LEFT) {
+                return availableOrientations.get(random.nextInt(availableOrientations.size()));
+            }
+
+            return nextOrientation;
         }
 
         ArrayList<GameData.Orientation> priorityOrientations = new ArrayList<>();
