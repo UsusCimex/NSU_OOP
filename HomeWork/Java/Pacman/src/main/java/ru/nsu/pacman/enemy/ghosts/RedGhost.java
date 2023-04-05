@@ -1,11 +1,10 @@
 package ru.nsu.pacman.enemy.ghosts;
 
 import ru.nsu.pacman.GameData;
-import ru.nsu.pacman.enemy.Enemy;
+import ru.nsu.pacman.enemy.Entity;
 import ru.nsu.pacman.enemy.Pacman;
 import ru.nsu.pacman.generation.LevelData;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,15 +12,15 @@ import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.GameData.Coordinates;
 
 //Always running after Pacman
-public class RedGhost extends Enemy {
+public class RedGhost extends Entity {
     public RedGhost(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
         speed = 1.8;
     }
     @Override
     public void move() {
-        if (curentOrientation == GameData.Orientation.NONE) {
-            curentOrientation = getNextOrientation();
+        if (currentOrientation == GameData.Orientation.NONE) {
+            currentOrientation = getNextOrientation();
         }
 
         if (enemyInNewCell()) {
@@ -37,7 +36,7 @@ public class RedGhost extends Enemy {
             }
             setPosition(newPosition);
 
-            curentOrientation = getNextOrientation();
+            currentOrientation = getNextOrientation();
         }
 
         if (enemyInBorder()) {
@@ -52,13 +51,13 @@ public class RedGhost extends Enemy {
             }
         }
 
-        if (curentOrientation == GameData.Orientation.UP) {
+        if (currentOrientation == GameData.Orientation.UP) {
             position.y -= speed;
-        } else if (curentOrientation == GameData.Orientation.RIGHT) {
+        } else if (currentOrientation == GameData.Orientation.RIGHT) {
             position.x += speed;
-        } else if (curentOrientation == GameData.Orientation.DOWN) {
+        } else if (currentOrientation == GameData.Orientation.DOWN) {
             position.y += speed;
-        } else if (curentOrientation == GameData.Orientation.LEFT) {
+        } else if (currentOrientation == GameData.Orientation.LEFT) {
             position.x -= speed;
         }
     }

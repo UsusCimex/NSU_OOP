@@ -8,7 +8,7 @@ import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.GameData.Coordinates;
 import static ru.nsu.pacman.GameData.Orientation;
 
-public class Pacman extends Enemy {
+public class Pacman extends Entity {
     private double distanceToEatFood = 12;
 
     public Pacman(Coordinates startPosition, LevelData data) {
@@ -35,16 +35,16 @@ public class Pacman extends Enemy {
     @Override
     public void move() {
         if (enemyCanMove()) {
-            if (curentOrientation == Orientation.UP) {
+            if (currentOrientation == Orientation.UP) {
                 position.y -= speed;
             }
-            else if (curentOrientation == Orientation.RIGHT) {
+            else if (currentOrientation == Orientation.RIGHT) {
                 position.x += speed;
             }
-            else if (curentOrientation == Orientation.DOWN) {
+            else if (currentOrientation == Orientation.DOWN) {
                 position.y += speed;
             }
-            else if (curentOrientation == Orientation.LEFT) {
+            else if (currentOrientation == Orientation.LEFT) {
                 position.x -= speed;
             }
         } else {

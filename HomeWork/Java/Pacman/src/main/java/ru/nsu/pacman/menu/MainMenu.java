@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -37,15 +38,27 @@ public class MainMenu extends Application {
     public void starte(ActionEvent actionEvent) throws Exception {
         String playerName = nameEnter.getText();
         if (playerName.trim().isEmpty()) {
-            System.err.println("Enter NAME!");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERROR");
+            alert.setHeaderText(null);
+            alert.setContentText("Enter NAME!");
+            alert.showAndWait();
             return;
         }
         if (!playerName.matches("[a-zA-Z0-9]*")) {
-            System.err.println("You use invalid symbols!");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERROR");
+            alert.setHeaderText(null);
+            alert.setContentText("You use invalid symbols! [a-zA-Z0-9]");
+            alert.showAndWait();
             return;
         }
         if (playerName.length() < 3 || playerName.length() > 15) {
-            System.err.println("Allowed nickname length: 3-15 characters");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("ERROR");
+            alert.setHeaderText(null);
+            alert.setContentText("Allowed nickname length: 3-15 characters");
+            alert.showAndWait();
             return;
         }
 

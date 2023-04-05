@@ -10,15 +10,15 @@ import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.Game.CELL_SIZE;
 import static ru.nsu.pacman.GameData.Coordinates;
 
-public abstract class Enemy {
+public abstract class Entity {
     protected LevelData data = null;
-    protected GameData.Orientation curentOrientation = GameData.Orientation.NONE;
+    protected GameData.Orientation currentOrientation = GameData.Orientation.NONE;
     protected GameData.Orientation nextOrientation = GameData.Orientation.NONE;
     protected double speed = 1;
     protected Coordinates position;
     protected Coordinates cellPosition;
 
-    public Enemy(Coordinates startPosition, LevelData data) {
+    public Entity(Coordinates startPosition, LevelData data) {
         this.cellPosition = startPosition;
         this.position = new Coordinates(startPosition.x * CELL_SIZE, startPosition.y * CELL_SIZE);
 
@@ -33,10 +33,10 @@ public abstract class Enemy {
         position = new Coordinates(newPosition.x * CELL_SIZE, newPosition.y * CELL_SIZE);
     }
     public GameData.Orientation getCurrentOrientation() {
-        return curentOrientation;
+        return currentOrientation;
     }
     public void changeCurrentOrientation() {
-        curentOrientation = nextOrientation;
+        currentOrientation = nextOrientation;
         nextOrientation = GameData.Orientation.NONE;
     }
     public GameData.Orientation getNextOrientation() {
@@ -55,13 +55,13 @@ public abstract class Enemy {
         else return false;
     }
     public boolean enemyCanMove() {
-        if ((curentOrientation == GameData.Orientation.UP) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)))) {
+        if ((currentOrientation == GameData.Orientation.UP) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)))) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.LEFT) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)))) {
+        } else if ((currentOrientation == GameData.Orientation.LEFT) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)))) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.RIGHT) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)))) {
+        } else if ((currentOrientation == GameData.Orientation.RIGHT) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)))) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.DOWN) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)))) {
+        } else if ((currentOrientation == GameData.Orientation.DOWN) && !isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)))) {
             return true;
         }
 
@@ -85,13 +85,13 @@ public abstract class Enemy {
         }
     }
     public boolean enemyInBorder() {
-        if ((curentOrientation == GameData.Orientation.LEFT) && ((int)cellPosition.x == 0)) {
+        if ((currentOrientation == GameData.Orientation.LEFT) && ((int)cellPosition.x == 0)) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.UP) && ((int)cellPosition.y == 0)) {
+        } else if ((currentOrientation == GameData.Orientation.UP) && ((int)cellPosition.y == 0)) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.RIGHT) && ((int)cellPosition.x == CELL_N - 1)) {
+        } else if ((currentOrientation == GameData.Orientation.RIGHT) && ((int)cellPosition.x == CELL_N - 1)) {
             return true;
-        } else if ((curentOrientation == GameData.Orientation.DOWN) && ((int)cellPosition.y == CELL_N - 1)) {
+        } else if ((currentOrientation == GameData.Orientation.DOWN) && ((int)cellPosition.y == CELL_N - 1)) {
             return true;
         }
         return false;
@@ -115,18 +115,18 @@ public abstract class Enemy {
         }
         return availableOrientations;
     }
-    public double getDistanceTo(Enemy enemy) {
-        return sqrt(pow(getPosition().x - enemy.getPosition().x, 2) + pow(getPosition().y - enemy.getPosition().y, 2));
+    public double getDistanceTo(Entity entity) {
+        return sqrt(pow(getPosition().x - entity.getPosition().x, 2) + pow(getPosition().y - entity.getPosition().y, 2));
     }
     public void move() {
         if (enemyCanMove()) {
-            if (curentOrientation == GameData.Orientation.UP) {
+            if (currentOrientation == GameData.Orientation.UP) {
                 position.y -= speed;
-            } else if (curentOrientation == GameData.Orientation.RIGHT) {
+            } else if (currentOrientation == GameData.Orientation.RIGHT) {
                 position.x += speed;
-            } else if (curentOrientation == GameData.Orientation.DOWN) {
+            } else if (currentOrientation == GameData.Orientation.DOWN) {
                 position.y += speed;
-            } else if (curentOrientation == GameData.Orientation.LEFT) {
+            } else if (currentOrientation == GameData.Orientation.LEFT) {
                 position.x -= speed;
             }
         } else {

@@ -13,11 +13,11 @@ import java.util.Properties;
 import static ru.nsu.pacman.generation.LevelData.convertStringToSymbol;
 import static ru.nsu.pacman.GameData.Coordinates;
 
-public class EnemyFactory {
-    private static EnemyFactory instance = null;
+public class EntityFactory {
+    private static EntityFactory instance = null;
     private final InputStream file = Game.class.getResourceAsStream("enemies.data");
     private Map<LevelData.Symbols, Class<?>> map = new HashMap<>();
-    private EnemyFactory() {
+    private EntityFactory() {
         Properties props = new Properties();
         try {
             props.load(file);
@@ -33,16 +33,16 @@ public class EnemyFactory {
         }
     }
 
-    public static EnemyFactory getInstance() {
+    public static EntityFactory getInstance() {
         if (instance == null) {
-            instance = new EnemyFactory();
+            instance = new EntityFactory();
         }
         return instance;
     }
 
-    public Enemy createEnemy(LevelData.Symbols symbol, Coordinates startPosition, LevelData data) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public Entity createEnemy(LevelData.Symbols symbol, Coordinates startPosition, LevelData data) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if (map.containsKey(symbol)) {
-            return (Enemy) map.get(symbol).getConstructor(Coordinates.class, LevelData.class).newInstance(startPosition, data);
+            return (Entity) map.get(symbol).getConstructor(Coordinates.class, LevelData.class).newInstance(startPosition, data);
         } else {
             return null;
         }

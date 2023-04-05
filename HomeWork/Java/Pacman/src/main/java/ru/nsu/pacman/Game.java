@@ -9,7 +9,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import ru.nsu.pacman.enemy.Enemy;
+import ru.nsu.pacman.enemy.Entity;
 import ru.nsu.pacman.enemy.Pacman;
 import ru.nsu.pacman.generation.LevelData;
 import ru.nsu.pacman.menu.MainMenu;
@@ -114,8 +114,8 @@ public class Game extends Application {
         });
     }
 
-    private double getDistance(Enemy enemyA, Enemy enemyB) {
-        return max(abs(enemyA.getPosition().x - enemyB.getPosition().x), abs(enemyA.getPosition().y - enemyB.getPosition().y));
+    private double getDistance(Entity entityA, Entity entityB) {
+        return max(abs(entityA.getPosition().x - entityB.getPosition().x), abs(entityA.getPosition().y - entityB.getPosition().y));
     }
 
     private void update() {

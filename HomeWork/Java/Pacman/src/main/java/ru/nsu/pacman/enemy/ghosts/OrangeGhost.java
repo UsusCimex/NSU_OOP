@@ -1,7 +1,7 @@
 package ru.nsu.pacman.enemy.ghosts;
 
 import ru.nsu.pacman.GameData;
-import ru.nsu.pacman.enemy.Enemy;
+import ru.nsu.pacman.enemy.Entity;
 import ru.nsu.pacman.enemy.Pacman;
 import ru.nsu.pacman.generation.LevelData;
 
@@ -11,7 +11,7 @@ import java.util.Random;
 import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.GameData.Coordinates;
 //Tries to get closer to Pacman, but keeps a long distance
-public class OrangeGhost extends Enemy {
+public class OrangeGhost extends Entity {
 
     private double distanceToPacman = 250;
     public OrangeGhost(Coordinates startPosition, LevelData data) {
@@ -47,8 +47,8 @@ public class OrangeGhost extends Enemy {
 
     @Override
     public void move() {
-        if (curentOrientation == GameData.Orientation.NONE) {
-            curentOrientation = getNextOrientation();
+        if (currentOrientation == GameData.Orientation.NONE) {
+            currentOrientation = getNextOrientation();
         }
 
         if (enemyInNewCell()) {
@@ -66,10 +66,10 @@ public class OrangeGhost extends Enemy {
 
             nextOrientation = getNextOrientation();
             if (getAvailableOrientations().size() != 2) {
-                curentOrientation = nextOrientation;
+                currentOrientation = nextOrientation;
             }
             if (!enemyCanMove()) {
-                curentOrientation = nextOrientation;
+                currentOrientation = nextOrientation;
             }
         }
 
@@ -85,13 +85,13 @@ public class OrangeGhost extends Enemy {
             }
         }
 
-        if (curentOrientation == GameData.Orientation.UP) {
+        if (currentOrientation == GameData.Orientation.UP) {
             position.y -= speed;
-        } else if (curentOrientation == GameData.Orientation.RIGHT) {
+        } else if (currentOrientation == GameData.Orientation.RIGHT) {
             position.x += speed;
-        } else if (curentOrientation == GameData.Orientation.DOWN) {
+        } else if (currentOrientation == GameData.Orientation.DOWN) {
             position.y += speed;
-        } else if (curentOrientation == GameData.Orientation.LEFT) {
+        } else if (currentOrientation == GameData.Orientation.LEFT) {
             position.x -= speed;
         }
     }

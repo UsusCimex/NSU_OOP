@@ -1,10 +1,9 @@
 package ru.nsu.pacman.generation;
 
-import ru.nsu.pacman.Game;
 import ru.nsu.pacman.GameData;
 import ru.nsu.pacman.Graphic;
-import ru.nsu.pacman.enemy.Enemy;
-import ru.nsu.pacman.enemy.EnemyFactory;
+import ru.nsu.pacman.enemy.Entity;
+import ru.nsu.pacman.enemy.EntityFactory;
 import ru.nsu.pacman.enemy.Pacman;
 
 import java.io.InputStream;
@@ -85,9 +84,9 @@ public class LevelData {
             allEnemies = new ArrayList<GameData.EnemyData>();
             for (int col = 0; col < CELL_N; ++col) {
                 for (int row = 0; row < CELL_N; ++row) {
-                    Enemy enemy = EnemyFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);
-                    if (enemy != null) {
-                        allEnemies.add(new GameData.EnemyData(enemy));
+                    Entity entity = EntityFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);
+                    if (entity != null) {
+                        allEnemies.add(new GameData.EnemyData(entity));
                     }
                 }
             }
