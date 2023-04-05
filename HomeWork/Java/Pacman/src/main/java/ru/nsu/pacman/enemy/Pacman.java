@@ -9,7 +9,7 @@ import static ru.nsu.pacman.GameData.Coordinates;
 import static ru.nsu.pacman.GameData.Orientation;
 
 public class Pacman extends Entity {
-    private double distanceToEatFood = 12;
+    private final double distanceToEatFood = 12;
 
     public Pacman(Coordinates startPosition, LevelData data) {
         super(startPosition, data);

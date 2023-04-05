@@ -13,13 +13,13 @@ import static ru.nsu.pacman.GameData.Coordinates;
 //Tries to get closer to Pacman, but keeps a long distance
 public class BlueGhost extends Entity {
 
-    private double distanceToPacman = 125;
+    private final double longSightedness = 125;
     public BlueGhost(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
         speed = 2;
     }
     private ArrayList<GameData.Orientation> getPriorityOrientationToPacman() {
-        if (getDistanceTo(data.getPacman().body) < distanceToPacman) {
+        if (getDistanceTo(data.getPacman().body) < longSightedness) {
             return getAvailableOrientations();
         }
 

@@ -13,13 +13,13 @@ import static ru.nsu.pacman.GameData.Coordinates;
 //Tries to get closer to Pacman, but keeps a long distance
 public class OrangeGhost extends Entity {
 
-    private double distanceToPacman = 250;
+    private final double shortSightedness = 250;
     public OrangeGhost(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
         speed = 1.5;
     }
     private ArrayList<GameData.Orientation> getPriorityOrientationToPacman() {
-        if (getDistanceTo(data.getPacman().body) > distanceToPacman) {
+        if (getDistanceTo(data.getPacman().body) > shortSightedness) {
             return getAvailableOrientations();
         }
 
