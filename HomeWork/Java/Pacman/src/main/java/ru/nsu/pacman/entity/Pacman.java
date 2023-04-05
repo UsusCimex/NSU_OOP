@@ -1,4 +1,4 @@
-package ru.nsu.pacman.enemy;
+package ru.nsu.pacman.entity;
 
 import ru.nsu.pacman.Graphic;
 import ru.nsu.pacman.generation.LevelData;
@@ -17,7 +17,7 @@ public class Pacman extends Entity {
     }
 
     private boolean pacmanCanEatFood() {
-        if (enemyInBorder()) {
+        if (entityInBorder()) {
             return false;
         }
         if (getCurrentOrientation() == Orientation.LEFT && ((position.x - (cellPosition.x - 1) * CELL_SIZE) <= distanceToEatFood)) {
@@ -34,7 +34,7 @@ public class Pacman extends Entity {
     }
     @Override
     public void move() {
-        if (enemyCanMove()) {
+        if (entityCanMove()) {
             if (currentOrientation == Orientation.UP) {
                 position.y -= speed;
             }
@@ -67,21 +67,18 @@ public class Pacman extends Entity {
             }
         }
 
-        if (enemyInNewCell() && getCurrentOrientation() != Orientation.NONE) {
-            Coordinates newPosition = null;
+        if (entityInNewCell() && getCurrentOrientation() != Orientation.NONE) {
             if (getCurrentOrientation() == Orientation.UP) {
-                newPosition = new Coordinates(cellPosition.x, cellPosition.y - 1);
+                setPosition(new Coordinates(cellPosition.x, cellPosition.y - 1));
             } else if (getCurrentOrientation() == Orientation.LEFT) {
-                newPosition = new Coordinates(cellPosition.x - 1, cellPosition.y);
+                setPosition(new Coordinates(cellPosition.x - 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.RIGHT) {
-                newPosition = new Coordinates(cellPosition.x + 1, cellPosition.y);
+                setPosition(new Coordinates(cellPosition.x + 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.DOWN) {
-                newPosition = new Coordinates(cellPosition.x, cellPosition.y + 1);
+                setPosition(new Coordinates(cellPosition.x, cellPosition.y + 1));
             }
 
-            assert newPosition != null;
-            setPosition(newPosition);
-            if (enemyCanRotate()) {
+            if (entityCanRotate()) {
                 changeCurrentOrientation();
             }
         }
@@ -93,7 +90,7 @@ public class Pacman extends Entity {
             changeCurrentOrientation();
         }
 
-        if (enemyInBorder()) {
+        if (entityInBorder()) {
             if (getCurrentOrientation() == Orientation.RIGHT) {
                 setPosition(new Coordinates(0, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.LEFT) {

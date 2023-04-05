@@ -2,7 +2,7 @@ package ru.nsu.pacman;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import ru.nsu.pacman.enemy.Entity;
+import ru.nsu.pacman.entity.Entity;
 
 public abstract class GameData {
     public enum Orientation {
@@ -29,7 +29,7 @@ public abstract class GameData {
             this.y = y;
         }
     }
-    public static class EnemyData {
+    public static class EntityData {
         public Entity body;
         public ImageView view = new ImageView();
 
@@ -39,7 +39,7 @@ public abstract class GameData {
         private Image upIMG;
         private Image downIMG;
 
-        public EnemyData(Entity entity) {
+        public EntityData(Entity entity) {
             body = entity;
 
             view.setFitWidth(Game.CELL_SIZE);

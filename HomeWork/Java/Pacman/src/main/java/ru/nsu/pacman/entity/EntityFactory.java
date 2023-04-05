@@ -1,4 +1,4 @@
-package ru.nsu.pacman.enemy;
+package ru.nsu.pacman.entity;
 
 import ru.nsu.pacman.Game;
 import ru.nsu.pacman.generation.LevelData;
@@ -15,7 +15,7 @@ import static ru.nsu.pacman.GameData.Coordinates;
 
 public class EntityFactory {
     private static EntityFactory instance = null;
-    private final InputStream file = Game.class.getResourceAsStream("enemies.data");
+    private final InputStream file = Game.class.getResourceAsStream("entity.data");
     private Map<LevelData.Symbols, Class<?>> map = new HashMap<>();
     private EntityFactory() {
         Properties props = new Properties();

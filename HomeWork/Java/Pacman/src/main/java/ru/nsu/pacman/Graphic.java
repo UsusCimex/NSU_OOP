@@ -8,11 +8,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import ru.nsu.pacman.enemy.Pacman;
-import ru.nsu.pacman.enemy.ghosts.BlueGhost;
-import ru.nsu.pacman.enemy.ghosts.OrangeGhost;
-import ru.nsu.pacman.enemy.ghosts.PinkGhost;
-import ru.nsu.pacman.enemy.ghosts.RedGhost;
+import ru.nsu.pacman.entity.Pacman;
+import ru.nsu.pacman.entity.ghosts.BlueGhost;
+import ru.nsu.pacman.entity.ghosts.OrangeGhost;
+import ru.nsu.pacman.entity.ghosts.PinkGhost;
+import ru.nsu.pacman.entity.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
@@ -24,8 +24,8 @@ public abstract class Graphic {
     private static boolean textIsWriten = false;
     private static GameData.GameStatus curTextStatus = GameData.GameStatus.NONE;
 
-    public static void settingIMG(ArrayList<GameData.EnemyData> enemies) {
-        for (GameData.EnemyData enemy : enemies) {
+    public static void settingIMG(ArrayList<GameData.EntityData> enemies) {
+        for (GameData.EntityData enemy : enemies) {
             if (enemy.body.getClass().equals(Pacman.class)) {
                 enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/stopped.png"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/left.gif"))),
@@ -62,15 +62,15 @@ public abstract class Graphic {
             }
         }
     }
-    public static void addAllEnemiesInGamePane(ArrayList<GameData.EnemyData> enemies) {
+    public static void addAllEnemiesInGamePane(ArrayList<GameData.EntityData> enemies) {
         Pane gamePane = (Pane) root.lookup("#gamePane");
-        for (GameData.EnemyData enemy : enemies) {
+        for (GameData.EntityData enemy : enemies) {
             gamePane.getChildren().add(enemy.view);
         }
     }
-    public static void removeAllEnemiesInGamePane(ArrayList<GameData.EnemyData> enemies) {
+    public static void removeAllEnemiesInGamePane(ArrayList<GameData.EntityData> enemies) {
         Pane gamePane = (Pane) root.lookup("#gamePane");
-        for (GameData.EnemyData enemy : enemies) {
+        for (GameData.EntityData enemy : enemies) {
             gamePane.getChildren().remove(enemy.view);
         }
     }
@@ -116,7 +116,7 @@ public abstract class Graphic {
             }
         }
     }
-    public static void rewriteEnemy(GameData.EnemyData enemy) {
+    public static void rewriteEnemy(GameData.EntityData enemy) {
         enemy.view.setLayoutX(enemy.body.getPosition().x);
         enemy.view.setLayoutY(enemy.body.getPosition().y);
 

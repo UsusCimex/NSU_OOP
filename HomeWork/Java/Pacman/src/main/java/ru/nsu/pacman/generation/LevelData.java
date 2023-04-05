@@ -2,9 +2,9 @@ package ru.nsu.pacman.generation;
 
 import ru.nsu.pacman.GameData;
 import ru.nsu.pacman.Graphic;
-import ru.nsu.pacman.enemy.Entity;
-import ru.nsu.pacman.enemy.EntityFactory;
-import ru.nsu.pacman.enemy.Pacman;
+import ru.nsu.pacman.entity.Entity;
+import ru.nsu.pacman.entity.EntityFactory;
+import ru.nsu.pacman.entity.Pacman;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +30,7 @@ public class LevelData {
     }
     private int countFood = 0;
     private int eatedFood = 0;
-    private ArrayList<GameData.EnemyData> allEnemies = null;
+    private ArrayList<GameData.EntityData> allEnemies = null;
     private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
     public void setValueLevelData(Coordinates cord, Symbols value) {
@@ -77,16 +77,16 @@ public class LevelData {
             default -> throw new Exception("Symbol not found");
         };
     }
-    public ArrayList<GameData.EnemyData> getAllEnemies() {
+    public ArrayList<GameData.EntityData> getAllEnemies() {
         if (allEnemies != null) return allEnemies;
 
         try {
-            allEnemies = new ArrayList<GameData.EnemyData>();
+            allEnemies = new ArrayList<GameData.EntityData>();
             for (int col = 0; col < CELL_N; ++col) {
                 for (int row = 0; row < CELL_N; ++row) {
                     Entity entity = EntityFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);
                     if (entity != null) {
-                        allEnemies.add(new GameData.EnemyData(entity));
+                        allEnemies.add(new GameData.EntityData(entity));
                     }
                 }
             }
@@ -98,12 +98,12 @@ public class LevelData {
     public void resetAllEnemies() {
         allEnemies = null;
     }
-    public GameData.EnemyData getPacman() {
+    public GameData.EntityData getPacman() {
         if (allEnemies == null) {
             allEnemies = getAllEnemies();
         }
 
-        for (GameData.EnemyData enemy : allEnemies) {
+        for (GameData.EntityData enemy : allEnemies) {
             if (enemy.body.getClass().equals(Pacman.class)) {
                 return enemy;
             }

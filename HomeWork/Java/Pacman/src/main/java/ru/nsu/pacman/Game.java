@@ -9,8 +9,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import ru.nsu.pacman.enemy.Entity;
-import ru.nsu.pacman.enemy.Pacman;
+import ru.nsu.pacman.entity.Entity;
+import ru.nsu.pacman.entity.Pacman;
 import ru.nsu.pacman.generation.LevelData;
 import ru.nsu.pacman.menu.MainMenu;
 import ru.nsu.pacman.menu.RecordsTable;
@@ -19,7 +19,7 @@ import java.util.*;
 
 import static java.lang.Math.*;
 import static ru.nsu.pacman.GameData.Orientation;
-import static ru.nsu.pacman.GameData.EnemyData;
+import static ru.nsu.pacman.GameData.EntityData;
 
 public class Game extends Application {
     public static final int CELL_SIZE = 32;
@@ -30,9 +30,9 @@ public class Game extends Application {
     private final static int MAXLEVEL = 3;
     private int curLevel = 0;
     private GameData.GameStatus status = GameData.GameStatus.NONE;
-    private EnemyData pacman = null;
+    private EntityData pacman = null;
     private boolean waitMode = false;
-    private ArrayList<EnemyData> enemies = null;
+    private ArrayList<EntityData> enemies = null;
     private GameData.PlayerRecord player = null;
     private int lives = 5;
 
@@ -45,15 +45,15 @@ public class Game extends Application {
 
         start(new Stage());
     }
-    private EnemyData searchPacman() {
+    private EntityData searchPacman() {
         if (enemies == null) enemies = data.getAllEnemies();
 
         boolean pacmanChecker = false;
-        EnemyData tempPacman = null;
-        for (GameData.EnemyData enemy : enemies) {
-            if (enemy.body.getClass() == Pacman.class) {
+        EntityData tempPacman = null;
+        for (EntityData entity : enemies) {
+            if (entity.body.getClass() == Pacman.class) {
                 if (!pacmanChecker) {
-                    tempPacman = enemy;
+                    tempPacman = entity;
                     pacmanChecker = true;
                 } else {
                     System.err.println("In game play only 1 PACMAN!");
@@ -124,7 +124,7 @@ public class Game extends Application {
             Graphic.rewriteLives(lives);
             Graphic.rewriteName(player.getName());
             //GhostsAnimation
-            for (EnemyData enemy : enemies) {
+            for (EntityData enemy : enemies) {
                 enemy.body.move();
                 Graphic.rewriteEnemy(enemy);
 
