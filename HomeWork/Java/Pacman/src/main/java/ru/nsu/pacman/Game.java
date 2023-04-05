@@ -37,13 +37,11 @@ public class Game extends Application {
     private int lives = 5;
 
 
-    public Game(GameData.PlayerRecord player, int level, int countLives) throws Exception {
+    public Game(GameData.PlayerRecord player, int level, int countLives) {
         this.player = player;
         this.curLevel = level;
         this.lives = countLives;
         data = generateLevel(level);
-
-        start(new Stage());
     }
     private EntityData searchPacman() {
         if (enemies == null) enemies = data.getAllEnemies();
@@ -214,7 +212,8 @@ public class Game extends Application {
                                 mainMenu.start(new Stage());
                             } else {
                                 player.addToScore(data.getEatedFood());
-                                new Game(player, curLevel + 1, lives + 1);
+                                Game nextGame = new Game(player, curLevel + 1, lives + 1);
+                                nextGame.start(new Stage());
                             }
                         } catch (Exception e) {
                             throw new RuntimeException(e);

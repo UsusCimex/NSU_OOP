@@ -62,7 +62,8 @@ public class MainMenu extends Application {
             return;
         }
 
-        new Game(new GameData.PlayerRecord(playerName, 0), FIRSTLEVEL, FIRSTLIVES);
+        Game newGame = new Game(new GameData.PlayerRecord(playerName, 0), FIRSTLEVEL, FIRSTLIVES);
+        newGame.start(new Stage());
         quit(actionEvent);
     }
     @FXML
