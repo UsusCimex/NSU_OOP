@@ -44,7 +44,9 @@ public class Game extends Application {
         data = generateLevel(level);
     }
     private EntityData searchPacman() {
-        if (enemies == null) enemies = data.getAllEnemies();
+        if (enemies == null) {
+            enemies = data.getAllEnemies();
+        }
 
         boolean pacmanChecker = false;
         EntityData tempPacman = null;
@@ -144,7 +146,7 @@ public class Game extends Application {
             if (data.getEatedFood() == data.getCountFood()) {
                 status = GameData.GameStatus.WIN;
             }
-        } else if (!waitMode){
+        } else if (!waitMode) {
             waitMode = true;
             Graphic.printText(status);
             if (status == GameData.GameStatus.WAITRESPAWN) {
@@ -239,10 +241,15 @@ public class Game extends Application {
 
     private LevelData generateLevel(int level) {
         try {
-            if (level == 1) return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
-            else if (level == 2) return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
-            else if (level == 3) return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
-            else throw new Exception("level not found!");
+            if (level == 1) {
+                return new LevelData(getClass().getResourceAsStream("levels/1.txt"));
+            } else if (level == 2) {
+                return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
+            } else if (level == 3) {
+                return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
+            } else {
+                throw new Exception("level not found!");
+            }
         } catch (Exception ex) {
             ex.getStackTrace();
         }

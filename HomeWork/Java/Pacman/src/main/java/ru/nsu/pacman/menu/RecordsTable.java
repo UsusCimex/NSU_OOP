@@ -19,6 +19,10 @@ import java.util.*;
 
 public class RecordsTable extends Application {
     private static final int MAX_PlayerRecordS = 10;
+    private static final int windowWidth = 300;
+    private static final int windowHeight = 550;
+    private static final int buttonWidth = 150;
+    private static final int buttonHeight = 100;
     @Override
     public void start(Stage primaryStage) throws IOException {
         ArrayList<PlayerRecord> PlayerRecords = loadPlayerRecords();
@@ -33,8 +37,8 @@ public class RecordsTable extends Application {
             vbox.getChildren().add(text);
         }
         Button buttonQuit = new Button("Quit");
-        buttonQuit.setMaxWidth(150);
-        buttonQuit.setMaxHeight(100);
+        buttonQuit.setMaxWidth(buttonWidth);
+        buttonQuit.setMaxHeight(buttonHeight);
         buttonQuit.setStyle("-fx-background-color: aqua; -fx-border-width: 4; -fx-border-color: black;");
         buttonQuit.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -52,7 +56,7 @@ public class RecordsTable extends Application {
         });
         vbox.getChildren().add(buttonQuit);
 
-        Scene scene = new Scene(vbox, 300, 550);
+        Scene scene = new Scene(vbox, windowWidth, windowHeight);
         primaryStage.setScene(scene);
         Image icon = new Image(Objects.requireNonNull(Game.class.getResourceAsStream("icon.png")));
         primaryStage.getIcons().add(icon);
@@ -64,7 +68,10 @@ public class RecordsTable extends Application {
     private static ArrayList<PlayerRecord> loadPlayerRecords() throws IOException {
         File file = new File("records.txt");
         if (!file.exists()) {
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                System.err.println("Error create file");
+                return null;
+            }
             FileWriter writer = new FileWriter(file);
             writer.write("NO_RECORD,0\n");
             writer.close();
