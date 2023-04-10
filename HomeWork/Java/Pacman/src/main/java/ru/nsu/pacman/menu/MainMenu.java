@@ -11,14 +11,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import ru.nsu.pacman.Controller;
 import ru.nsu.pacman.Game;
 import ru.nsu.pacman.GameData;
 
 import java.util.Objects;
 
 public class MainMenu extends Application {
-    private final static int FIRSTLEVEL = 1;
-    private final static int FIRSTLIVES = 5;
+    public final static int FIRSTLEVEL = 1;
+    public final static int FIRSTLIVES = 5;
     @FXML
     private TextField nameEnter;
     @FXML
@@ -62,7 +63,7 @@ public class MainMenu extends Application {
             return;
         }
 
-        Game newGame = new Game(new GameData.PlayerRecord(playerName, 0), FIRSTLEVEL, FIRSTLIVES);
+        Game newGame = new Game(new GameData.PlayerRecord(playerName, 0, FIRSTLEVEL, FIRSTLIVES));
         newGame.start(new Stage());
         quit(actionEvent);
     }
@@ -85,5 +86,9 @@ public class MainMenu extends Application {
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        nameEnter = (TextField) loader.getNamespace().get("nameEnter");
+        quitButton = (Button) loader.getNamespace().get("quitButton");
+        Controller.setMainMenuControl(nameEnter, this);
     }
 }

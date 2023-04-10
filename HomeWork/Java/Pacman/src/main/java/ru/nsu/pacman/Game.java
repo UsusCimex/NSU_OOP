@@ -5,88 +5,44 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.entity.Pacman;
 import ru.nsu.pacman.generation.LevelData;
-import ru.nsu.pacman.menu.MainMenu;
-import ru.nsu.pacman.menu.RecordsTable;
 
 import java.util.*;
 
 import static java.lang.Math.*;
-import static ru.nsu.pacman.GameData.Orientation;
 import static ru.nsu.pacman.GameData.EntityData;
 
 public class Game extends Application {
     public static final int CELL_SIZE = 32;
     public static final int CELL_N = 21;
+    private static final int TIMECICLE = 20;
+    public final static int MAXLEVEL = 3;
+    private GameData.PlayerRecord player;
+    private Controller.Context context;
 
-    private LevelData data = null;
-    private Scene scene = null;
-    private final static int MAXLEVEL = 3;
-    private int curLevel = 0;
-    private GameData.GameStatus status = GameData.GameStatus.NONE;
-    private EntityData pacman = null;
-    private boolean waitMode = false;
-    private ArrayList<EntityData> enemies = null;
-    private GameData.PlayerRecord player = null;
-    private int lives = 5;
-
-
-    public Game(GameData.PlayerRecord player, int level, int countLives) {
+    public Game(GameData.PlayerRecord player) {
         this.player = player;
-        this.curLevel = level;
-        this.lives = countLives;
-        data = generateLevel(level);
     }
-    private EntityData searchPacman() {
-        if (enemies == null) {
-            enemies = data.getAllEnemies();
-        }
 
-        boolean pacmanChecker = false;
-        EntityData tempPacman = null;
-        for (EntityData entity : enemies) {
-            if (entity.body.getClass() == Pacman.class) {
-                if (!pacmanChecker) {
-                    tempPacman = entity;
-                    pacmanChecker = true;
-                } else {
-                    System.err.println("In game play only 1 PACMAN!");
-                    throw new RuntimeException();
-                }
-            }
-        }
-        if (!pacmanChecker) {
-            System.err.println("PACMAN NOT FOUND!");
-            throw new RuntimeException();
-        }
-        return tempPacman;
-    }
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("PacmanGame");
         primaryStage.setResizable(false);
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon.png")));
         primaryStage.getIcons().add(icon);
+        LevelData data = generateLevel(player.getLevel());
+        assert data != null;
+
         StackPane root = Graphic.generateMainRoot(data);
-        scene = new Scene(root);
+        Scene scene = new Scene(root);
 
-        enemies = data.getAllEnemies();
-        pacman = searchPacman();
-
-        Graphic.settingIMG(enemies);
-        Graphic.addAllEnemiesInGamePane(enemies);
-
-        setDefaultControl();
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> update()));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        Graphic.settingIMG(data.getAllEntities());
+        Graphic.addAllEnemiesInGamePane(data.getAllEntities());
 
         Timeline timeToDestroyBarriers = new Timeline(new KeyFrame(Duration.seconds(10), event -> data.removeAllBarriers()));
         timeToDestroyBarriers.setCycleCount(1);
@@ -95,23 +51,18 @@ public class Game extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        status = GameData.GameStatus.GAME;
-    }
+        Graphic.rewriteScore(player.getScore() + data.getEatedFood());
+        Graphic.rewriteLives(player.getLives());
+        Graphic.rewriteName(player.getName());
 
-    private void setDefaultControl() {
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.UP) {
-                pacman.body.changeNextOrientation(Orientation.UP);
-            } else if (event.getCode() == KeyCode.DOWN) {
-                pacman.body.changeNextOrientation(Orientation.DOWN);
-            } else if (event.getCode() == KeyCode.LEFT) {
-                pacman.body.changeNextOrientation(Orientation.LEFT);
-            } else if (event.getCode() == KeyCode.RIGHT) {
-                pacman.body.changeNextOrientation(Orientation.RIGHT);
-            } else if (event.getCode() == KeyCode.ESCAPE) {
-                status = GameData.GameStatus.PAUSE;
-            }
-        });
+        GameData.GameStatus status = GameData.GameStatus.GAME;
+
+        Timeline gameCicle = new Timeline(new KeyFrame(Duration.millis(TIMECICLE), e -> update()));
+        gameCicle.setCycleCount(Timeline.INDEFINITE);
+        gameCicle.play();
+
+        context = new Controller.Context(scene, data, status, player, gameCicle);
+        Controller.setDefaultGameControl(context);
     }
 
     private double getDistance(Entity entityA, Entity entityB) {
@@ -119,123 +70,37 @@ public class Game extends Application {
     }
 
     private void update() {
-        if (status == GameData.GameStatus.GAME) {
-            Graphic.rewriteScore(player.getScore() + data.getEatedFood());
-            Graphic.rewriteLives(lives);
-            Graphic.rewriteName(player.getName());
+        if (context.getStatus() == GameData.GameStatus.GAME) {
+            Graphic.update();
+
+            Graphic.rewriteScore(player.getScore() + context.getData().getEatedFood());
             //GhostsAnimation
-            for (EntityData enemy : enemies) {
+            for (EntityData enemy : context.getData().getAllEntities()) {
                 enemy.body.move();
                 Graphic.rewriteEnemy(enemy);
 
                 //Check mob collision
                 if (enemy.body.getClass() != Pacman.class) {
-                    if (getDistance(pacman.body, enemy.body) <= CELL_SIZE * 0.8) {
-                        lives--;
-                        if (lives == 0) {
-                            status = GameData.GameStatus.LOSE;
+                    if (getDistance(context.getData().getPacman().body, enemy.body) <= CELL_SIZE * 0.8) {
+                        player.loseLive();
+                        if (player.getLives() == 0) {
+                            context.setStatus(GameData.GameStatus.LOSE);
                         } else {
-                            status = GameData.GameStatus.WAITRESPAWN;
+                            context.setStatus(GameData.GameStatus.WAITRESPAWN);
                         }
+                        Graphic.rewriteLives(player.getLives());
                         return;
                     }
                 }
             }
 
             //Check finish
-            if (data.getEatedFood() == data.getCountFood()) {
-                status = GameData.GameStatus.WIN;
+            if (context.getData().getEatedFood() == context.getData().getCountFood()) {
+                context.setStatus(GameData.GameStatus.WIN);
             }
-        } else if (!waitMode) {
-            waitMode = true;
-            Graphic.printText(status);
-            if (status == GameData.GameStatus.WAITRESPAWN) {
-                scene.setOnKeyPressed(event -> {
-                    if (event.getCode() == KeyCode.ENTER) {
-                        Graphic.removeText();
-                        setDefaultControl();
-
-                        Graphic.removeAllEnemiesInGamePane(enemies);
-                        data.resetAllEnemies();
-                        enemies = data.getAllEnemies();
-                        pacman = data.getPacman();
-
-                        Graphic.settingIMG(enemies);
-                        Graphic.addAllEnemiesInGamePane(enemies);
-
-                        status = GameData.GameStatus.GAME;
-                        waitMode = false;
-                    } else if (event.getCode() == KeyCode.ESCAPE) {
-                        Graphic.removeText();
-
-                        try {
-                            player.addToScore(data.getEatedFood());
-                            RecordsTable.addPlayerRecord(player);
-
-                            MainMenu mainMenu = new MainMenu();
-                            mainMenu.start(new Stage());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        Stage stage = (Stage) scene.getWindow();
-                        stage.close();
-                    }
-                });
-            } else if (status == GameData.GameStatus.LOSE) {
-                scene.setOnKeyPressed(event -> {
-                    if (event.getCode() == KeyCode.ESCAPE) {
-                        Graphic.removeText();
-
-                        try {
-                            player.addToScore(data.getEatedFood());
-                            RecordsTable.addPlayerRecord(player);
-
-                            MainMenu mainMenu = new MainMenu();
-                            mainMenu.start(new Stage());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        Stage stage = (Stage) scene.getWindow();
-                        stage.close();
-                    }
-                });
-            } else if (status == GameData.GameStatus.WIN) {
-                scene.setOnKeyPressed(event -> {
-                    if (event.getCode() == KeyCode.ENTER) {
-                        Graphic.removeText();
-                        try {
-                            if (curLevel == MAXLEVEL) {
-                                player.addToScore(data.getEatedFood());
-                                RecordsTable.addPlayerRecord(player);
-
-                                MainMenu mainMenu = new MainMenu();
-                                mainMenu.start(new Stage());
-                            } else {
-                                player.addToScore(data.getEatedFood());
-                                Game nextGame = new Game(player, curLevel + 1, lives + 1);
-                                nextGame.start(new Stage());
-                            }
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        Stage stage = (Stage) scene.getWindow();
-                        stage.close();
-                    }
-                });
-            } else if (status == GameData.GameStatus.PAUSE) {
-                scene.setOnKeyPressed(event -> {
-                    if (event.getCode() == KeyCode.ESCAPE) {
-                        setDefaultControl();
-                        Graphic.removeText();
-
-                        status = GameData.GameStatus.GAME;
-                        waitMode = false;
-                    }
-                });
-            }
+        } else {
+            context.getGameCicle().stop();
+            Graphic.printText(context.getStatus());
         }
     }
 

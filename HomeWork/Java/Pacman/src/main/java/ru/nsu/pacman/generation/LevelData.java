@@ -1,7 +1,6 @@
 package ru.nsu.pacman.generation;
 
 import ru.nsu.pacman.GameData;
-import ru.nsu.pacman.Graphic;
 import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.entity.EntityFactory;
 import ru.nsu.pacman.entity.Pacman;
@@ -30,7 +29,8 @@ public class LevelData {
     }
     private int countFood = 0;
     private int eatedFood = 0;
-    private ArrayList<GameData.EntityData> allEnemies = null;
+    private ArrayList<GameData.EntityData> allEntities = null;
+    private GameData.EntityData pacman = null;
     private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
     public void setValueLevelData(Coordinates cord, Symbols value) {
@@ -48,7 +48,6 @@ public class LevelData {
                 Coordinates coordinates = new Coordinates(col, row);
                 if (getValueLevelData(coordinates) == Symbols.Barrier) {
                     setValueLevelData(coordinates, Symbols.Empty);
-                    Graphic.removeNodeFromArea(coordinates);
                 }
             }
         }
@@ -77,38 +76,42 @@ public class LevelData {
             default -> throw new Exception("Symbol not found");
         };
     }
-    public ArrayList<GameData.EntityData> getAllEnemies() {
-        if (allEnemies != null) return allEnemies;
+    public ArrayList<GameData.EntityData> getAllEntities() {
+        if (allEntities != null) return allEntities;
 
         try {
-            allEnemies = new ArrayList<GameData.EntityData>();
+            allEntities = new ArrayList<GameData.EntityData>();
             for (int col = 0; col < CELL_N; ++col) {
                 for (int row = 0; row < CELL_N; ++row) {
                     Entity entity = EntityFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);
                     if (entity != null) {
-                        allEnemies.add(new GameData.EntityData(entity));
+                        allEntities.add(new GameData.EntityData(entity));
                     }
                 }
             }
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException ex) {
             ex.getStackTrace();
         }
-        return allEnemies;
+        return allEntities;
     }
-    public void resetAllEnemies() {
-        allEnemies = null;
+    public void resetAllEntities() {
+        allEntities = null;
+        pacman = null;
     }
     public GameData.EntityData getPacman() {
-        if (allEnemies == null) {
-            allEnemies = getAllEnemies();
+        if (allEntities == null) {
+            allEntities = getAllEntities();
         }
-
-        for (GameData.EntityData enemy : allEnemies) {
+        if (pacman != null) {
+            return pacman;
+        }
+        for (GameData.EntityData enemy : allEntities) {
             if (enemy.body.getClass().equals(Pacman.class)) {
-                return enemy;
+                pacman = enemy;
+                break;
             }
         }
-        return null;
+        return pacman;
     }
     private void loadLevelDataFromFile(InputStream is) throws Exception {
         Scanner scanner = new Scanner(is);

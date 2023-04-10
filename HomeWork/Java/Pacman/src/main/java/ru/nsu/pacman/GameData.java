@@ -69,19 +69,28 @@ public abstract class GameData {
     public static class PlayerRecord {
         private String name;
         private int score = 0;
+        private int level = 0;
+        private int lives = 0;
 
-        public PlayerRecord(String name, int score) {
+        public PlayerRecord(String name, int score, int level, int lives) {
             this.name = name;
             this.score = score;
+            this.level = level;
+            this.lives = lives;
         }
-
         public String getName() {
             return name;
         }
-
         public int getScore() {
             return score;
         }
         public void addToScore(int value) { score += value; }
+        public int getLevel() {
+            return level;
+        }
+        public int getLives() {
+            return lives;
+        }
+        public void loseLive() { lives--; }
     }
 }

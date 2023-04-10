@@ -1,6 +1,5 @@
 package ru.nsu.pacman.entity;
 
-import ru.nsu.pacman.Graphic;
 import ru.nsu.pacman.generation.LevelData;
 
 import static ru.nsu.pacman.Game.CELL_SIZE;
@@ -49,20 +48,19 @@ public class Pacman extends Entity {
             }
         } else {
             changeCurrentOrientation();
+            if (!entityCanMove()) {
+                currentOrientation = Orientation.NONE;
+            }
         }
 
         if (pacmanCanEatFood()) {
             if (getCurrentOrientation() == Orientation.LEFT) {
-                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x - 1, cellPosition.y));
                 data.eatFood(new Coordinates(cellPosition.x - 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.UP) {
-                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y - 1));
                 data.eatFood(new Coordinates(cellPosition.x, cellPosition.y - 1));
             } else if (getCurrentOrientation() == Orientation.RIGHT) {
-                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x + 1, cellPosition.y));
                 data.eatFood(new Coordinates(cellPosition.x + 1, cellPosition.y));
             } else if (getCurrentOrientation() == Orientation.DOWN) {
-                Graphic.removeNodeFromArea(new Coordinates(cellPosition.x, cellPosition.y + 1));
                 data.eatFood(new Coordinates(cellPosition.x, cellPosition.y + 1));
             }
         }

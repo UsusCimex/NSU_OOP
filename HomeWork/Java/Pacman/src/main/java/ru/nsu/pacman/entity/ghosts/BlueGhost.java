@@ -11,7 +11,7 @@ import java.util.Random;
 import static ru.nsu.pacman.GameData.Coordinates;
 //Tries to get closer to Pacman, but keeps a long distance
 public class BlueGhost extends Entity {
-    private final double longSightedness = 125;
+    private final double longSightedness = 160;
     public BlueGhost(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
         speed = 1.94;

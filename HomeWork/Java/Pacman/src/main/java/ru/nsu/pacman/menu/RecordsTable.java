@@ -85,7 +85,7 @@ public class RecordsTable extends Application {
                 if (parts.length == 2) {
                     String name = parts[0].trim();
                     int score = Integer.parseInt(parts[1].trim());
-                    PlayerRecords.add(new PlayerRecord(name, score));
+                    PlayerRecords.add(new PlayerRecord(name, score, 0,0));
                 }
                 if (PlayerRecords.size() >= MAX_PlayerRecordS) {
                     break;

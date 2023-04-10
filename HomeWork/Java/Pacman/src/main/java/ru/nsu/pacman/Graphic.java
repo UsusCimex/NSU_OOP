@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public abstract class Graphic {
+    private static LevelData data = null;
     private static StackPane root = null;
     private static boolean textIsWriten = false;
     private static GameData.GameStatus curTextStatus = GameData.GameStatus.NONE;
@@ -75,6 +76,7 @@ public abstract class Graphic {
         }
     }
     public static StackPane generateMainRoot(LevelData data) {
+        Graphic.data = data;
         LevelBuilder builder = new LevelBuilder();
         GridPane area = builder.buildLevel(data);
         area.setId("area");
@@ -104,17 +106,18 @@ public abstract class Graphic {
         root.setStyle("-fx-background-color: AQUA;");
         return root;
     }
-    private static GridPane getArea() {
-        return (GridPane) root.lookup("#gamePane #area");
-    }
-    public static void removeNodeFromArea(GameData.Coordinates cord) {
+    public static void update() {
+        if (data == null || root == null) return;
         GridPane area = getArea();
         for (Node node : area.getChildren()) {
-            if (GridPane.getColumnIndex(node) == (int)cord.x && GridPane.getRowIndex(node) == (int)cord.y) {
+            if (data.getValueLevelData(new GameData.Coordinates(GridPane.getColumnIndex(node), GridPane.getRowIndex(node))) == LevelData.Symbols.Empty) {
                 area.getChildren().remove(node);
                 break;
             }
         }
+    }
+    private static GridPane getArea() {
+        return (GridPane) root.lookup("#gamePane #area");
     }
     public static void rewriteEnemy(GameData.EntityData enemy) {
         enemy.view.setLayoutX(enemy.body.getPosition().x);
@@ -199,7 +202,13 @@ public abstract class Graphic {
         text2.setStroke(Color.BLACK);
         text2.setStrokeWidth(2.0);
 
-        VBox vbox = new VBox(text1, text2);
+        Text text3 = new Text("Press ENTER to start new game!");
+        text3.setFont(Font.font("OCR A Extended", FontWeight.BOLD, 40));
+        text3.setFill(Color.YELLOW);
+        text3.setStroke(Color.BLACK);
+        text3.setStrokeWidth(2.0);
+
+        VBox vbox = new VBox(text1, text2, text3);
         vbox.setId("loseText");
         vbox.setAlignment(Pos.CENTER);
 
