@@ -10,7 +10,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import ru.nsu.pacman.entity.Pacman;
 import ru.nsu.pacman.entity.ghosts.BlueGhost;
-import ru.nsu.pacman.entity.ghosts.OrangeGhost;
+import ru.nsu.pacman.entity.ghosts.GreenGhost;
 import ru.nsu.pacman.entity.ghosts.PinkGhost;
 import ru.nsu.pacman.entity.ghosts.RedGhost;
 import ru.nsu.pacman.generation.LevelBuilder;
@@ -26,53 +26,53 @@ public abstract class Graphic {
     private static GameData.GameStatus curTextStatus = GameData.GameStatus.NONE;
 
     public static void settingIMG(ArrayList<GameData.EntityData> enemies) {
-        for (GameData.EntityData enemy : enemies) {
-            if (enemy.body.getClass().equals(Pacman.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/stopped.png"))),
+        for (GameData.EntityData entity : enemies) {
+            if (entity.body.getClass().equals(Pacman.class)) {
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/stopped.png"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/left.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/right.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/up.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/down.gif"))));
-            } else if (enemy.body.getClass().equals(RedGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
+            } else if (entity.body.getClass().equals(RedGhost.class)) {
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))));
-            } else if (enemy.body.getClass().equals(BlueGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/test.png"))));
-            } else if (enemy.body.getClass().equals(OrangeGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/orange/test.png"))));
-            } else if (enemy.body.getClass().equals(PinkGhost.class)) {
-                enemy.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/test.png"))));
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/down.gif"))));
+            } else if (entity.body.getClass().equals(BlueGhost.class)) {
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))));
+            } else if (entity.body.getClass().equals(GreenGhost.class)) {
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))));
+            } else if (entity.body.getClass().equals(PinkGhost.class)) {
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))));
             } else {
-                System.err.println("Enemy not found! Add new enemy in setting IMG");
+                System.err.println("Entity not found! Add new entity in setting IMG");
                 throw new RuntimeException();
             }
         }
     }
     public static void addAllEnemiesInGamePane(ArrayList<GameData.EntityData> enemies) {
         Pane gamePane = (Pane) root.lookup("#gamePane");
-        for (GameData.EntityData enemy : enemies) {
-            gamePane.getChildren().add(enemy.view);
+        for (GameData.EntityData entity : enemies) {
+            gamePane.getChildren().add(entity.view);
         }
     }
     public static void removeAllEnemiesInGamePane(ArrayList<GameData.EntityData> enemies) {
         Pane gamePane = (Pane) root.lookup("#gamePane");
-        for (GameData.EntityData enemy : enemies) {
-            gamePane.getChildren().remove(enemy.view);
+        for (GameData.EntityData entity : enemies) {
+            gamePane.getChildren().remove(entity.view);
         }
     }
     public static StackPane generateMainRoot(LevelData data) {
@@ -119,11 +119,11 @@ public abstract class Graphic {
     private static GridPane getArea() {
         return (GridPane) root.lookup("#gamePane #area");
     }
-    public static void rewriteEnemy(GameData.EntityData enemy) {
-        enemy.view.setLayoutX(enemy.body.getPosition().x);
-        enemy.view.setLayoutY(enemy.body.getPosition().y);
+    public static void rewriteEnemy(GameData.EntityData entity) {
+        entity.view.setLayoutX(entity.body.getPosition().x);
+        entity.view.setLayoutY(entity.body.getPosition().y);
 
-        enemy.view.setImage(enemy.getImages(enemy.body.getCurrentOrientation()));
+        entity.view.setImage(entity.getImages(entity.body.getCurrentOrientation()));
     }
     public static void rewriteScore(int score) {
         Text scoreText = (Text)root.lookup("#mainPain #infoPain #score");

@@ -47,7 +47,6 @@ public abstract class Controller {
 
         public void setStatus(GameData.GameStatus newStatus) {
             status = newStatus;
-            System.err.println("MY STAT:" + newStatus);
         }
         public GameData.GameStatus getStatus() {
             return status;

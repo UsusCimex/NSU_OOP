@@ -10,10 +10,10 @@ import java.util.Random;
 
 import static ru.nsu.pacman.GameData.Coordinates;
 //Tries to get closer to Pacman, but keeps a long distance
-public class OrangeGhost extends Entity {
+public class GreenGhost extends Entity {
 
     private final double shortSightedness = 250;
-    public OrangeGhost(Coordinates startPosition, LevelData data) {
+    public GreenGhost(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
         speed = 1.65;
     }

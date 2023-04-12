@@ -25,7 +25,7 @@ public class LevelData {
         RedGhost,
         BlueGhost,
         PinkGhost,
-        OrangeGhost
+        GreenGhost
     }
     private int countFood = 0;
     private int eatedFood = 0;
@@ -72,7 +72,7 @@ public class LevelData {
             case ("r") -> Symbols.RedGhost;
             case ("b") -> Symbols.BlueGhost;
             case ("p") -> Symbols.PinkGhost;
-            case ("o") -> Symbols.OrangeGhost;
+            case ("g") -> Symbols.GreenGhost;
             default -> throw new Exception("Symbol not found");
         };
     }

@@ -1,5 +1,5 @@
 ru.nsu.pacman.entity.Pacman             = P
 ru.nsu.pacman.entity.ghosts.RedGhost    = r
-ru.nsu.pacman.entity.ghosts.OrangeGhost = o
+ru.nsu.pacman.entity.ghosts.GreenGhost  = g
 ru.nsu.pacman.entity.ghosts.PinkGhost   = p
 ru.nsu.pacman.entity.ghosts.BlueGhost   = b
