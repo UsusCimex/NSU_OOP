@@ -15,7 +15,7 @@
             <Font name="OCR A Extended" size="96.0" />
          </font>
       </Text>
-      <Button fx:id="startButton" layoutX="160.0" layoutY="180.0" mnemonicParsing="false" onAction="#starte" prefHeight="86.0" prefWidth="279.0" style="-fx-background-color: aqua; -fx-border-width: 4; -fx-border-color: black;" text="Start" underline="true">
+      <Button fx:id="startButton" layoutX="160.0" layoutY="180.0" mnemonicParsing="false" onAction="#startEvent" prefHeight="86.0" prefWidth="279.0" style="-fx-background-color: aqua; -fx-border-width: 4; -fx-border-color: black;" text="Start" underline="true">
          <font>
             <Font name="OCR A Extended" size="42.0" />
          </font>

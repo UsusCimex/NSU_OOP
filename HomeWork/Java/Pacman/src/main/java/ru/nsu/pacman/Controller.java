@@ -20,7 +20,7 @@ public abstract class Controller {
         nameEnter.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 try {
-                    menu.starte(new ActionEvent());
+                    menu.startEvent(new ActionEvent());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -29,14 +29,14 @@ public abstract class Controller {
     }
 
     public static class Context {
-        private Scene scene;
+        private final Scene scene;
 
-        private LevelData data;
+        private final LevelData data;
         private GameData.GameStatus status;
 
-        private GameData.PlayerRecord player;
+        private final GameData.PlayerRecord player;
 
-        private Timeline gameCicle;
+        private final Timeline gameCicle;
         public Context(Scene scene, LevelData data, GameData.GameStatus status, GameData.PlayerRecord player, Timeline gameCicle) {
             this.scene = scene;
             this.data = data;

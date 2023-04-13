@@ -22,7 +22,7 @@ public class Game extends Application {
     public static final int CELL_N = 21;
     private static final int TIMECICLE = 20;
     public final static int MAXLEVEL = 3;
-    private GameData.PlayerRecord player;
+    private final GameData.PlayerRecord player;
     private Controller.Context context;
 
     public Game(GameData.PlayerRecord player) {

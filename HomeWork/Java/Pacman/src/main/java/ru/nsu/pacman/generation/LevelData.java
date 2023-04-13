@@ -31,7 +31,7 @@ public class LevelData {
     private int eatedFood = 0;
     private ArrayList<GameData.EntityData> allEntities = null;
     private GameData.EntityData pacman = null;
-    private Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
+    private final Symbols[][] levelData = new Symbols[ARRAY_SIZE][ARRAY_SIZE];
     public LevelData(InputStream is) throws Exception { loadLevelDataFromFile(is); }
     public void setValueLevelData(Coordinates cord, Symbols value) {
         levelData[(int)cord.x][(int)cord.y] = value;
@@ -80,7 +80,7 @@ public class LevelData {
         if (allEntities != null) return allEntities;
 
         try {
-            allEntities = new ArrayList<GameData.EntityData>();
+            allEntities = new ArrayList<>();
             for (int col = 0; col < CELL_N; ++col) {
                 for (int row = 0; row < CELL_N; ++row) {
                     Entity entity = EntityFactory.getInstance().createEnemy(getValueLevelData(new Coordinates(col, row)), new Coordinates(col, row), this);

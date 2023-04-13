@@ -36,7 +36,7 @@ public class MainMenu extends Application {
         quit(actionEvent);
     }
     @FXML
-    public void starte(ActionEvent actionEvent) throws Exception {
+    public void startEvent(ActionEvent actionEvent) {
         String playerName = nameEnter.getText();
         if (playerName.trim().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -68,7 +68,7 @@ public class MainMenu extends Application {
         quit(actionEvent);
     }
     @FXML
-    public void quit(ActionEvent actionEvent) {
+    public void quit(ActionEvent ignoredActionEvent) {
         Stage stage = (Stage) quitButton.getScene().getWindow();
         stage.close();
     }

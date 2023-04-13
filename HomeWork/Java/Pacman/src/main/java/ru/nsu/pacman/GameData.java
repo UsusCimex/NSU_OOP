@@ -67,10 +67,10 @@ public abstract class GameData {
         }
     }
     public static class PlayerRecord {
-        private String name;
-        private int score = 0;
-        private int level = 0;
-        private int lives = 0;
+        private final String name;
+        private int score;
+        private final int level;
+        private int lives;
 
         public PlayerRecord(String name, int score, int level, int lives) {
             this.name = name;
