@@ -7,4 +7,6 @@ module ru.nsu.pacman {
     exports ru.nsu.pacman;
     exports ru.nsu.pacman.menu;
     opens ru.nsu.pacman.menu to javafx.fxml;
+    exports ru.nsu.pacman.data;
+    opens ru.nsu.pacman.data to javafx.fxml;
 }

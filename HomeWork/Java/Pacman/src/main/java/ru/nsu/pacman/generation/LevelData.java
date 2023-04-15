@@ -1,6 +1,6 @@
 package ru.nsu.pacman.generation;
 
-import ru.nsu.pacman.GameData;
+import ru.nsu.pacman.data.GameData;
 import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.entity.EntityFactory;
 import ru.nsu.pacman.entity.Pacman;
@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static ru.nsu.pacman.GameData.Coordinates;
+import static ru.nsu.pacman.data.GameData.Coordinates;
 import static ru.nsu.pacman.Game.CELL_N;
 
 public class LevelData {
@@ -21,6 +21,7 @@ public class LevelData {
         Empty,
         Wall,
         Food,
+        MegaFood,
         Barrier,
         RedGhost,
         BlueGhost,
@@ -59,6 +60,8 @@ public class LevelData {
         if (getValueLevelData(cord) == Symbols.Food) {
             setValueLevelData(cord, Symbols.Empty);
             eatedFood++;
+        } else if (getValueLevelData(cord) == Symbols.Food) {
+
         }
     }
     public int getEatedFood() { return eatedFood; }

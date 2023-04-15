@@ -1,6 +1,6 @@
 package ru.nsu.pacman.entity.ghosts;
 
-import ru.nsu.pacman.GameData;
+import ru.nsu.pacman.data.GameData;
 import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.entity.Pacman;
 import ru.nsu.pacman.generation.LevelData;
@@ -8,7 +8,7 @@ import ru.nsu.pacman.generation.LevelData;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static ru.nsu.pacman.GameData.Coordinates;
+import static ru.nsu.pacman.data.GameData.Coordinates;
 
 //Always running after Pacman
 public class RedGhost extends Entity {

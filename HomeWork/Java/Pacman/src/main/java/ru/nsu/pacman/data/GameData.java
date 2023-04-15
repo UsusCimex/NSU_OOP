@@ -1,7 +1,8 @@
-package ru.nsu.pacman;
+package ru.nsu.pacman.data;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import ru.nsu.pacman.Game;
 import ru.nsu.pacman.entity.Entity;
 
 public abstract class GameData {
@@ -19,6 +20,10 @@ public abstract class GameData {
         LOSE,
         WAITRESPAWN,
         NONE
+    }
+    public enum GameMode {
+        DEFAULT,
+        RUNUP
     }
     public static class Coordinates {
         public double x;
@@ -91,6 +96,8 @@ public abstract class GameData {
         public int getLives() {
             return lives;
         }
-        public void loseLive() { lives--; }
+        public void loseLive() {
+            lives--;
+        }
     }
 }

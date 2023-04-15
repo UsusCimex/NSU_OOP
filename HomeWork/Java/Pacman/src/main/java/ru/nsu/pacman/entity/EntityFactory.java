@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import static ru.nsu.pacman.generation.LevelData.convertStringToSymbol;
-import static ru.nsu.pacman.GameData.Coordinates;
+import static ru.nsu.pacman.data.GameData.Coordinates;
 
 public class EntityFactory {
     private static EntityFactory instance = null;

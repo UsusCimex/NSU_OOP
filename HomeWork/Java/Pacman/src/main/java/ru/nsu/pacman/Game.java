@@ -8,6 +8,10 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import ru.nsu.pacman.data.Controller;
+import ru.nsu.pacman.data.GameData;
+import ru.nsu.pacman.data.GameTimer;
+import ru.nsu.pacman.data.Graphic;
 import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.entity.Pacman;
 import ru.nsu.pacman.generation.LevelData;
@@ -15,18 +19,27 @@ import ru.nsu.pacman.generation.LevelData;
 import java.util.*;
 
 import static java.lang.Math.*;
-import static ru.nsu.pacman.GameData.EntityData;
+import static ru.nsu.pacman.data.GameData.EntityData;
 
 public class Game extends Application {
     public static final int CELL_SIZE = 32;
     public static final int CELL_N = 21;
     private static final int TIMECICLE = 20;
     public final static int MAXLEVEL = 3;
+    private static GameData.GameMode gameMode;
     private final GameData.PlayerRecord player;
     private Controller.Context context;
 
     public Game(GameData.PlayerRecord player) {
         this.player = player;
+    }
+
+    public GameData.GameMode getGameMode() {
+        return gameMode;
+    }
+    public void startRunupMode() {
+        gameMode = GameData.GameMode.RUNUP;
+
     }
 
     @Override
@@ -44,9 +57,9 @@ public class Game extends Application {
         Graphic.settingIMG(data.getAllEntities());
         Graphic.addAllEnemiesInGamePane(data.getAllEntities());
 
-        Timeline timeToDestroyBarriers = new Timeline(new KeyFrame(Duration.seconds(10), event -> data.removeAllBarriers()));
-        timeToDestroyBarriers.setCycleCount(1);
-        timeToDestroyBarriers.play();
+        ArrayList<GameTimer> allTimers = new ArrayList<>();
+        GameTimer timeToDestroyBarriers = new GameTimer(Duration.seconds(10), 1, () -> data.removeAllBarriers());
+        allTimers.add(timeToDestroyBarriers);
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -56,13 +69,14 @@ public class Game extends Application {
         Graphic.rewriteName(player.getName());
 
         GameData.GameStatus status = GameData.GameStatus.GAME;
+        gameMode = GameData.GameMode.DEFAULT;
 
-        Timeline gameCicle = new Timeline(new KeyFrame(Duration.millis(TIMECICLE), e -> update()));
-        gameCicle.setCycleCount(Timeline.INDEFINITE);
-        gameCicle.play();
+        GameTimer gameCicle = new GameTimer(Duration.millis(TIMECICLE), Timeline.INDEFINITE, () -> update());
+        allTimers.add(gameCicle);
 
-        context = new Controller.Context(scene, data, status, player, gameCicle);
+        context = new Controller.Context(scene, data, status, player, allTimers);
         Controller.setDefaultGameControl(context);
+        context.playAllTimers();
     }
 
     private double getDistance(Entity entityA, Entity entityB) {
@@ -83,12 +97,12 @@ public class Game extends Application {
                 if (enemy.body.getClass() != Pacman.class) {
                     if (getDistance(context.getData().getPacman().body, enemy.body) <= CELL_SIZE * 0.8) {
                         player.loseLive();
+                        Graphic.rewriteLives(player.getLives());
                         if (player.getLives() == 0) {
                             context.setStatus(GameData.GameStatus.LOSE);
                         } else {
                             context.setStatus(GameData.GameStatus.WAITRESPAWN);
                         }
-                        Graphic.rewriteLives(player.getLives());
                         return;
                     }
                 }
@@ -99,7 +113,7 @@ public class Game extends Application {
                 context.setStatus(GameData.GameStatus.WIN);
             }
         } else {
-            context.getGameCicle().stop();
+            context.pauseAllTimers();
             Graphic.printText(context.getStatus());
         }
     }

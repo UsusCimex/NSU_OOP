@@ -8,13 +8,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-import static ru.nsu.pacman.GameData.Coordinates;
+import static ru.nsu.pacman.data.GameData.Coordinates;
 
 public class LevelBuilder {
     private static final int GRID_SIZE = 21;
     private static final int BLOCK_SIZE = 32;
     private static final Color WALL_COLOR = Color.BLUE;
-    private static final Color COIN_COLOR = Color.WHITE;
+    private static final Color FOOD_COLOR = Color.WHITE;
     private static final Color BARRIER_COLOR = Color.BROWN;
 
     public LevelBuilder() {}
@@ -34,7 +34,10 @@ public class LevelBuilder {
                     elem.setFill(WALL_COLOR);
                 } else if (status == LevelData.Symbols.Food) {
                     elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 6);
-                    elem.setFill(COIN_COLOR);
+                    elem.setFill(FOOD_COLOR);
+                } else if (status == LevelData.Symbols.MegaFood) {
+                    elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 15);
+                    elem.setFill(FOOD_COLOR);
                 } else if (status == LevelData.Symbols.Barrier) {
                     elem = new Rectangle(BLOCK_SIZE - 5, BLOCK_SIZE - 5);
                     elem.setFill(BARRIER_COLOR);

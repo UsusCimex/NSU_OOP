@@ -12,7 +12,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import ru.nsu.pacman.Game;
-import ru.nsu.pacman.GameData.PlayerRecord;
+import ru.nsu.pacman.data.GameData.PlayerRecord;
 
 import java.io.*;
 import java.util.*;

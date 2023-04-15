@@ -4,8 +4,8 @@ import ru.nsu.pacman.generation.LevelData;
 
 import static ru.nsu.pacman.Game.CELL_SIZE;
 import static ru.nsu.pacman.Game.CELL_N;
-import static ru.nsu.pacman.GameData.Coordinates;
-import static ru.nsu.pacman.GameData.Orientation;
+import static ru.nsu.pacman.data.GameData.Coordinates;
+import static ru.nsu.pacman.data.GameData.Orientation;
 
 public class Pacman extends Entity {
     private final double distanceToEatFood = 12;

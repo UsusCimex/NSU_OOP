@@ -11,9 +11,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import ru.nsu.pacman.Controller;
+import ru.nsu.pacman.data.Controller;
 import ru.nsu.pacman.Game;
-import ru.nsu.pacman.GameData;
+import ru.nsu.pacman.data.GameData;
 
 import java.util.Objects;
 

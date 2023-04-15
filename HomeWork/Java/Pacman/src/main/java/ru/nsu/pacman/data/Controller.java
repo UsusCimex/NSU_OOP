@@ -1,4 +1,4 @@
-package ru.nsu.pacman;
+package ru.nsu.pacman.data;
 
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -7,9 +7,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import ru.nsu.pacman.Game;
 import ru.nsu.pacman.generation.LevelData;
 import ru.nsu.pacman.menu.MainMenu;
 import ru.nsu.pacman.menu.RecordsTable;
+
+import java.util.ArrayList;
 
 import static ru.nsu.pacman.Game.MAXLEVEL;
 import static ru.nsu.pacman.menu.MainMenu.FIRSTLEVEL;
@@ -36,13 +39,13 @@ public abstract class Controller {
 
         private final GameData.PlayerRecord player;
 
-        private final Timeline gameCicle;
-        public Context(Scene scene, LevelData data, GameData.GameStatus status, GameData.PlayerRecord player, Timeline gameCicle) {
+        private final ArrayList<GameTimer> timers;
+        public Context(Scene scene, LevelData data, GameData.GameStatus status, GameData.PlayerRecord player, ArrayList<GameTimer> timers) {
             this.scene = scene;
             this.data = data;
             this.status = status;
             this.player = player;
-            this.gameCicle = gameCicle;
+            this.timers = timers;
         }
 
         public void setStatus(GameData.GameStatus newStatus) {
@@ -51,8 +54,20 @@ public abstract class Controller {
         public GameData.GameStatus getStatus() {
             return status;
         }
-        public Timeline getGameCicle() {
-            return gameCicle;
+        public void pauseAllTimers() {
+            for (int i = 0; i < timers.size(); ++i) {
+                timers.get(i).pause();
+            }
+        }
+        public void resumeAllTimers() {
+            for (int i = 0; i < timers.size(); ++i) {
+                timers.get(i).resume();
+            }
+        }
+        public void playAllTimers() {
+            for (int i = 0; i < timers.size(); ++i) {
+                timers.get(i).play();
+            }
         }
         public GameData.PlayerRecord getPlayer() {
             return player;
@@ -88,7 +103,7 @@ public abstract class Controller {
                 Graphic.addAllEnemiesInGamePane(context.data.getAllEntities());
 
                 context.setStatus(GameData.GameStatus.GAME);
-                context.gameCicle.play();
+                context.resumeAllTimers();
             } else if (event.getCode() == KeyCode.ESCAPE) {
                 Graphic.removeText();
 
@@ -156,7 +171,7 @@ public abstract class Controller {
                 Graphic.removeText();
 
                 context.setStatus(GameData.GameStatus.GAME);
-                context.gameCicle.play();
+                context.resumeAllTimers();
             }
         }
     }

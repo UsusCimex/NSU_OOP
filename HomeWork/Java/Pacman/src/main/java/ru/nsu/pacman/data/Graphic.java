@@ -1,4 +1,4 @@
-package ru.nsu.pacman;
+package ru.nsu.pacman.data;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import ru.nsu.pacman.Game;
 import ru.nsu.pacman.entity.Pacman;
 import ru.nsu.pacman.entity.ghosts.BlueGhost;
 import ru.nsu.pacman.entity.ghosts.GreenGhost;

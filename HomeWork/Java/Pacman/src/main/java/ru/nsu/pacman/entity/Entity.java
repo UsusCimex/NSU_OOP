@@ -1,6 +1,6 @@
 package ru.nsu.pacman.entity;
 
-import ru.nsu.pacman.GameData;
+import ru.nsu.pacman.data.GameData;
 import ru.nsu.pacman.generation.LevelData;
 
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import static java.lang.Math.*;
 import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.Game.CELL_SIZE;
-import static ru.nsu.pacman.GameData.Coordinates;
+import static ru.nsu.pacman.data.GameData.Coordinates;
 
 public abstract class Entity {
     protected LevelData data;
