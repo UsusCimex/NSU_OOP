@@ -17,6 +17,9 @@ public class RedGhost extends Ghost {
     }
     @Override
     public GameData.Orientation getNextOrientation() {
+        if (getAvailableOrientations().size() == 2 && currentOrientation != GameData.Orientation.NONE && entityCanMove()) {
+            return currentOrientation;
+        }
         if (getState() == GhostState.DEFAULT) {
             return defaultAction();
         } else if (getState() == GhostState.SCARED) {
@@ -53,7 +56,8 @@ public class RedGhost extends Ghost {
         if (priorityOrientations.size() != 0) {
             return priorityOrientations.get(random.nextInt(priorityOrientations.size()));
         } else {
-            return availableOrientations.get(random.nextInt(availableOrientations.size()));
+            GameData.Orientation orientation = availableOrientations.get(random.nextInt(availableOrientations.size()));
+            return orientation;
         }
     }
 

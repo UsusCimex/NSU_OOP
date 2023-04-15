@@ -24,7 +24,10 @@ public abstract class Entity {
     }
 
     public Coordinates getPosition() {
-        return  position;
+        return position;
+    }
+    public Coordinates getCellPosition() {
+        return cellPosition;
     }
     public void setPosition(Coordinates newPosition) {
         cellPosition = newPosition;
