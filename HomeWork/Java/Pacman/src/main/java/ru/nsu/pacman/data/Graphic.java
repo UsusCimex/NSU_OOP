@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
+import static ru.nsu.pacman.generation.LevelBuilder.CHERRY_COLOR;
 
 public abstract class Graphic {
     private static LevelData data = null;
@@ -131,9 +132,8 @@ public abstract class Graphic {
             area.getChildren().remove(node);
         }
         if (isNewCherry) {
-            System.err.println("CHERRY GENERATED!");
             Shape circle = new Circle(CELL_SIZE, CELL_SIZE, 6);
-            circle.setFill(Color.RED);
+            circle.setFill(CHERRY_COLOR);
             GridPane.setHalignment(circle, HPos.CENTER);
             GridPane.setValignment(circle, VPos.CENTER);
             circle.setId("Cherry");
