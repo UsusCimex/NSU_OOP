@@ -11,11 +11,12 @@ import javafx.scene.shape.Shape;
 import static ru.nsu.pacman.data.GameData.Coordinates;
 
 public class LevelBuilder {
-    private static final int GRID_SIZE = 21;
-    private static final int BLOCK_SIZE = 32;
-    private static final Color WALL_COLOR = Color.BLUE;
-    private static final Color FOOD_COLOR = Color.WHITE;
-    private static final Color BARRIER_COLOR = Color.BROWN;
+    public static final int CELL_N = 21;
+    public static final int CELL_SIZE = 32;
+    public static final Color WALL_COLOR = Color.BLUE;
+    public static final Color FOOD_COLOR = Color.WHITE;
+    public static final Color BARRIER_COLOR = Color.BROWN;
+    public static final Color CHERRY_COLOR = Color.RED;
 
     public LevelBuilder() {}
 
@@ -24,23 +25,26 @@ public class LevelBuilder {
         gridPane.setHgap(0);
         gridPane.setVgap(0);
 
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+        for (int row = 0; row < CELL_N; row++) {
+            for (int col = 0; col < CELL_N; col++) {
                 LevelData.Symbols status = levelData.getValueLevelData(new Coordinates(row, col));
                 Shape elem = null;
 
                 if (status == LevelData.Symbols.Wall) {
-                    elem = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
+                    elem = new Rectangle(CELL_SIZE, CELL_SIZE);
                     elem.setFill(WALL_COLOR);
                 } else if (status == LevelData.Symbols.Food) {
-                    elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 4);
+                    elem = new Circle(CELL_SIZE, CELL_SIZE, 4);
                     elem.setFill(FOOD_COLOR);
                 } else if (status == LevelData.Symbols.MegaFood) {
-                    elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 9);
+                    elem = new Circle(CELL_SIZE, CELL_SIZE, 9);
                     elem.setFill(FOOD_COLOR);
                 } else if (status == LevelData.Symbols.Barrier) {
-                    elem = new Rectangle(BLOCK_SIZE - 5, BLOCK_SIZE - 5);
+                    elem = new Rectangle(CELL_SIZE - 5, CELL_SIZE - 5);
                     elem.setFill(BARRIER_COLOR);
+                } else if (status == LevelData.Symbols.Cherry) {
+                    elem = new Circle(CELL_SIZE, CELL_SIZE, 6);
+                    elem.setFill(CHERRY_COLOR);
                 }
                 if (elem != null) {
                     gridPane.add(elem, row, col);

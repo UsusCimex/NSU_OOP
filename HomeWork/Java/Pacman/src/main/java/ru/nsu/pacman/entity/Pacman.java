@@ -2,10 +2,12 @@ package ru.nsu.pacman.entity;
 
 import ru.nsu.pacman.generation.LevelData;
 
-import static ru.nsu.pacman.Game.CELL_SIZE;
-import static ru.nsu.pacman.Game.CELL_N;
 import static ru.nsu.pacman.data.GameData.Coordinates;
 import static ru.nsu.pacman.data.GameData.Orientation;
+
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_N;
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
+import static ru.nsu.pacman.generation.LevelData.isFood;
 
 public class Pacman extends Entity {
     private final double distanceToEatFood = 12;
@@ -30,10 +32,6 @@ public class Pacman extends Entity {
         } else {
             return false;
         }
-    }
-    private boolean isFood(LevelData.Symbols symbol) {
-        if (symbol == LevelData.Symbols.Food || symbol== LevelData.Symbols.MegaFood) return true;
-        return false;
     }
     @Override
     public void move() {

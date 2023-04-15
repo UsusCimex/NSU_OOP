@@ -7,6 +7,8 @@ import ru.nsu.pacman.entity.Entity;
 
 import java.util.Objects;
 
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
+
 public abstract class GameData {
     public enum Orientation {
         UP,
@@ -49,8 +51,8 @@ public abstract class GameData {
         public EntityData(Entity entity) {
             body = entity;
 
-            view.setFitWidth(Game.CELL_SIZE);
-            view.setFitHeight(Game.CELL_SIZE);
+            view.setFitWidth(CELL_SIZE);
+            view.setFitHeight(CELL_SIZE);
 
             view.setLayoutX(entity.getPosition().x);
             view.setLayoutY(entity.getPosition().y);

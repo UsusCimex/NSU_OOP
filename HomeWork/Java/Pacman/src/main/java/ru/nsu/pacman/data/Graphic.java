@@ -1,10 +1,14 @@
 package ru.nsu.pacman.data;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -16,6 +20,8 @@ import ru.nsu.pacman.generation.LevelData;
 
 import java.util.ArrayList;
 import java.util.Objects;
+
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
 
 public abstract class Graphic {
     private static LevelData data = null;
@@ -107,11 +113,31 @@ public abstract class Graphic {
     public static void update() {
         if (data == null || root == null) return;
         GridPane area = getArea();
+        ArrayList<Node> removeList = new ArrayList<>();
+        boolean isNewCherry = false;
+        int colCherry = 0, rowCherry = 0;
         for (Node node : area.getChildren()) {
             if (data.getValueLevelData(new GameData.Coordinates(GridPane.getColumnIndex(node), GridPane.getRowIndex(node))) == LevelData.Symbols.Empty) {
-                area.getChildren().remove(node);
-                break;
+                removeList.add(node);
             }
+            if ((data.getValueLevelData(new GameData.Coordinates(GridPane.getColumnIndex(node), GridPane.getRowIndex(node))) == LevelData.Symbols.Cherry )&& (!Objects.equals(node.getId(), "Cherry"))) {
+                isNewCherry = true;
+                colCherry = GridPane.getColumnIndex(node);
+                rowCherry = GridPane.getRowIndex(node);
+                removeList.add(node);
+            }
+        }
+        for (Node node : removeList) {
+            area.getChildren().remove(node);
+        }
+        if (isNewCherry) {
+            System.err.println("CHERRY GENERATED!");
+            Shape circle = new Circle(CELL_SIZE, CELL_SIZE, 6);
+            circle.setFill(Color.RED);
+            GridPane.setHalignment(circle, HPos.CENTER);
+            GridPane.setValignment(circle, VPos.CENTER);
+            circle.setId("Cherry");
+            area.add(circle, colCherry, rowCherry);
         }
     }
     private static GridPane getArea() {

@@ -4,9 +4,9 @@ import ru.nsu.pacman.data.GameData;
 import ru.nsu.pacman.generation.LevelData;
 
 import static java.lang.Math.*;
-import static ru.nsu.pacman.Game.CELL_N;
-import static ru.nsu.pacman.Game.CELL_SIZE;
 import static ru.nsu.pacman.data.GameData.Coordinates;
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_N;
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
 
 public abstract class Entity {
     protected LevelData data;

@@ -21,19 +21,22 @@ import java.util.*;
 import static java.lang.Math.*;
 import static ru.nsu.pacman.data.GameData.EntityData;
 import static ru.nsu.pacman.entity.ghosts.Ghost.GhostState.*;
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
 
 public class Game extends Application {
-    public static final int CELL_SIZE = 32;
-    public static final int CELL_N = 21;
     private static final int TIMECICLE = 20;
     private static final int MEGAFOODDURATION = 10;
     public final static int MAXLEVEL = 3;
     private static boolean signalToChangeMode = false;
+    private static boolean signalToEatCherry = false;
     private final GameData.PlayerRecord player;
     private Controller.Context context;
 
     public static void signalChangeMode() {
         signalToChangeMode = true;
+    }
+    public static void signalEatCherry() {
+        signalToEatCherry = true;
     }
     public Game(GameData.PlayerRecord player) {
         this.player = player;
@@ -47,6 +50,7 @@ public class Game extends Application {
         primaryStage.getIcons().add(icon);
         LevelData data = generateLevel(player.getLevel());
         assert data != null;
+        data.generateCherry();
 
         StackPane root = Graphic.generateMainRoot(data);
         Scene scene = new Scene(root);
@@ -88,6 +92,10 @@ public class Game extends Application {
                 GameTimer timerScaredMode = new GameTimer(Duration.seconds(MEGAFOODDURATION), 1, () -> Ghost.changeAllStates(context.getData().getAllEntities(), DEFAULT));
                 context.addTimer(timerScaredMode);
                 timerScaredMode.play();
+            }
+            if (signalToEatCherry) {
+                signalToEatCherry = false;
+                player.addToScore(1);
             }
 
             Graphic.rewriteScore(player.getScore() + context.getData().getEatedFood());

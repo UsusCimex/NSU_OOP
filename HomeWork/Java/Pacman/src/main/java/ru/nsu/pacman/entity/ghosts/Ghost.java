@@ -4,6 +4,8 @@ import ru.nsu.pacman.Game;
 import ru.nsu.pacman.data.GameData;
 import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.generation.LevelData;
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
+import static ru.nsu.pacman.generation.LevelBuilder.CELL_N;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,7 +22,6 @@ public abstract class Ghost extends Entity {
             }
         }
     }
-
     public enum GhostState {
         DEFAULT,
         SCARED,
@@ -76,9 +77,9 @@ public abstract class Ghost extends Entity {
     }
 
     protected boolean checkDeadlock(GameData.Coordinates curCord, GameData.Orientation orientation) {
-        boolean[][] area = new boolean[Game.CELL_N][Game.CELL_N];
-        for (int y = 0; y < Game.CELL_N; ++y) {
-            for (int x = 0; x < Game.CELL_N; ++x) {
+        boolean[][] area = new boolean[CELL_N][CELL_N];
+        for (int y = 0; y < CELL_N; ++y) {
+            for (int x = 0; x < CELL_N; ++x) {
                 area[x][y] = isStopBlock(data.getValueLevelData(new GameData.Coordinates(x, y)));
             }
         }
