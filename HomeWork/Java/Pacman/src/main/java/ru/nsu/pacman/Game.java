@@ -118,7 +118,7 @@ public class Game extends Application {
             }
 
             //Check finish
-            if (context.getData().getEatedFood() == context.getData().getCountFood() || context.getData().getEatedFood() >= 10) {
+            if (context.getData().getEatedFood() == context.getData().getCountFood()) {
                 context.setStatus(GameData.GameStatus.WIN);
             }
         } else {
