@@ -1,7 +1,5 @@
 package ru.nsu.pacman.data;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
@@ -10,7 +8,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 import ru.nsu.pacman.Game;
 import ru.nsu.pacman.entity.Pacman;
 import ru.nsu.pacman.entity.ghosts.*;

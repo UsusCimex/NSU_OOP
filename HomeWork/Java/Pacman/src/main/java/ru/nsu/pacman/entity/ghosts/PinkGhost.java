@@ -1,11 +1,7 @@
 package ru.nsu.pacman.entity.ghosts;
 
 import ru.nsu.pacman.data.GameData;
-import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.generation.LevelData;
-
-import java.util.ArrayList;
-import java.util.Random;
 
 import static ru.nsu.pacman.data.GameData.Coordinates;
 
