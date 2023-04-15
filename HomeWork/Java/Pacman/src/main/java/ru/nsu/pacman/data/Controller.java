@@ -1,6 +1,5 @@
 package ru.nsu.pacman.data;
 
-import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
@@ -33,12 +32,9 @@ public abstract class Controller {
 
     public static class Context {
         private final Scene scene;
-
         private final LevelData data;
         private GameData.GameStatus status;
-
         private final GameData.PlayerRecord player;
-
         private final ArrayList<GameTimer> timers;
         public Context(Scene scene, LevelData data, GameData.GameStatus status, GameData.PlayerRecord player, ArrayList<GameTimer> timers) {
             this.scene = scene;
@@ -55,19 +51,22 @@ public abstract class Controller {
             return status;
         }
         public void pauseAllTimers() {
-            for (int i = 0; i < timers.size(); ++i) {
-                timers.get(i).pause();
+            for (GameTimer timer : timers) {
+                timer.pause();
             }
         }
         public void resumeAllTimers() {
-            for (int i = 0; i < timers.size(); ++i) {
-                timers.get(i).resume();
+            for (GameTimer timer : timers) {
+                timer.resume();
             }
         }
         public void playAllTimers() {
-            for (int i = 0; i < timers.size(); ++i) {
-                timers.get(i).play();
+            for (GameTimer timer : timers) {
+                timer.play();
             }
+        }
+        public void addTimer(GameTimer newTimer) {
+            timers.add(newTimer);
         }
         public GameData.PlayerRecord getPlayer() {
             return player;

@@ -33,10 +33,10 @@ public class LevelBuilder {
                     elem = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
                     elem.setFill(WALL_COLOR);
                 } else if (status == LevelData.Symbols.Food) {
-                    elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 6);
+                    elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 4);
                     elem.setFill(FOOD_COLOR);
                 } else if (status == LevelData.Symbols.MegaFood) {
-                    elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 15);
+                    elem = new Circle(BLOCK_SIZE, BLOCK_SIZE, 9);
                     elem.setFill(FOOD_COLOR);
                 } else if (status == LevelData.Symbols.Barrier) {
                     elem = new Rectangle(BLOCK_SIZE - 5, BLOCK_SIZE - 5);

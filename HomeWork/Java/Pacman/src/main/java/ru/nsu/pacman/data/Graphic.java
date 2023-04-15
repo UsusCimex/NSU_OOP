@@ -1,5 +1,7 @@
 package ru.nsu.pacman.data;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
@@ -8,12 +10,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import ru.nsu.pacman.Game;
 import ru.nsu.pacman.entity.Pacman;
-import ru.nsu.pacman.entity.ghosts.BlueGhost;
-import ru.nsu.pacman.entity.ghosts.GreenGhost;
-import ru.nsu.pacman.entity.ghosts.PinkGhost;
-import ru.nsu.pacman.entity.ghosts.RedGhost;
+import ru.nsu.pacman.entity.ghosts.*;
 import ru.nsu.pacman.generation.LevelBuilder;
 import ru.nsu.pacman.generation.LevelData;
 
@@ -120,11 +120,24 @@ public abstract class Graphic {
     private static GridPane getArea() {
         return (GridPane) root.lookup("#gamePane #area");
     }
+
     public static void rewriteEnemy(GameData.EntityData entity) {
         entity.view.setLayoutX(entity.body.getPosition().x);
         entity.view.setLayoutY(entity.body.getPosition().y);
-
-        entity.view.setImage(entity.getImages(entity.body.getCurrentOrientation()));
+        if (entity.body instanceof Ghost) {
+            Ghost ghost = (Ghost) entity.body;
+            if (ghost.getState() == Ghost.GhostState.DEFAULT) {
+                entity.view.setImage(entity.getImages(entity.body.getCurrentOrientation()));
+                entity.view.setOpacity(1);
+            } else if (ghost.getState() == Ghost.GhostState.SCARED) {
+                entity.view.setImage(entity.getScaredImage());
+            } else {
+                entity.view.setImage(entity.getScaredImage());
+                entity.view.setOpacity(0.2);
+            }
+        } else {
+            entity.view.setImage(entity.getImages(entity.body.getCurrentOrientation()));
+        }
     }
     public static void rewriteScore(int score) {
         Text scoreText = (Text)root.lookup("#mainPain #infoPain #score");

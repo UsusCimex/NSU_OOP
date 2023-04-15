@@ -5,6 +5,8 @@ import javafx.scene.image.ImageView;
 import ru.nsu.pacman.Game;
 import ru.nsu.pacman.entity.Entity;
 
+import java.util.Objects;
+
 public abstract class GameData {
     public enum Orientation {
         UP,
@@ -69,6 +71,9 @@ public abstract class GameData {
                 case LEFT -> leftIMG;
                 case RIGHT -> rightIMG;
             };
+        }
+        public Image getScaredImage() {
+            return new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/death.png")));
         }
     }
     public static class PlayerRecord {

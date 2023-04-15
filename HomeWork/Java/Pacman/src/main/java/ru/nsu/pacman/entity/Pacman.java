@@ -20,16 +20,20 @@ public class Pacman extends Entity {
             return false;
         }
         if (getCurrentOrientation() == Orientation.LEFT && ((position.x - (cellPosition.x - 1) * CELL_SIZE) <= distanceToEatFood)) {
-            return data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)) == LevelData.Symbols.Food;
+            return isFood(data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)));
         } else if (getCurrentOrientation() == Orientation.RIGHT && (((cellPosition.x + 1) * CELL_SIZE - position.x) <= distanceToEatFood)) {
-            return data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)) == LevelData.Symbols.Food;
+            return isFood(data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)));
         } else if (getCurrentOrientation() == Orientation.UP && ((position.y - (cellPosition.y - 1) * CELL_SIZE) <= distanceToEatFood)) {
-            return data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)) == LevelData.Symbols.Food;
+            return isFood(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)));
         } else if (getCurrentOrientation() == Orientation.DOWN && (((cellPosition.y + 1) * CELL_SIZE - position.y) <= distanceToEatFood)) {
-            return data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)) == LevelData.Symbols.Food;
+            return isFood(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)));
         } else {
             return false;
         }
+    }
+    private boolean isFood(LevelData.Symbols symbol) {
+        if (symbol == LevelData.Symbols.Food || symbol== LevelData.Symbols.MegaFood) return true;
+        return false;
     }
     @Override
     public void move() {

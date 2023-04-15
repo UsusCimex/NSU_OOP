@@ -1,6 +1,5 @@
 package ru.nsu.pacman;
 
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -14,32 +13,30 @@ import ru.nsu.pacman.data.GameTimer;
 import ru.nsu.pacman.data.Graphic;
 import ru.nsu.pacman.entity.Entity;
 import ru.nsu.pacman.entity.Pacman;
+import ru.nsu.pacman.entity.ghosts.Ghost;
 import ru.nsu.pacman.generation.LevelData;
 
 import java.util.*;
 
 import static java.lang.Math.*;
 import static ru.nsu.pacman.data.GameData.EntityData;
+import static ru.nsu.pacman.entity.ghosts.Ghost.GhostState.*;
 
 public class Game extends Application {
     public static final int CELL_SIZE = 32;
     public static final int CELL_N = 21;
     private static final int TIMECICLE = 20;
+    private static final int MEGAFOODDURATION = 10;
     public final static int MAXLEVEL = 3;
-    private static GameData.GameMode gameMode;
+    private static boolean signalToChangeMode = false;
     private final GameData.PlayerRecord player;
     private Controller.Context context;
 
+    public static void signalChangeMode() {
+        signalToChangeMode = true;
+    }
     public Game(GameData.PlayerRecord player) {
         this.player = player;
-    }
-
-    public GameData.GameMode getGameMode() {
-        return gameMode;
-    }
-    public void startRunupMode() {
-        gameMode = GameData.GameMode.RUNUP;
-
     }
 
     @Override
@@ -58,7 +55,7 @@ public class Game extends Application {
         Graphic.addAllEnemiesInGamePane(data.getAllEntities());
 
         ArrayList<GameTimer> allTimers = new ArrayList<>();
-        GameTimer timeToDestroyBarriers = new GameTimer(Duration.seconds(10), 1, () -> data.removeAllBarriers());
+        GameTimer timeToDestroyBarriers = new GameTimer(Duration.seconds(10), 1, data::removeAllBarriers);
         allTimers.add(timeToDestroyBarriers);
 
         primaryStage.setScene(scene);
@@ -69,9 +66,8 @@ public class Game extends Application {
         Graphic.rewriteName(player.getName());
 
         GameData.GameStatus status = GameData.GameStatus.GAME;
-        gameMode = GameData.GameMode.DEFAULT;
 
-        GameTimer gameCicle = new GameTimer(Duration.millis(TIMECICLE), Timeline.INDEFINITE, () -> update());
+        GameTimer gameCicle = new GameTimer(Duration.millis(TIMECICLE), Timeline.INDEFINITE, this::update);
         allTimers.add(gameCicle);
 
         context = new Controller.Context(scene, data, status, player, allTimers);
@@ -86,6 +82,13 @@ public class Game extends Application {
     private void update() {
         if (context.getStatus() == GameData.GameStatus.GAME) {
             Graphic.update();
+            if (signalToChangeMode) {
+                signalToChangeMode = false;
+                Ghost.changeAllStates(context.getData().getAllEntities(), SCARED);
+                GameTimer timerScaredMode = new GameTimer(Duration.seconds(MEGAFOODDURATION), 1, () -> Ghost.changeAllStates(context.getData().getAllEntities(), DEFAULT));
+                context.addTimer(timerScaredMode);
+                timerScaredMode.play();
+            }
 
             Graphic.rewriteScore(player.getScore() + context.getData().getEatedFood());
             //GhostsAnimation
@@ -95,21 +98,27 @@ public class Game extends Application {
 
                 //Check mob collision
                 if (enemy.body.getClass() != Pacman.class) {
+                    Ghost ghost = (Ghost) enemy.body;
                     if (getDistance(context.getData().getPacman().body, enemy.body) <= CELL_SIZE * 0.8) {
-                        player.loseLive();
-                        Graphic.rewriteLives(player.getLives());
-                        if (player.getLives() == 0) {
-                            context.setStatus(GameData.GameStatus.LOSE);
-                        } else {
-                            context.setStatus(GameData.GameStatus.WAITRESPAWN);
+                        if (ghost.getState() == DEFAULT) {
+                            player.loseLive();
+                            Graphic.rewriteLives(player.getLives());
+                            if (player.getLives() == 0) {
+                                context.setStatus(GameData.GameStatus.LOSE);
+                            } else {
+                                context.setStatus(GameData.GameStatus.WAITRESPAWN);
+                            }
+                            return;
+                        } else if (ghost.getState() == SCARED) {
+                            ghost.setState(DEAD);
+                            player.addToScore(5);
                         }
-                        return;
                     }
                 }
             }
 
             //Check finish
-            if (context.getData().getEatedFood() == context.getData().getCountFood()) {
+            if (context.getData().getEatedFood() == context.getData().getCountFood() || context.getData().getEatedFood() >= 10) {
                 context.setStatus(GameData.GameStatus.WIN);
             }
         } else {

@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static ru.nsu.pacman.Game.signalChangeMode;
 import static ru.nsu.pacman.data.GameData.Coordinates;
 import static ru.nsu.pacman.Game.CELL_N;
 
@@ -60,8 +61,9 @@ public class LevelData {
         if (getValueLevelData(cord) == Symbols.Food) {
             setValueLevelData(cord, Symbols.Empty);
             eatedFood++;
-        } else if (getValueLevelData(cord) == Symbols.Food) {
-
+        } else if (getValueLevelData(cord) == Symbols.MegaFood) {
+            setValueLevelData(cord, Symbols.Empty);
+            signalChangeMode();
         }
     }
     public int getEatedFood() { return eatedFood; }
@@ -71,6 +73,7 @@ public class LevelData {
             case ("E") -> Symbols.Empty;
             case ("W") -> Symbols.Wall;
             case ("F") -> Symbols.Food;
+            case ("M") -> Symbols.MegaFood;
             case ("B") -> Symbols.Barrier;
             case ("r") -> Symbols.RedGhost;
             case ("b") -> Symbols.BlueGhost;

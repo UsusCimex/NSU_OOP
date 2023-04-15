@@ -49,7 +49,7 @@ public abstract class Entity {
         return ( abs(position.x - (cellPosition.x * CELL_SIZE)) >= CELL_SIZE ||
                 abs(position.y - (cellPosition.y * CELL_SIZE)) >= CELL_SIZE);
     }
-    private boolean isStopBlock(LevelData.Symbols symbol) {
+    protected boolean isStopBlock(LevelData.Symbols symbol) {
         if (symbol == LevelData.Symbols.Wall) return false;
         else return symbol != LevelData.Symbols.Barrier;
     }
@@ -84,25 +84,7 @@ public abstract class Entity {
             return true;
         } else return (currentOrientation == GameData.Orientation.DOWN) && ((int) cellPosition.y == CELL_N - 1);
     }
-    protected ArrayList<GameData.Orientation> getAvailableOrientations() {
-        ArrayList<GameData.Orientation> availableOrientations = new ArrayList<>();
-        if (isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x - 1, cellPosition.y)))) {
-            availableOrientations.add(GameData.Orientation.LEFT);
-        }
-        if (isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x + 1, cellPosition.y)))) {
-            availableOrientations.add(GameData.Orientation.RIGHT);
-        }
-        if (isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y - 1)))) {
-            availableOrientations.add(GameData.Orientation.UP);
-        }
-        if (isStopBlock(data.getValueLevelData(new Coordinates(cellPosition.x, cellPosition.y + 1)))) {
-            availableOrientations.add(GameData.Orientation.DOWN);
-        }
-        if (availableOrientations.size() == 0) {
-            availableOrientations.add(GameData.Orientation.NONE);
-        }
-        return availableOrientations;
-    }
+
     public double getDistanceTo(Entity entity) {
         return sqrt(pow(getPosition().x - entity.getPosition().x, 2) + pow(getPosition().y - entity.getPosition().y, 2));
     }

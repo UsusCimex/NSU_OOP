@@ -1,11 +1,8 @@
 package ru.nsu.pacman.data;
 
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
-
-import java.util.ArrayList;
 
 public class GameTimer {
     private Timeline timeline;
@@ -34,14 +31,14 @@ public class GameTimer {
     }
 
     public void pause() {
-        if (!isPaused && !isCompleted) {
+        if (!isPaused) {
             timeline.pause();
             isPaused = true;
         }
     }
 
     public void resume() {
-        if (isPaused && !isCompleted) {
+        if (isPaused) {
             timeline.play();
             isPaused = false;
         }
