@@ -41,7 +41,7 @@ public abstract class Controller {
         private GameData.GameStatus status;
         private final GameData.PlayerRecord player;
         private final ArrayList<GameTimer> timers;
-        private final GameTimer eventTimer = new GameTimer(Duration.seconds(MEGAFOODDURATION), 1, () -> Ghost.changeAllStates(getData().getAllEntities(), DEFAULT));
+        private final GameTimer scaredTimer = new GameTimer(Duration.seconds(MEGAFOODDURATION), 1, () -> Ghost.changeAllStates(getData().getAllEntities(), DEFAULT));
         public Context(Scene scene, LevelData data, GameData.GameStatus status, GameData.PlayerRecord player, ArrayList<GameTimer> timers) {
             this.scene = scene;
             this.data = data;
@@ -60,27 +60,29 @@ public abstract class Controller {
             for (GameTimer timer : timers) {
                 timer.pause();
             }
-            eventTimer.pause();
+            scaredTimer.pause();
         }
         public void resumeAllTimers() {
             for (GameTimer timer : timers) {
                 timer.resume();
             }
-            eventTimer.resume();
+            scaredTimer.resume();
         }
         public void playAllTimers() {
             for (GameTimer timer : timers) {
                 timer.play();
             }
-            eventTimer.play();
         }
         public void addTimer(GameTimer newTimer) {
             timers.add(newTimer);
         }
         public void resetScarredEvent() {
-            eventTimer.stop();
-            eventTimer.play();
+            scaredTimer.stop();
+            scaredTimer.play();
             Ghost.changeAllStates(getData().getAllEntities(), SCARED);
+        }
+        public GameTimer getScaredTimer() {
+            return scaredTimer;
         }
         public GameData.PlayerRecord getPlayer() {
             return player;

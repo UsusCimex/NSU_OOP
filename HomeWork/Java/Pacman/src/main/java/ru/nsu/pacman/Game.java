@@ -86,6 +86,9 @@ public class Game extends Application {
     private void update() {
         if (context.getStatus() == GameData.GameStatus.GAME) {
             Graphic.update();
+            if(context.getScaredTimer().isWorked()) {
+                Graphic.printTimer(context.getScaredTimer());
+            }
             if (signalToChangeMode) {
                 signalToChangeMode = false;
                 context.resetScarredEvent();

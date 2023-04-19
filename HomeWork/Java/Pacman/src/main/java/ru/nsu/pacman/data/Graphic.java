@@ -4,6 +4,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -103,7 +104,13 @@ public abstract class Graphic {
         infoPain.setAlignment(Pos.CENTER);
         infoPain.setId("infoPain");
 
-        VBox mainPain = new VBox(gamePane, infoPain);
+        Label eventTimer = new Label("Scared: 0.0");
+        eventTimer.setFont(Font.font("OCR A Extended", 50));
+        eventTimer.setAlignment(Pos.CENTER);
+        eventTimer.setId("eventTimer");
+
+        VBox mainPain = new VBox(gamePane, infoPain, eventTimer);
+        mainPain.setAlignment(Pos.CENTER);
         mainPain.setId("mainPain");
 
         root = new StackPane();
@@ -154,6 +161,7 @@ public abstract class Graphic {
                 entity.view.setOpacity(1);
             } else if (ghost.getState() == Ghost.GhostState.SCARED) {
                 entity.view.setImage(entity.getScaredImage());
+                entity.view.setOpacity(1);
             } else {
                 entity.view.setImage(entity.getScaredImage());
                 entity.view.setOpacity(0.2);
@@ -294,5 +302,9 @@ public abstract class Graphic {
         vbox.setAlignment(Pos.CENTER);
 
         root.getChildren().add(vbox);
+    }
+    public static void printTimer(GameTimer timer) {
+        Label eventTimer = (Label) root.lookup("#mainPain #eventTimer");
+        eventTimer.setText(String.valueOf("Scared: " + timer.getRemainingSeconds()));
     }
 }

@@ -7,38 +7,39 @@ import javafx.util.Duration;
 public class GameTimer {
     private Timeline timeline;
     private boolean isPaused;
-    private boolean isCompleted;
+    private boolean isWorked;
 
     public GameTimer(Duration duration, int cycleCount, Runnable onFinished) {
         timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, event -> {
+                    isWorked = true;
+                }),
                 new KeyFrame(duration, event -> {
                     onFinished.run();
-                    isCompleted = true;
+                    if(cycleCount != Timeline.INDEFINITE) isWorked = false;
                 })
         );
         timeline.setCycleCount(cycleCount);
-        timeline.setOnFinished(event -> {
-            isCompleted = true;
-        });
         isPaused = false;
-        isCompleted = false;
+        isWorked = false;
     }
 
     public void play() {
-        if (!isPaused && !isCompleted) {
+        if (!isPaused && !isWorked) {
             timeline.play();
+            isWorked = true;
         }
     }
 
     public void pause() {
-        if (!isPaused) {
+        if (!isPaused && isWorked) {
             timeline.pause();
             isPaused = true;
         }
     }
 
     public void resume() {
-        if (isPaused) {
+        if (isPaused && isWorked) {
             timeline.play();
             isPaused = false;
         }
@@ -47,14 +48,19 @@ public class GameTimer {
     public void stop() {
         timeline.stop();
         isPaused = false;
-        isCompleted = false;
+        isWorked = false;
+    }
+
+    public double getRemainingSeconds() {
+        Duration currentTime = timeline.getCurrentTime();
+        return (double)Math.round((timeline.getCycleDuration().toSeconds() - currentTime.toSeconds()) * 10) / 10;
     }
 
     public boolean isPaused() {
         return isPaused;
     }
 
-    public boolean isCompleted() {
-        return isCompleted;
+    public boolean isWorked() {
+        return isWorked;
     }
 }
