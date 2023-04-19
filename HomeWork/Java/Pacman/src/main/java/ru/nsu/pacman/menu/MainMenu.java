@@ -18,7 +18,7 @@ import ru.nsu.pacman.data.GameData;
 import java.util.Objects;
 
 public class MainMenu extends Application {
-    public final static int FIRSTLEVEL = 4;
+    public final static int FIRSTLEVEL = 1;
     public final static int FIRSTLIVES = 5;
     @FXML
     private TextField nameEnter;
