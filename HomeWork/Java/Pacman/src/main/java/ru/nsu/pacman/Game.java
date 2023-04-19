@@ -26,7 +26,7 @@ import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
 public class Game extends Application {
     public static final int TIMECICLE = 20;
     public static final int MEGAFOODDURATION = 10;
-    public final static int MAXLEVEL = 3;
+    public final static int MAXLEVEL = 4;
     private static boolean signalToChangeMode = false;
     private static boolean signalToEatCherry = false;
     private final GameData.PlayerRecord player;
@@ -143,6 +143,8 @@ public class Game extends Application {
                 return new LevelData(getClass().getResourceAsStream("levels/2.txt"));
             } else if (level == 3) {
                 return new LevelData(getClass().getResourceAsStream("levels/3.txt"));
+            } else if (level == 4) {
+                return new LevelData(getClass().getResourceAsStream("levels/bonuslevel.txt"));
             } else {
                 throw new Exception("level not found!");
             }

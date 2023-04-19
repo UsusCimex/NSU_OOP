@@ -10,7 +10,7 @@ import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
 import static ru.nsu.pacman.generation.LevelData.isFood;
 
 public class Pacman extends Entity {
-    private final double distanceToEatFood = 12;
+    private final double distanceToEatFood = 12.5;
 
     public Pacman(Coordinates startPosition, LevelData data) {
         super(startPosition, data);
