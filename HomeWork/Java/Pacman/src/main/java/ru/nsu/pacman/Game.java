@@ -24,8 +24,8 @@ import static ru.nsu.pacman.entity.ghosts.Ghost.GhostState.*;
 import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
 
 public class Game extends Application {
-    private static final int TIMECICLE = 20;
-    private static final int MEGAFOODDURATION = 10;
+    public static final int TIMECICLE = 20;
+    public static final int MEGAFOODDURATION = 10;
     public final static int MAXLEVEL = 3;
     private static boolean signalToChangeMode = false;
     private static boolean signalToEatCherry = false;
@@ -88,10 +88,7 @@ public class Game extends Application {
             Graphic.update();
             if (signalToChangeMode) {
                 signalToChangeMode = false;
-                Ghost.changeAllStates(context.getData().getAllEntities(), SCARED);
-                GameTimer timerScaredMode = new GameTimer(Duration.seconds(MEGAFOODDURATION), 1, () -> Ghost.changeAllStates(context.getData().getAllEntities(), DEFAULT));
-                context.addTimer(timerScaredMode);
-                timerScaredMode.play();
+                context.resetScarredEvent();
             }
             if (signalToEatCherry) {
                 signalToEatCherry = false;

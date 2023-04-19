@@ -6,7 +6,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import ru.nsu.pacman.Game;
+import ru.nsu.pacman.entity.ghosts.Ghost;
 import ru.nsu.pacman.generation.LevelData;
 import ru.nsu.pacman.menu.MainMenu;
 import ru.nsu.pacman.menu.RecordsTable;
@@ -14,6 +16,9 @@ import ru.nsu.pacman.menu.RecordsTable;
 import java.util.ArrayList;
 
 import static ru.nsu.pacman.Game.MAXLEVEL;
+import static ru.nsu.pacman.Game.MEGAFOODDURATION;
+import static ru.nsu.pacman.entity.ghosts.Ghost.GhostState.DEFAULT;
+import static ru.nsu.pacman.entity.ghosts.Ghost.GhostState.SCARED;
 import static ru.nsu.pacman.menu.MainMenu.FIRSTLEVEL;
 import static ru.nsu.pacman.menu.MainMenu.FIRSTLIVES;
 
@@ -36,6 +41,7 @@ public abstract class Controller {
         private GameData.GameStatus status;
         private final GameData.PlayerRecord player;
         private final ArrayList<GameTimer> timers;
+        private final GameTimer eventTimer = new GameTimer(Duration.seconds(MEGAFOODDURATION), 1, () -> Ghost.changeAllStates(getData().getAllEntities(), DEFAULT));
         public Context(Scene scene, LevelData data, GameData.GameStatus status, GameData.PlayerRecord player, ArrayList<GameTimer> timers) {
             this.scene = scene;
             this.data = data;
@@ -54,19 +60,27 @@ public abstract class Controller {
             for (GameTimer timer : timers) {
                 timer.pause();
             }
+            eventTimer.pause();
         }
         public void resumeAllTimers() {
             for (GameTimer timer : timers) {
                 timer.resume();
             }
+            eventTimer.resume();
         }
         public void playAllTimers() {
             for (GameTimer timer : timers) {
                 timer.play();
             }
+            eventTimer.play();
         }
         public void addTimer(GameTimer newTimer) {
             timers.add(newTimer);
+        }
+        public void resetScarredEvent() {
+            eventTimer.stop();
+            eventTimer.play();
+            Ghost.changeAllStates(getData().getAllEntities(), SCARED);
         }
         public GameData.PlayerRecord getPlayer() {
             return player;
