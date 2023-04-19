@@ -39,29 +39,29 @@ public abstract class Graphic {
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/up.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/pacman/down.gif"))));
             } else if (entity.body.getClass().equals(RedGhost.class)) {
-                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/left.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/left.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/right.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/up.gif"))),
                         new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/red/down.gif"))));
             } else if (entity.body.getClass().equals(BlueGhost.class)) {
-                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/blue.gif"))));
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/left.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/left.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/right.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/up.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/blue/down.gif"))));
             } else if (entity.body.getClass().equals(GreenGhost.class)) {
-                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/green.gif"))));
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/left.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/left.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/right.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/up.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/green/down.gif"))));
             } else if (entity.body.getClass().equals(PinkGhost.class)) {
-                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))),
-                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/pink.gif"))));
+                entity.setImages(new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/left.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/left.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/right.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/up.gif"))),
+                        new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/pink/down.gif"))));
             } else {
                 System.err.println("Entity not found! Add new entity in setting IMG");
                 throw new RuntimeException();
