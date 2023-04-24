@@ -25,10 +25,6 @@ public abstract class GameData {
         WAITRESPAWN,
         NONE
     }
-    public enum GameMode {
-        DEFAULT,
-        RUNUP
-    }
     public static class Coordinates {
         public double x;
         public double y;
@@ -73,9 +69,6 @@ public abstract class GameData {
                 case LEFT -> leftIMG;
                 case RIGHT -> rightIMG;
             };
-        }
-        public Image getScaredImage() {
-            return new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/death.png")));
         }
     }
     public static class PlayerRecord {

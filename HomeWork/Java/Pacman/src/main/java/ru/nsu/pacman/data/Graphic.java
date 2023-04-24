@@ -150,6 +150,10 @@ public abstract class Graphic {
     private static GridPane getArea() {
         return (GridPane) root.lookup("#gamePane #area");
     }
+    private static Image scaredIMG = new Image(Objects.requireNonNull(Game.class.getResourceAsStream("sprites/ghosts/death.gif")));
+    private static Image getScaredImage() {
+        return scaredIMG;
+    }
 
     public static void rewriteEnemy(GameData.EntityData entity) {
         entity.view.setLayoutX(entity.body.getPosition().x);
@@ -160,10 +164,10 @@ public abstract class Graphic {
                 entity.view.setImage(entity.getImages(entity.body.getCurrentOrientation()));
                 entity.view.setOpacity(1);
             } else if (ghost.getState() == Ghost.GhostState.SCARED) {
-                entity.view.setImage(entity.getScaredImage());
+                entity.view.setImage(getScaredImage());
                 entity.view.setOpacity(1);
             } else {
-                entity.view.setImage(entity.getScaredImage());
+                entity.view.setImage(getScaredImage());
                 entity.view.setOpacity(0.2);
             }
         } else {
