@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import ru.nsu.pacman.data.Graphic;
 
 import static ru.nsu.pacman.data.GameData.Coordinates;
 
@@ -17,7 +18,6 @@ public class LevelBuilder {
     public static final Color WALL_COLOR = Color.BLUE;
     public static final Color FOOD_COLOR = Color.WHITE;
     public static final Color BARRIER_COLOR = Color.BROWN;
-    public static final Color CHERRY_COLOR = Color.RED;
 
     public LevelBuilder() {}
 
@@ -45,8 +45,7 @@ public class LevelBuilder {
                     elem = new Rectangle(CELL_SIZE - 5, CELL_SIZE - 5);
                     elem.setFill(BARRIER_COLOR);
                 } else if (symbol == LevelData.Symbols.Cherry) {
-                    elem = new Circle(CELL_SIZE, CELL_SIZE, 6);
-                    elem.setFill(CHERRY_COLOR);
+                    gridPane.add(Graphic.getCherryView(), row, col);
                 }
                 if (elem != null) {
                     gridPane.add(elem, row, col);

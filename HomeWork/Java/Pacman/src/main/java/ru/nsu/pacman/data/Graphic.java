@@ -6,6 +6,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -23,13 +24,19 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static ru.nsu.pacman.generation.LevelBuilder.CELL_SIZE;
-import static ru.nsu.pacman.generation.LevelBuilder.CHERRY_COLOR;
 
 public abstract class Graphic {
     private static LevelData data = null;
     private static StackPane root = null;
     private static boolean textIsWriten = false;
     private static GameData.GameStatus curTextStatus = GameData.GameStatus.NONE;
+    private static ImageView cherryView = new ImageView(new Image(Game.class.getResourceAsStream("sprites/cherry.png")));
+    public static ImageView getCherryView() {
+        cherryView.setId("Cherry");
+        GridPane.setHalignment(cherryView, HPos.CENTER);
+        GridPane.setValignment(cherryView, VPos.CENTER);
+        return cherryView;
+    }
 
     public static void settingIMG(ArrayList<GameData.EntityData> enemies) {
         for (GameData.EntityData entity : enemies) {
@@ -139,12 +146,7 @@ public abstract class Graphic {
             area.getChildren().remove(node);
         }
         if (isNewCherry) {
-            Shape circle = new Circle(CELL_SIZE, CELL_SIZE, 6);
-            circle.setFill(CHERRY_COLOR);
-            GridPane.setHalignment(circle, HPos.CENTER);
-            GridPane.setValignment(circle, VPos.CENTER);
-            circle.setId("Cherry");
-            area.add(circle, colCherry, rowCherry);
+            area.add(getCherryView(), colCherry, rowCherry);
         }
     }
     private static GridPane getArea() {
