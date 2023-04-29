@@ -13,11 +13,13 @@ import javafx.stage.Stage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+import javafx.scene.control.Alert;
 
 import java.io.File;
+
 public class TorrentApp extends Application {
     private TextArea progressTextArea;
-    private TorrentClient torrentClient = null;
+    private TorrentClient torrentClient = new TorrentClient();
 
     public static void main(String[] args) {
         launch(args);
@@ -33,7 +35,17 @@ public class TorrentApp extends Application {
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Torrent files (*.torrent)", "*.torrent"));
             File torrentFile = fileChooser.showOpenDialog(primaryStage);
             if (torrentFile != null) {
-                torrentClient = new TorrentClient(new TorrentFile(torrentFile));
+                torrentClient.selectFile(new TorrentFile(torrentFile));
+                if (torrentClient.getTracker().getPeers().size() == 0) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Внимание");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Пиры не найдены!");
+                    alert.showAndWait();
+                }
+                else {
+                    torrentClient.start();
+                }
                 updateProgress();
             }
         });
@@ -55,22 +67,27 @@ public class TorrentApp extends Application {
     }
 
     private void updateProgress() {
-        if (torrentClient != null) {
-            String fileName = torrentClient.getFileName().replace(".torrent","");
+        if (torrentClient.getFile() != null) {
+            String fileName = torrentClient.getFile().getName().replace(".torrent","");
             int totalPieces = torrentClient.getTotalPieces();
             int downloadedPieces = torrentClient.getDownloadedPieces();
             int remainingPieces = totalPieces - downloadedPieces;
             double downloadSpeed = torrentClient.getDownloadSpeed();
             double uploadSpeed = torrentClient.getUploadSpeed();
             double percentComplete = (double) downloadedPieces / totalPieces * 100;
+            int countPeers = torrentClient.getTracker().getPeers().size();
 
             String progressText = String.format(
-                    "Загружается торрент: \"%s\"\n\n" +
-                            "Процент завершения: %.2f%%\n" +
-                            "Загружено кусочков: %d из %d\n" +
-                            "Оставшиеся кусочки: %d\n" +
-                            "Скорость загрузки: %.2f kB/s\n" +
-                            "Скорость раздачи: %.2f kB/s",
+                    """
+                    Загружается торрент: "%s"
+
+                    Процент завершения: %.2f%%
+                    Загружено кусочков: %d из %d
+                    Оставшиеся кусочки: %d
+                    Скорость загрузки: %.2f kB/s
+                    Скорость раздачи: %.2f kB/s
+                    Количество пиров: %d
+                    """,
 
                     fileName,
                     percentComplete,
@@ -78,7 +95,8 @@ public class TorrentApp extends Application {
                     totalPieces,
                     remainingPieces,
                     downloadSpeed,
-                    uploadSpeed
+                    uploadSpeed,
+                    countPeers
             );
 
             progressTextArea.setText(progressText);
