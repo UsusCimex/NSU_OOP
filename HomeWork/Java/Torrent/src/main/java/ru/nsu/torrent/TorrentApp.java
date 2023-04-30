@@ -69,12 +69,12 @@ public class TorrentApp extends Application {
     private void updateProgress() {
         if (torrentClient.getFile() != null) {
             String fileName = torrentClient.getFile().getName().replace(".torrent","");
-            int totalPieces = torrentClient.getTotalPieces();
-            int downloadedPieces = torrentClient.getDownloadedPieces();
-            int remainingPieces = totalPieces - downloadedPieces;
-            double downloadSpeed = torrentClient.getDownloadSpeed();
-            double uploadSpeed = torrentClient.getUploadSpeed();
-            double percentComplete = (double) downloadedPieces / totalPieces * 100;
+//            int totalPieces = torrentClient.getTotalPieces();
+//            int downloadedPieces = torrentClient.getDownloadedPieces();
+//            int remainingPieces = totalPieces - downloadedPieces;
+//            double downloadSpeed = torrentClient.getDownloadSpeed();
+//            double uploadSpeed = torrentClient.getUploadSpeed();
+//            double percentComplete = (double) downloadedPieces / totalPieces * 100;
             int countPeers = torrentClient.getTracker().getPeers().size();
 
             String progressText = String.format(
@@ -90,12 +90,13 @@ public class TorrentApp extends Application {
                     """,
 
                     fileName,
-                    percentComplete,
-                    downloadedPieces,
-                    totalPieces,
-                    remainingPieces,
-                    downloadSpeed,
-                    uploadSpeed,
+//                    percentComplete,
+//                    downloadedPieces,
+//                    totalPieces,
+//                    remainingPieces,
+//                    downloadSpeed,
+//                    uploadSpeed,
+                    0.0,0,0,0,0.0,0.0,
                     countPeers
             );
 

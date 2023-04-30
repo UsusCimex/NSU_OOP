@@ -37,8 +37,6 @@ javafx {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-
-    implementation 'com.turn:ttorrent:1.5'
 }
 
 test {

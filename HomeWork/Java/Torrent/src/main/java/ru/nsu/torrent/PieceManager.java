@@ -1,21 +1,30 @@
 package ru.nsu.torrent;
 
 import java.util.BitSet;
-import java.util.List;
+import java.util.Optional;
 
 public class PieceManager {
     private TorrentFile torrentFile;
-    private List<Peer> peers;
     private BitSet availablePieces;
 
-    public PieceManager(TorrentFile torrentFile, List<Peer> peers) {
+    public PieceManager(TorrentFile torrentFile) {
         this.torrentFile = torrentFile;
-        this.peers = peers;
         this.availablePieces = new BitSet(torrentFile.getPieceHashes().size());
+        this.availablePieces.set(0, torrentFile.getPieceHashes().size());
     }
-
-    public int getNextPiece() {
-        // Реализация выбора следующего кусочка для скачивания...
-        return 0;
+    public synchronized int getNextPiece() {
+        int nextClearBit = availablePieces.nextClearBit(0);
+        if (nextClearBit < torrentFile.getPieceHashes().size()) {
+            availablePieces.clear(nextClearBit);
+            return nextClearBit;
+        } else {
+            return -1;
+        }
+    }
+    public synchronized void markPieceAsAvailable(int pieceIndex) {
+        availablePieces.set(pieceIndex);
+    }
+    public int getNumberOfPieces() {
+        return torrentFile.getPieceHashes().size();
     }
 }
