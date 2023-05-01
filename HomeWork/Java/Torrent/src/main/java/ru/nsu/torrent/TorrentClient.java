@@ -95,7 +95,7 @@ public class TorrentClient {
         return tracker;
     }
 
-    public static Set<byte[]> getAvailableInfoHashes() throws IOException {
+    public static Set<byte[]> getAvailableInfoHashes() {
         Set<byte[]> infoHashes = new HashSet<>();
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
@@ -106,7 +106,7 @@ public class TorrentClient {
 
         return infoHashes;
     }
-    public static File getFileByInfoHash(byte[] infoHash) throws IOException {
+    public static File getFileByInfoHash(byte[] infoHash) {
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
         for (File torrentFile : torrentsDir.listFiles()) {
