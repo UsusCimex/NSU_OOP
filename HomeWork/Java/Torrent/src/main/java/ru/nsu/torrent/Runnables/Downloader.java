@@ -1,16 +1,17 @@
 package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.Messages.PieceMessage;
-import ru.nsu.torrent.Messages.RequestMessage;
-
-import java.net.Socket;
+import java.nio.channels.SocketChannel;
 
 public class Downloader implements Runnable {
-    Socket socket;
+    SocketChannel socketChannel;
     PieceMessage pieceMessage;
-    public Downloader(Socket socket, PieceMessage pieceMessage) {
-        this.socket = socket;
+    byte[] infoHash;
+
+    public Downloader(SocketChannel socketChannel, PieceMessage pieceMessage, byte[] infoHash) {
+        this.socketChannel = socketChannel;
         this.pieceMessage = pieceMessage;
+        this.infoHash = infoHash;
     }
     @Override
     public void run() {

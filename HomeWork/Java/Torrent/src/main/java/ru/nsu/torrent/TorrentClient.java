@@ -2,7 +2,6 @@ package ru.nsu.torrent;
 
 import ru.nsu.torrent.Runnables.TorrentListener;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +33,7 @@ public class TorrentClient {
         if (torrentFile != null) {
             return;
         }
+        // законектиться со всеми пирами из tracker.getPeers();
         // Начать установку файла (Запрашивать у пиров куски)!
     }
     public TorrentFile getFile() {

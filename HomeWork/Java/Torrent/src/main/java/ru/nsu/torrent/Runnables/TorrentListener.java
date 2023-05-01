@@ -113,10 +113,12 @@ public class TorrentListener implements Runnable {
         Message message = Message.fromBytes(byteBuffer.flip().toString().getBytes());
         if (message.getType() == 6) {
             RequestMessage requestMessage = (RequestMessage) message;
-            // Обработка RequestMessage, используя infoHash для определения файла
+            Uploader uploader = new Uploader(socketChannel, requestMessage, infoHash);
+            TorrentClient.executor.submit(uploader);
         } else if (message.getType() == 7) {
             PieceMessage pieceMessage = (PieceMessage) message;
-            // Обработка PieceMessage, используя infoHash для определения файла
+            Downloader downloader = new Downloader(socketChannel, pieceMessage, infoHash);
+            TorrentClient.executor.submit(downloader);
         }
     }
 }
