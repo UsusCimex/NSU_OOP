@@ -17,6 +17,15 @@ public class TorrentClient {
         TorrentListener torrentListener = new TorrentListener(host, port);
         Thread listenerThread = new Thread(torrentListener);
         listenerThread.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                torrentListener.stop();
+                listenerThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
     }
     public void selectFile(TorrentFile file) {
         this.torrentFile = file;

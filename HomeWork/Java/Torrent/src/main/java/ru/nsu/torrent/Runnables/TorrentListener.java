@@ -23,8 +23,8 @@ public class TorrentListener implements Runnable {
     private final InetSocketAddress address;
     private final Set<Peer> session;
     private Selector selector;
+    private ServerSocketChannel serverSocketChannel;
 
-    private final byte[] infoHash = new byte[20];
     public TorrentListener(String host, int port) {
         this.address = new InetSocketAddress(host, port);
         this.session = new HashSet<>();
@@ -35,7 +35,7 @@ public class TorrentListener implements Runnable {
     public void run() {
         try {
             this.selector = Selector.open();
-            ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+            serverSocketChannel = ServerSocketChannel.open();
             serverSocketChannel.bind(address);
             serverSocketChannel.configureBlocking(false);
             serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
@@ -120,6 +120,28 @@ public class TorrentListener implements Runnable {
             PieceMessage pieceMessage = (PieceMessage) message;
             Downloader downloader = new Downloader(socketChannel, pieceMessage, infoHash);
             TorrentClient.executor.submit(downloader);
+        }
+    }
+
+    public void stop() {
+        try {
+            if (serverSocketChannel != null) {
+                serverSocketChannel.close();
+            }
+
+            for (Peer peer : session) {
+                if (peer.getSocketChannel() != null) {
+                    peer.getSocketChannel().close();
+                }
+            }
+
+            if (selector != null) {
+                selector.close();
+            }
+
+            Thread.currentThread().interrupt();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
