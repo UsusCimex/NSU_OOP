@@ -19,9 +19,13 @@ import java.io.File;
 
 public class TorrentApp extends Application {
     private TextArea progressTextArea;
-    private TorrentClient torrentClient = new TorrentClient();
+    private static TorrentClient torrentClient;
 
     public static void main(String[] args) {
+        if (args.length < 2) {
+            throw new RuntimeException("Usage: ./torrent yourHost yourPort");
+        }
+        torrentClient = new TorrentClient(args[0], Integer.parseInt(args[1]));
         launch(args);
     }
 

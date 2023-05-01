@@ -1,5 +1,6 @@
 package ru.nsu.torrent;
 
+import java.nio.channels.SocketChannel;
 import java.util.*;
 
 // По ТЗ не нужен, но пусть возвращает список пиров из файла
@@ -20,7 +21,8 @@ public class Tracker {
                 String[] peerData = scanner.nextLine().split(":");
                 String ipAddress = peerData[0].trim();
                 int port = Integer.parseInt(peerData[1].trim());
-                peers.add(new Peer(ipAddress, port));
+//                SocketChannel socketChannel
+//                peers.add(new Peer(ipAddress, port));
             }
             scanner.close();
         } catch (NullPointerException ex) {
