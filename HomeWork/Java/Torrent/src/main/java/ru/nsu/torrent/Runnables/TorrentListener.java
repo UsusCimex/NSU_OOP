@@ -20,11 +20,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class TorrentListener implements Runnable {
-    private InetSocketAddress address;
-    private Set<Peer> session;
+    private final InetSocketAddress address;
+    private final Set<Peer> session;
     private Selector selector;
 
-    private byte[] infoHash = new byte[20];
+    private final byte[] infoHash = new byte[20];
     public TorrentListener(String host, int port) {
         this.address = new InetSocketAddress(host, port);
         this.session = new HashSet<>();
@@ -68,6 +68,7 @@ public class TorrentListener implements Runnable {
         byte[] receivedInfoHash = Handshake.receiveHandshake(socketChannel);
         Set<byte[]> availableInfoHashes = TorrentClient.getAvailableInfoHashes();
         byte[] validInfoHash = null;
+        assert availableInfoHashes != null;
         for (byte[] infoHash : availableInfoHashes) {
             if (receivedInfoHash != null && Arrays.equals(infoHash, receivedInfoHash)) {
                 validInfoHash = infoHash;

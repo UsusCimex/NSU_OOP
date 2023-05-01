@@ -1,11 +1,10 @@
 package ru.nsu.torrent;
 
 import java.util.BitSet;
-import java.util.Optional;
 
 public class PieceManager {
-    private TorrentFile torrentFile;
-    private BitSet availablePieces;
+    private final TorrentFile torrentFile;
+    private final BitSet availablePieces;
 
     public PieceManager(TorrentFile torrentFile) {
         this.torrentFile = torrentFile;

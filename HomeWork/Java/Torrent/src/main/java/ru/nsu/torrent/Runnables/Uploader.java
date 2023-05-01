@@ -3,7 +3,6 @@ package ru.nsu.torrent.Runnables;
 import ru.nsu.torrent.Messages.PieceMessage;
 import ru.nsu.torrent.Messages.RequestMessage;
 import ru.nsu.torrent.TorrentClient;
-import ru.nsu.torrent.TorrentFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class Uploader implements Runnable {
         try {
             int pieceIndex = requestMessage.getIndex();
             int offset = requestMessage.getOffset();
-            int length = requestMessage.getLength();
+            int length = requestMessage.getPieceLength();
 
             byte[] data = readPieceData(pieceIndex, offset, length);
             PieceMessage pieceMessage = new PieceMessage(pieceIndex, offset, data);
@@ -43,6 +42,7 @@ public class Uploader implements Runnable {
 
     private byte[] readPieceData(int pieceIndex, int offset, int length) throws IOException {
         File fileByInfoHash = TorrentClient.getFileByInfoHash(infoHash);
+        assert fileByInfoHash != null;
         try (RandomAccessFile file = new RandomAccessFile(fileByInfoHash, "r")) {
             file.seek((long) pieceIndex * length + offset);
 

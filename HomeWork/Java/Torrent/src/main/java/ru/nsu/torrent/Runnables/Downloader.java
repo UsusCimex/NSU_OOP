@@ -33,7 +33,7 @@ public class Downloader implements Runnable {
 
             // Записать кусок данных в файл в соответствующем смещении
             try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
-                raf.seek((long) index * pieceMessage.getLength() + offset);
+                raf.seek((long) index * pieceMessage.getData().length + offset);
                 raf.write(data);
             }
         } catch (Exception e) {

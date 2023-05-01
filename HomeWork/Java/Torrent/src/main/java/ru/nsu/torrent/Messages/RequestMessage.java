@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 
 public class RequestMessage extends Message {
     public static final byte REQUEST = 6;
-    private int index;
-    private int offset;
-    private int pieceLength;
+    private final int index;
+    private final int offset;
+    private final int pieceLength;
 
     public RequestMessage(int index, int offset, int pieceLength) {
         this.type = REQUEST;
@@ -46,5 +46,4 @@ public class RequestMessage extends Message {
         buffer.get(data);
         return new PieceMessage(index, offset, data);
     }
-
 }

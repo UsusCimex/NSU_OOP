@@ -1,13 +1,12 @@
 package ru.nsu.torrent;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 
 // По ТЗ не нужен, но пусть возвращает список пиров из файла
 public class Tracker {
-    private List<Peer> peers;
+    private final List<Peer> peers;
     public Tracker(TorrentFile torrentFile) {
         peers = generatePeers(torrentFile);
     }

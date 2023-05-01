@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TorrentFile {
-    private String name;
-    private String filePath;
-    private int pieceSize;
-    private List<byte[]> pieceHashes;
-    private long totalSize;
+    private final String name;
+    private final String filePath;
+    private final int pieceSize;
+    private final List<byte[]> pieceHashes;
+    private final long totalSize;
 
     public TorrentFile(File file) {
         // Parsing .torrent file...
