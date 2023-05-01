@@ -9,16 +9,9 @@ public class PieceManager {
     public PieceManager(TorrentFile torrentFile) {
         this.torrentFile = torrentFile;
         this.availablePieces = new BitSet(torrentFile.getPieceHashes().size());
-        this.availablePieces.set(0, torrentFile.getPieceHashes().size());
     }
     public synchronized int getNextPiece() {
-        int nextClearBit = availablePieces.nextClearBit(0);
-        if (nextClearBit < torrentFile.getPieceHashes().size()) {
-            availablePieces.clear(nextClearBit);
-            return nextClearBit;
-        } else {
-            return -1;
-        }
+        return availablePieces.nextClearBit(0);
     }
     public synchronized void markPieceAsAvailable(int pieceIndex) {
         availablePieces.set(pieceIndex);

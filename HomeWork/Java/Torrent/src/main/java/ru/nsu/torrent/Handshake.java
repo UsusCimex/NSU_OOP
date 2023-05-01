@@ -9,7 +9,7 @@ public abstract class Handshake {
     private static final int RESERVED_BYTES_LENGTH = 8;
     private static final int HANDSHAKE_LENGTH = 1 + PROTOCOL_STRING.length() + RESERVED_BYTES_LENGTH + 20 + 20;
 
-    public static void sendHandshake(SocketChannel socketChannel, byte[] infoHash, byte[] peerId) throws IOException {
+    public static boolean sendHandshake(SocketChannel socketChannel, byte[] infoHash, byte[] peerId) throws IOException {
         ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
 
         handshakeBuffer.put((byte) PROTOCOL_STRING.length());
@@ -19,10 +19,15 @@ public abstract class Handshake {
         handshakeBuffer.put(peerId);
 
         handshakeBuffer.flip();
+
+        int bytesWritten = 0;
         while (handshakeBuffer.hasRemaining()) {
-            socketChannel.write(handshakeBuffer);
+            bytesWritten += socketChannel.write(handshakeBuffer);
         }
+
+        return bytesWritten == HANDSHAKE_LENGTH;
     }
+
 
     public static byte[] receiveHandshake(SocketChannel socketChannel) throws IOException {
         ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);

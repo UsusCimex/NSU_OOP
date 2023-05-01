@@ -1,6 +1,7 @@
 module ru.nsu.torrent {
     requires javafx.controls;
     requires javafx.fxml;
+    requires bencode;
 
     opens ru.nsu.torrent to javafx.fxml;
     exports ru.nsu.torrent;
