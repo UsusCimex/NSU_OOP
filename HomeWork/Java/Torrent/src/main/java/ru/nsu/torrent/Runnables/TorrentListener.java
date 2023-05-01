@@ -77,7 +77,8 @@ public class TorrentListener implements Runnable {
 
         if (validInfoHash != null) {
             socketChannel.register(this.selector, SelectionKey.OP_READ);
-            this.session.add(new Peer(socketChannel, validInfoHash));
+            InetSocketAddress rmAddress = ((InetSocketAddress)socketChannel.getRemoteAddress());
+            this.session.add(new Peer(rmAddress.getAddress().getHostAddress(), rmAddress.getPort() ,socketChannel, validInfoHash));
             System.err.println("Сессия открыта: " + socketChannel.getLocalAddress());
         } else {
             socketChannel.close();

@@ -40,4 +40,9 @@ public class TorrentFile {
     public int getPieceSize() {
         return pieceSize;
     }
+
+    public byte[] getInfoHash() {
+        // get info hash .torrent file
+        return null;
+    }
 }
