@@ -28,7 +28,7 @@ public class TorrentListener implements Runnable {
     public TorrentListener(String host, int port) {
         this.address = new InetSocketAddress(host, port);
         this.session = new HashSet<>();
-        System.err.println("Сервер запущен: " + address);
+        System.err.println("Server started: " + address);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class TorrentListener implements Runnable {
             socketChannel.register(this.selector, SelectionKey.OP_READ);
             InetSocketAddress rmAddress = ((InetSocketAddress)socketChannel.getRemoteAddress());
             this.session.add(new Peer(rmAddress.getAddress().getHostAddress(), rmAddress.getPort() ,socketChannel, validInfoHash));
-            System.err.println("Сессия открыта: " + socketChannel.getLocalAddress());
+            System.err.println("Session opened: " + socketChannel.getLocalAddress());
         } else {
             socketChannel.close();
         }
@@ -91,7 +91,7 @@ public class TorrentListener implements Runnable {
         ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
         int numRead = socketChannel.read(byteBuffer);
         if (numRead == -1) {
-            System.err.println("Сессия закрыта: " + socketChannel.getLocalAddress());
+            System.err.println("Session closed: " + socketChannel.getLocalAddress());
             this.session.removeIf(session -> session.getSocketChannel().equals(socketChannel));
             socketChannel.close();
             key.cancel();
@@ -104,7 +104,7 @@ public class TorrentListener implements Runnable {
                 .orElse(null);
 
         if (peer == null) {
-            System.err.println("Не найдена сессия для пира");
+            System.err.println("less not found...");
             return;
         }
 
