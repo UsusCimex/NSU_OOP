@@ -10,6 +10,9 @@ public abstract class Handshake {
     private static final int HANDSHAKE_LENGTH = 1 + PROTOCOL_STRING.length() + RESERVED_BYTES_LENGTH + 20 + 20;
 
     public static boolean sendHandshake(SocketChannel socketChannel, byte[] infoHash, byte[] peerId) throws IOException {
+        if (!socketChannel.isConnected()) {
+            return false;
+        }
         ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
 
         handshakeBuffer.put((byte) PROTOCOL_STRING.length());

@@ -22,10 +22,11 @@ public class TorrentApp extends Application {
     private static TorrentClient torrentClient;
 
     public static void main(String[] args) {
-        if (args.length < 2) {
-            throw new RuntimeException("Usage: ./torrent yourHost yourPort");
-        }
-        torrentClient = new TorrentClient(args[0], Integer.parseInt(args[1]));
+//        if (args.length < 2) {
+//            throw new RuntimeException("Usage: ./torrent yourHost yourPort");
+//        }
+//        torrentClient = new TorrentClient(args[0], Integer.parseInt(args[1]));
+        torrentClient = new TorrentClient("localhost", 6969); //temp
         launch(args);
     }
 
@@ -72,7 +73,7 @@ public class TorrentApp extends Application {
 
     private void updateProgress() {
         if (torrentClient.getFile() != null) {
-            String fileName = torrentClient.getFile().getName().replace(".torrent","");
+            String fileName = torrentClient.getFile().getName();
 //            int totalPieces = torrentClient.getTotalPieces();
 //            int downloadedPieces = torrentClient.getDownloadedPieces();
 //            int remainingPieces = totalPieces - downloadedPieces;

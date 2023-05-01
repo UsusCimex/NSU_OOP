@@ -41,7 +41,7 @@ public class TorrentListener implements Runnable {
             serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
 
             while (!Thread.currentThread().isInterrupted()) {
-                this.selector.select();
+                this.selector.select(100);
                 Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();

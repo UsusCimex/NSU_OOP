@@ -1,13 +1,11 @@
 package ru.nsu.torrent;
 
 import com.dampcake.bencode.Bencode;
-import com.dampcake.bencode.BencodeInputStream;
 import com.dampcake.bencode.Type;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -17,7 +15,7 @@ import java.util.Map;
 public class TorrentFile {
     private final long totalSize;
     private final String name;
-    private final int pieceSize;
+    private final long pieceSize;
     private final List<byte[]> pieceHashes;
     private final byte[] infoHash;
 
@@ -26,24 +24,24 @@ public class TorrentFile {
         try (FileInputStream fis = new FileInputStream(file)) {
             Map<String, Object> torrentData = bencode.decode(fis.readAllBytes(), Type.DICTIONARY);
             Map<String, Object> infoDict = (Map<String, Object>) torrentData.get("info");
-            this.name = new String((byte[]) infoDict.get("name"), StandardCharsets.UTF_8);
-            this.pieceSize = (int) infoDict.get("piece length");
-            this.totalSize = (long) infoDict.get("length");
-            this.pieceHashes = extractPieceHashes((byte[]) infoDict.get("pieces"));
+            this.name = (String) infoDict.get("name");
+            this.pieceSize = (Long) infoDict.get("piece length");
+            this.totalSize = (Long) infoDict.get("length");
+            this.pieceHashes = extractPieceHashes((String) infoDict.get("pieces"));
             this.infoHash = calculateInfoHash(bencode, infoDict);
         } catch (IOException e) {
             throw new RuntimeException("Error decoding torrent file", e);
         }
     }
 
-    private List<byte[]> extractPieceHashes(byte[] pieces) {
+    private List<byte[]> extractPieceHashes(String pieces) {
         int pieceHashLength = 20;
-        int numberOfPieces = pieces.length / pieceHashLength;
+        int numberOfPieces = pieces.length() / pieceHashLength;
         List<byte[]> pieceHashList = new ArrayList<>(numberOfPieces);
 
         for (int i = 0; i < numberOfPieces; i++) {
             byte[] pieceHash = new byte[pieceHashLength];
-            System.arraycopy(pieces, i * pieceHashLength, pieceHash, 0, pieceHashLength);
+            System.arraycopy(pieces.getBytes(), i * pieceHashLength, pieceHash, 0, pieceHashLength);
             pieceHashList.add(pieceHash);
         }
 
@@ -71,7 +69,7 @@ public class TorrentFile {
         return totalSize;
     }
 
-    public int getPieceSize() {
+    public long getPieceSize() {
         return pieceSize;
     }
 

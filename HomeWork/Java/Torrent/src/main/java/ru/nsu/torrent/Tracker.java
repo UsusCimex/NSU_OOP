@@ -14,7 +14,7 @@ public class Tracker {
         return peers;
     }
     private List<Peer> generatePeers(TorrentFile torrentFile) {
-        String fileName = "Tracker/" + torrentFile.getName().replace(".torrent",".txt");
+        String fileName = "Tracker/" + torrentFile.getName() + ".txt";
         List<Peer> peers = new ArrayList<>();
         try {
             Scanner scanner = new Scanner(Objects.requireNonNull(getClass().getResourceAsStream(fileName)));

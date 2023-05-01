@@ -6,6 +6,8 @@ import ru.nsu.torrent.Runnables.Uploader;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -52,6 +54,10 @@ public class TorrentClient {
                 SocketChannel socketChannel = peer.getSocketChannel();
                 socketChannel.configureBlocking(false);
                 socketChannel.connect(peer.getAddress());
+
+                if (!socketChannel.isConnected()) {
+                    continue;
+                }
                 boolean success = Handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
                 if (success) {
                     availablePeers.add(peer);
@@ -62,13 +68,12 @@ public class TorrentClient {
                 e.printStackTrace();
             }
         }
-
         boolean complete = false;
-        while(!complete) {
+        while(!complete && !availablePeers.isEmpty()) {
             for (Peer peer : availablePeers) {
                 int missingPieceIndex = pieceManager.getNextPiece();
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-                    RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, torrentFile.getPieceSize());
+                    RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) torrentFile.getPieceSize());
                     Uploader uploader = new Uploader(peer.getSocketChannel(), requestMessage, peer.getInfoHash());
                     executor.submit(uploader);
                 } else {
@@ -86,7 +91,6 @@ public class TorrentClient {
             }
         }
         availablePeers.clear();
-        System.err.println("File downloaded!");
     }
     public TorrentFile getFile() {
         return torrentFile;
@@ -112,7 +116,7 @@ public class TorrentClient {
         for (File torrentFile : torrentsDir.listFiles()) {
             TorrentFile tFile = new TorrentFile(torrentFile);
             if (Arrays.equals(tFile.getInfoHash(), infoHash)) {
-                return new File(DOWNLOADS_DIRECTORY, tFile.getName().replace(".torrent", ".txt"));
+                return new File(DOWNLOADS_DIRECTORY, tFile.getName());
             }
         }
 
