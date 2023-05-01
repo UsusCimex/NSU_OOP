@@ -45,6 +45,5 @@ public class PieceMessage extends Message {
         int pieceLength = buffer.getInt();
         return new RequestMessage(index, offset, pieceLength);
     }
-
 }
 

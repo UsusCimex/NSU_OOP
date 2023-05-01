@@ -9,7 +9,8 @@ public abstract class Message {
     public byte getType() {
         return type;
     }
-
+    // Get piece size
+    public int getLength() { return length; }
     public abstract byte[] toBytes();
 
     public static Message fromBytes(byte[] bytes) {

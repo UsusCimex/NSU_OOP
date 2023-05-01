@@ -2,6 +2,7 @@ package ru.nsu.torrent;
 
 import ru.nsu.torrent.Runnables.TorrentListener;
 
+import java.io.File;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,13 +18,6 @@ public class TorrentClient {
         Thread listenerThread = new Thread(torrentListener);
         listenerThread.start();
     }
-
-    public static Set<byte[]> getAvailableInfoHashes() {
-        // Расспарсить все имеющиеся хэши торрентов
-        // Хэш получить при помощи SHA-1 к "info" полю .torrent
-        return null;
-    }
-
     public void selectFile(TorrentFile file) {
         this.torrentFile = file;
         this.tracker = new Tracker(torrentFile);
@@ -39,8 +33,17 @@ public class TorrentClient {
     public TorrentFile getFile() {
         return torrentFile;
     }
-
     public Tracker getTracker() {
         return tracker;
+    }
+
+    public static Set<byte[]> getAvailableInfoHashes() {
+        // Расспарсить все имеющиеся хэши торрентов
+        // Хэш получить при помощи SHA-1 к "info" полю .torrent
+        return null;
+    }
+    public static File getFileByInfoHash(byte[] infoHash) {
+        // Реализация метода для поиска файла на основе infoHash
+        return null;
     }
 }
