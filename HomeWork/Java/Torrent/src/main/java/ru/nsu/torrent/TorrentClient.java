@@ -1,17 +1,13 @@
 package ru.nsu.torrent;
 
-import com.dampcake.bencode.*;
-import ru.nsu.torrent.Messages.PieceMessage;
 import ru.nsu.torrent.Messages.RequestMessage;
-import ru.nsu.torrent.Runnables.Downloader;
 import ru.nsu.torrent.Runnables.TorrentListener;
 import ru.nsu.torrent.Runnables.Uploader;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,7 +16,10 @@ public class TorrentClient {
     private TorrentFile torrentFile = null;
     private Tracker tracker;
     private PieceManager pieceManager;
-    private List<Peer> availablePeers;
+    private List<Peer> availablePeers = new ArrayList<>();
+
+    private static final String TORRENTS_DIRECTORY = "torrentsDir";
+    private static final String DOWNLOADS_DIRECTORY = "downloadsDir";
 
     public TorrentClient(String host, int port) {
         TorrentListener torrentListener = new TorrentListener(host, port);
@@ -96,13 +95,27 @@ public class TorrentClient {
         return tracker;
     }
 
-    public static Set<byte[]> getAvailableInfoHashes() {
-        // Расспарсить все имеющиеся хэши торрентов
-        // Хэш получить при помощи SHA-1 к "info" полю .torrent
-        return null;
+    public static Set<byte[]> getAvailableInfoHashes() throws IOException {
+        Set<byte[]> infoHashes = new HashSet<>();
+        File torrentsDir = new File(TORRENTS_DIRECTORY);
+
+        for (File torrentFile : torrentsDir.listFiles()) {
+            TorrentFile tFile = new TorrentFile(torrentFile);
+            infoHashes.add(tFile.getInfoHash());
+        }
+
+        return infoHashes;
     }
-    public static File getFileByInfoHash(byte[] infoHash) {
-        // Реализация метода для поиска файла на основе infoHash
+    public static File getFileByInfoHash(byte[] infoHash) throws IOException {
+        File torrentsDir = new File(TORRENTS_DIRECTORY);
+
+        for (File torrentFile : torrentsDir.listFiles()) {
+            TorrentFile tFile = new TorrentFile(torrentFile);
+            if (Arrays.equals(tFile.getInfoHash(), infoHash)) {
+                return new File(DOWNLOADS_DIRECTORY, tFile.getName().replace(".torrent", ".txt"));
+            }
+        }
+
         return null;
     }
 }
