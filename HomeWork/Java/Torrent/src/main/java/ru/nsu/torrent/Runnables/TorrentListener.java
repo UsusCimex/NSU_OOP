@@ -88,23 +88,43 @@ public class TorrentListener implements Runnable {
 
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-        int numRead = socketChannel.read(byteBuffer);
-        if (numRead == -1) {
-            System.err.println("Session closed: " + socketChannel.getLocalAddress());
-            this.session.removeIf(session -> session.getSocketChannel().equals(socketChannel));
+
+        Peer peer = null;
+        for (Peer pr : session) {
+            if (pr.getSocketChannel().equals(socketChannel)) {
+                peer = pr;
+                break;
+            }
+        }
+
+        if (peer == null) {
+            System.err.println("less not found...");
             socketChannel.close();
             key.cancel();
             return;
         }
 
-        Peer peer = this.session.stream()
-                .filter(session -> session.getSocketChannel().equals(socketChannel))
-                .findFirst()
-                .orElse(null);
+        ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+        int numRead = socketChannel.read(lengthBuffer);
+        if (numRead == -1) {
+            System.err.println("Session closed: " + socketChannel.getLocalAddress());
+            this.session.remove(peer);
+            socketChannel.close();
+            key.cancel();
+            return;
+        }
+        lengthBuffer.flip();
+        int messageLength = lengthBuffer.getInt();
 
-        if (peer == null) {
-            System.err.println("less not found...");
+        ByteBuffer byteBuffer = ByteBuffer.allocate(messageLength + 4);
+        lengthBuffer.flip();
+        byteBuffer.put(lengthBuffer);
+        numRead = socketChannel.read(byteBuffer);
+        if (numRead == -1) {
+            System.err.println("Session closed: " + socketChannel.getLocalAddress());
+            this.session.remove(peer);
+            socketChannel.close();
+            key.cancel();
             return;
         }
 

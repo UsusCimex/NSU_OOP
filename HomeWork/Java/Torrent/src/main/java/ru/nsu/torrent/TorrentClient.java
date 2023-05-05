@@ -17,7 +17,7 @@ public class TorrentClient {
     public static ExecutorService executor = Executors.newFixedThreadPool(3);
     private TorrentFile torrentFile = null;
     private Tracker tracker;
-    private PieceManager pieceManager;
+    private static PieceManager pieceManager;
     private List<Peer> availablePeers = new ArrayList<>();
 
     private static final String TORRENTS_DIRECTORY = "torrentsDir";
@@ -108,13 +108,16 @@ public class TorrentClient {
 
         return infoHashes;
     }
-    public static File getFileByInfoHash(byte[] infoHash) {
+    public static File getDownloadFileByTorrent(TorrentFile torrentFile) {
+        return new File(DOWNLOADS_DIRECTORY, torrentFile.getName());
+    }
+    public static TorrentFile getTorrentFileByInfoHash(byte[] infoHash) {
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
         for (File torrentFile : torrentsDir.listFiles()) {
             TorrentFile tFile = new TorrentFile(torrentFile);
             if (Arrays.equals(tFile.getInfoHash(), infoHash)) {
-                return new File(DOWNLOADS_DIRECTORY, tFile.getName());
+                return tFile;
             }
         }
 
@@ -127,5 +130,8 @@ public class TorrentClient {
 
     public int getDownloadedPieces() {
         return pieceManager.getNumberOfDownloadedPieces();
+    }
+    public static synchronized void markPieceAsDownloaded(int index) {
+        pieceManager.markPieceAsDownloaded(index);
     }
 }
