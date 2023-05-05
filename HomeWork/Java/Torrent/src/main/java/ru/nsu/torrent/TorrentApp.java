@@ -70,16 +70,18 @@ public class TorrentApp extends Application {
         primaryStage.setScene(new Scene(vBox, 400, 300));
         primaryStage.show();
     }
+    @Override
+    public void stop() {
+        torrentClient.stopTorrentListener();
+    }
 
     private void updateProgress() {
         if (torrentClient.getFile() != null) {
             String fileName = torrentClient.getFile().getName();
-//            int totalPieces = torrentClient.getTotalPieces();
-//            int downloadedPieces = torrentClient.getDownloadedPieces();
-//            int remainingPieces = totalPieces - downloadedPieces;
-//            double downloadSpeed = torrentClient.getDownloadSpeed();
-//            double uploadSpeed = torrentClient.getUploadSpeed();
-//            double percentComplete = (double) downloadedPieces / totalPieces * 100;
+            int totalPieces = torrentClient.getTotalPieces();
+            int downloadedPieces = torrentClient.getDownloadedPieces();
+            int remainingPieces = totalPieces - downloadedPieces;
+            double percentComplete = (double) downloadedPieces / totalPieces * 100;
             int countPeers = torrentClient.getTracker().getPeers().size();
 
             String progressText = String.format(
@@ -89,19 +91,14 @@ public class TorrentApp extends Application {
                     Процент завершения: %.2f%%
                     Загружено кусочков: %d из %d
                     Оставшиеся кусочки: %d
-                    Скорость загрузки: %.2f kB/s
-                    Скорость раздачи: %.2f kB/s
                     Количество пиров: %d
                     """,
 
                     fileName,
-//                    percentComplete,
-//                    downloadedPieces,
-//                    totalPieces,
-//                    remainingPieces,
-//                    downloadSpeed,
-//                    uploadSpeed,
-                    0.0,0,0,0,0.0,0.0,
+                    percentComplete,
+                    downloadedPieces,
+                    totalPieces,
+                    remainingPieces,
                     countPeers
             );
 

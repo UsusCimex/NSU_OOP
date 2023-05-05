@@ -23,19 +23,17 @@ public class TorrentClient {
     private static final String TORRENTS_DIRECTORY = "torrentsDir";
     private static final String DOWNLOADS_DIRECTORY = "downloadsDir";
 
+    private final TorrentListener torrentListener;
+
     public TorrentClient(String host, int port) {
-        TorrentListener torrentListener = new TorrentListener(host, port);
+        torrentListener = new TorrentListener(host, port);
         Thread listenerThread = new Thread(torrentListener);
         listenerThread.start();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                torrentListener.stop();
-                listenerThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }));
+    }
+    public void stopTorrentListener() {
+        if (torrentListener != null) {
+            torrentListener.stop();
+        }
     }
     public void selectFile(TorrentFile file) {
         this.torrentFile = file;
@@ -121,5 +119,13 @@ public class TorrentClient {
         }
 
         return null;
+    }
+
+    public int getTotalPieces() {
+        return torrentFile.getPieceHashes().size();
+    }
+
+    public int getDownloadedPieces() {
+        return pieceManager.getNumberOfDownloadedPieces();
     }
 }

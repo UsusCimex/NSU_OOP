@@ -10,10 +10,7 @@ import ru.nsu.torrent.TorrentClient;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,6 +52,8 @@ public class TorrentListener implements Runnable {
                     }
                 }
             }
+        } catch (ClosedSelectorException e) {
+            System.err.println("Selector closed");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

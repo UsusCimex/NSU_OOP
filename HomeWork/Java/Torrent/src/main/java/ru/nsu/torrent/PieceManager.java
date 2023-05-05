@@ -13,10 +13,8 @@ public class PieceManager {
     public synchronized int getNextPiece() {
         return availablePieces.nextClearBit(0);
     }
-    public synchronized void markPieceAsAvailable(int pieceIndex) {
+    public synchronized void markPieceAsDownloaded(int pieceIndex) {
         availablePieces.set(pieceIndex);
     }
-    public int getNumberOfPieces() {
-        return torrentFile.getPieceHashes().size();
-    }
+    public int getNumberOfDownloadedPieces() { return availablePieces.cardinality(); }
 }

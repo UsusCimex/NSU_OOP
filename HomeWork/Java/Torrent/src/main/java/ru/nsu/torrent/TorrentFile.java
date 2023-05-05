@@ -1,16 +1,13 @@
 package ru.nsu.torrent;
 
 import com.dampcake.bencode.Bencode;
+import com.dampcake.bencode.BencodeInputStream;
 import com.dampcake.bencode.Type;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TorrentFile {
     private final long totalSize;
@@ -20,35 +17,43 @@ public class TorrentFile {
     private final byte[] infoHash;
 
     public TorrentFile(File file) {
-        Bencode bencode = new Bencode();
-        try (FileInputStream fis = new FileInputStream(file)) {
-            Map<String, Object> torrentData = bencode.decode(fis.readAllBytes(), Type.DICTIONARY);
-            Map<String, Object> infoDict = (Map<String, Object>) torrentData.get("info");
+        try (
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-15"));
+                ByteArrayInputStream in = new ByteArrayInputStream(bufferedReader.readLine().getBytes());
+                BencodeInputStream bin = new BencodeInputStream(in);
+        ) {
+            Type type = bin.nextType();
+            if (type != Type.DICTIONARY) {
+                throw new RuntimeException("Type != DICTIONARY");
+            }
+            Map<String, Object> dict = bin.readDictionary();
+            Map<String, Object> infoDict = (Map<String, Object>) dict.get("info");
+            this.totalSize = (Long) infoDict.get("length");
             this.name = (String) infoDict.get("name");
             this.pieceSize = (Long) infoDict.get("piece length");
-            this.totalSize = (Long) infoDict.get("length");
-            this.pieceHashes = extractPieceHashes((String) infoDict.get("pieces"));
-            this.infoHash = calculateInfoHash(bencode, infoDict);
+            this.pieceHashes = extractPieceHashes(((String) infoDict.get("pieces")).getBytes("ISO-8859-15"));
+            this.infoHash = calculateInfoHash(infoDict);
         } catch (IOException e) {
-            throw new RuntimeException("Error decoding torrent file", e);
+            throw new RuntimeException(e);
         }
     }
 
-    private List<byte[]> extractPieceHashes(String pieces) {
-        int pieceHashLength = 20;
-        int numberOfPieces = pieces.length() / pieceHashLength;
-        List<byte[]> pieceHashList = new ArrayList<>(numberOfPieces);
+    private List<byte[]> extractPieceHashes(byte[] pieces) {
+        final int pieceHashLength = 20;
+        int numberOfPieces = pieces.length / pieceHashLength;
+        List<byte[]> pieceHashes = new ArrayList<>(numberOfPieces);
 
         for (int i = 0; i < numberOfPieces; i++) {
             byte[] pieceHash = new byte[pieceHashLength];
-            System.arraycopy(pieces.getBytes(), i * pieceHashLength, pieceHash, 0, pieceHashLength);
-            pieceHashList.add(pieceHash);
+            System.arraycopy(pieces, i * pieceHashLength, pieceHash, 0, pieceHashLength);
+            pieceHashes.add(pieceHash);
         }
-
-        return pieceHashList;
+        return pieceHashes;
     }
 
-    private byte[] calculateInfoHash(Bencode bencode, Map<String, Object> infoDict) {
+
+    private byte[] calculateInfoHash(Map<String, Object> infoDict) {
+        Bencode bencode = new Bencode();
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
             return sha1.digest(bencode.encode(infoDict));
