@@ -18,8 +18,8 @@ public class TorrentClient {
     private static PieceManager pieceManager;
     private final List<Peer> availablePeers = new ArrayList<>();
 
-    private static final String TORRENTS_DIRECTORY = "torrentsDir";
-    private static final String DOWNLOADS_DIRECTORY = "downloadsDir";
+    public static final String TORRENTS_DIRECTORY = "torrentsDir";
+    public static final String DOWNLOADS_DIRECTORY = "downloadsDir";
 
     private final TorrentListener torrentListener;
 

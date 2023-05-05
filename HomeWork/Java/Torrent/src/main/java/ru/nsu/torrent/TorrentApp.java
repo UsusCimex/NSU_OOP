@@ -14,11 +14,15 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import javafx.scene.control.Alert;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ListView;
+
 
 import java.io.File;
 
 public class TorrentApp extends Application {
-    private TextArea progressTextArea;
+    private ListView<String> progressListView;
     private static TorrentClient torrentClient;
 
     public static void main(String[] args) {
@@ -38,6 +42,7 @@ public class TorrentApp extends Application {
         loadTorrentButton.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Torrent files (*.torrent)", "*.torrent"));
+            fileChooser.setInitialDirectory(new File(TorrentClient.TORRENTS_DIRECTORY));
             File torrentFile = fileChooser.showOpenDialog(primaryStage);
             if (torrentFile != null) {
                 torrentClient.selectFile(new TorrentFile(torrentFile));
@@ -56,10 +61,9 @@ public class TorrentApp extends Application {
         });
 
         Label progressLabel = new Label("Прогресс загрузки:");
-        progressTextArea = new TextArea();
-        progressTextArea.setEditable(false);
+        progressListView = new ListView<>();
 
-        VBox vBox = new VBox(10, loadTorrentButton, progressLabel, progressTextArea);
+        VBox vBox = new VBox(10, loadTorrentButton, progressLabel, progressListView);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(15));
 
@@ -67,7 +71,7 @@ public class TorrentApp extends Application {
         progressUpdater.setCycleCount(Timeline.INDEFINITE);
         progressUpdater.play();
 
-        primaryStage.setScene(new Scene(vBox, 400, 300));
+        primaryStage.setScene(new Scene(vBox, 400, 400));
         primaryStage.show();
     }
     @Override
@@ -86,32 +90,22 @@ public class TorrentApp extends Application {
             int countPeers = torrentClient.getTracker().getPeers().size();
             long pieceLength = torrentClient.getPieceLength();
 
-            String progressText = String.format(
-                    """
-                    Загружается торрент: "%s"
-                    Размер файла: %d байт
-
-                    Процент завершения: %.2f%%
-                    Загружено кусочков: %d из %d
-                    Оставшиеся кусочки: %d
-                    Количество пиров: %d
-                    Размер кусочков: %d байт
-                    """,
-
-                    fileName,
-                    totalLength,
-                    percentComplete,
-                    downloadedPieces,
-                    totalPieces,
-                    remainingPieces,
-                    countPeers,
-                    pieceLength
+            ObservableList<String> progressInfo = FXCollections.observableArrayList(
+                    String.format("Загружается торрент: \"%s\"", fileName),
+                    String.format("Размер файла: %d байт", totalLength),
+                    String.format("Количество кусочков: %d", totalPieces),
+                    String.format("Размер кусочков: %d байт", pieceLength),
+                    "",
+                    String.format("Процент завершения: %.2f%%", percentComplete),
+                    String.format("Загружено кусочков: %d", downloadedPieces),
+                    String.format("Оставшиеся кусочки: %d", remainingPieces),
+                    "",
+                    String.format("Количество пиров: %d", countPeers)
             );
 
-            progressTextArea.setText(progressText);
+            progressListView.setItems(progressInfo);
         } else {
-            progressTextArea.setText("Enter .torrent file!");
+            progressListView.setItems(FXCollections.observableArrayList("Enter .torrent file!"));
         }
     }
-
 }
