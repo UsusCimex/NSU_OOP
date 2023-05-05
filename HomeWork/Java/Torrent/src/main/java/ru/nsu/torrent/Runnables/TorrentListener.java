@@ -67,7 +67,6 @@ public class TorrentListener implements Runnable {
         byte[] receivedInfoHash = Handshake.receiveHandshake(socketChannel);
         Set<byte[]> availableInfoHashes = TorrentClient.getAvailableInfoHashes();
         byte[] validInfoHash = null;
-        assert availableInfoHashes != null;
         for (byte[] infoHash : availableInfoHashes) {
             if (receivedInfoHash != null && Arrays.equals(infoHash, receivedInfoHash)) {
                 validInfoHash = infoHash;

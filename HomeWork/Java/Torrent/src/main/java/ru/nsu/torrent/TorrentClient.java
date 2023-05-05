@@ -16,7 +16,7 @@ public class TorrentClient {
     private TorrentFile torrentFile = null;
     private Tracker tracker;
     private static PieceManager pieceManager;
-    private List<Peer> availablePeers = new ArrayList<>();
+    private final List<Peer> availablePeers = new ArrayList<>();
 
     private static final String TORRENTS_DIRECTORY = "torrentsDir";
     private static final String DOWNLOADS_DIRECTORY = "downloadsDir";
@@ -36,7 +36,7 @@ public class TorrentClient {
     public void selectFile(TorrentFile file) {
         this.torrentFile = file;
         this.tracker = new Tracker(torrentFile);
-        this.pieceManager = new PieceManager(torrentFile);
+        pieceManager = new PieceManager(torrentFile);
         start();
     }
     public void start(){
@@ -99,7 +99,7 @@ public class TorrentClient {
         Set<byte[]> infoHashes = new HashSet<>();
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
-        for (File torrentFile : torrentsDir.listFiles()) {
+        for (File torrentFile : Objects.requireNonNull(torrentsDir.listFiles())) {
             TorrentFile tFile = new TorrentFile(torrentFile);
             infoHashes.add(tFile.getInfoHash());
         }
@@ -112,7 +112,7 @@ public class TorrentClient {
     public static TorrentFile getTorrentFileByInfoHash(byte[] infoHash) {
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
-        for (File torrentFile : torrentsDir.listFiles()) {
+        for (File torrentFile : Objects.requireNonNull(torrentsDir.listFiles())) {
             TorrentFile tFile = new TorrentFile(torrentFile);
             if (Arrays.equals(tFile.getInfoHash(), infoHash)) {
                 return tFile;

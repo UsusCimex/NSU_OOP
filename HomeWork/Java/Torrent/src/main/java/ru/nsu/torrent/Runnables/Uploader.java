@@ -43,6 +43,7 @@ public class Uploader implements Runnable {
 
     private byte[] readPieceData(int pieceIndex, int offset, int length) throws IOException {
         TorrentFile tFile = TorrentClient.getTorrentFileByInfoHash(infoHash);
+        assert tFile != null;
         File fileByInfoHash = TorrentClient.getDownloadFileByTorrent(tFile);
         try (RandomAccessFile file = new RandomAccessFile(fileByInfoHash, "r")) {
             file.seek((long) pieceIndex * length + offset);

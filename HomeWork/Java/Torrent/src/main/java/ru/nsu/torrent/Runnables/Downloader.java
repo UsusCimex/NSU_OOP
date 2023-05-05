@@ -39,6 +39,7 @@ public class Downloader implements Runnable {
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
+            assert md != null;
             byte[] calculatedHash = md.digest(data);
 
             byte[] expectedHash = torrentFile.getPieceHashes().get(index);
