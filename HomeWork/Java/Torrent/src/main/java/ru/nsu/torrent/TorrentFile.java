@@ -10,9 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class TorrentFile {
-    private final long totalSize;
+    private final long length;
     private final String name;
-    private final long pieceSize;
+    private final long pieceLength;
     private final List<byte[]> pieceHashes;
     private final byte[] infoHash;
 
@@ -28,9 +28,9 @@ public class TorrentFile {
             }
             Map<String, Object> dict = bin.readDictionary();
             Map<String, Object> infoDict = (Map<String, Object>) dict.get("info");
-            this.totalSize = (Long) infoDict.get("length");
+            this.length = (Long) infoDict.get("length");
             this.name = (String) infoDict.get("name");
-            this.pieceSize = (Long) infoDict.get("piece length");
+            this.pieceLength = (Long) infoDict.get("piece length");
             this.pieceHashes = extractPieceHashes(((String) infoDict.get("pieces")).getBytes("ISO-8859-15"));
             this.infoHash = calculateInfoHash(infoDict);
         } catch (IOException e) {
@@ -70,12 +70,12 @@ public class TorrentFile {
         return pieceHashes;
     }
 
-    public long getTotalSize() {
-        return totalSize;
+    public long getLength() {
+        return length;
     }
 
-    public long getPieceSize() {
-        return pieceSize;
+    public long getPieceLength() {
+        return pieceLength;
     }
 
     public byte[] getInfoHash() {

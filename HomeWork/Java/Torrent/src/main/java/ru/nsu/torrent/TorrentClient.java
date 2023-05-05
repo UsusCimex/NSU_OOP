@@ -6,8 +6,6 @@ import ru.nsu.torrent.Runnables.Uploader;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -71,7 +69,7 @@ public class TorrentClient {
             for (Peer peer : availablePeers) {
                 int missingPieceIndex = pieceManager.getNextPiece();
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-                    RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) torrentFile.getPieceSize());
+                    RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) torrentFile.getPieceLength());
                     Uploader uploader = new Uploader(peer.getSocketChannel(), requestMessage, peer.getInfoHash());
                     executor.submit(uploader);
                 } else {
@@ -133,5 +131,13 @@ public class TorrentClient {
     }
     public static synchronized void markPieceAsDownloaded(int index) {
         pieceManager.markPieceAsDownloaded(index);
+    }
+
+    public long getTotalLength() {
+        return torrentFile.getLength();
+    }
+
+    public long getPieceLength() {
+        return torrentFile.getPieceLength();
     }
 }
