@@ -11,12 +11,12 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-public class UploaderFile implements Runnable {
+public class Uploader implements Runnable {
     SocketChannel socketChannel;
     RequestMessage requestMessage;
     byte[] infoHash;
 
-    public UploaderFile(SocketChannel socketChannel, RequestMessage requestMessage, byte[] infoHash) {
+    public Uploader(SocketChannel socketChannel, RequestMessage requestMessage, byte[] infoHash) {
         this.socketChannel = socketChannel;
         this.requestMessage = requestMessage;
         this.infoHash = infoHash;
@@ -25,29 +25,33 @@ public class UploaderFile implements Runnable {
     @Override
     public void run() {
         try {
-            System.err.println("[UploaderFile] Start upload!");
-            int pieceIndex = requestMessage.getIndex();
+            System.err.println("[Uploader] Start upload!");
+            int index = requestMessage.getIndex();
             int offset = requestMessage.getOffset();
             int length = requestMessage.getPieceLength();
 
-            byte[] data = readPieceData(pieceIndex, offset, length);
-            PieceMessage pieceMessage = new PieceMessage(pieceIndex, offset, data);
+            byte[] data = readPieceData(index, offset, length);
+            if (data == null) return;
+            PieceMessage pieceMessage = new PieceMessage(index, offset, data);
             ByteBuffer byteBuffer = ByteBuffer.wrap(pieceMessage.toBytes());
             while (byteBuffer.hasRemaining()) {
                 socketChannel.write(byteBuffer);
             }
-            System.err.println("[UploaderFile] Uploaded: " + new String(data) + ", to " + socketChannel.getRemoteAddress());
+            System.err.println("[Uploader] Uploaded: " + index + " piece, to " + socketChannel.getRemoteAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private byte[] readPieceData(int pieceIndex, int offset, int length) throws IOException {
+    private byte[] readPieceData(int index, int offset, int length) throws IOException {
         TorrentFile tFile = TorrentClient.getTorrentFileByInfoHash(infoHash);
         assert tFile != null;
+        if (!tFile.getPieceManager().getPiece(index)) {
+            return null;
+        }
         File fileByInfoHash = TorrentClient.getDownloadFileByTorrent(tFile);
         try (RandomAccessFile file = new RandomAccessFile(fileByInfoHash, "r")) {
-            file.seek((long) pieceIndex * length + offset);
+            file.seek((long) index * length + offset);
 
             byte[] data = new byte[length];
             file.read(data);

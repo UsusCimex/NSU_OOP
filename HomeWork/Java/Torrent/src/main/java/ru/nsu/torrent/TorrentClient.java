@@ -1,113 +1,55 @@
 package ru.nsu.torrent;
 
-import ru.nsu.torrent.Messages.RequestMessage;
-import ru.nsu.torrent.Runnables.TorrentListener;
-import ru.nsu.torrent.Runnables.Uploader;
+import ru.nsu.torrent.Runnables.AnswerListener;
+import ru.nsu.torrent.Runnables.RequestListener;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TorrentClient {
     public static ExecutorService executor = Executors.newFixedThreadPool(3);
-    private TorrentFile torrentFile = null;
-    private Tracker tracker;
-    private static PieceManager pieceManager;
-    private final List<Peer> availablePeers = new ArrayList<>();
+    private static TorrentFile torrentFile = null;
+    private static Tracker tracker;
 
     public static final String TORRENTS_DIRECTORY = "torrentsDir";
     public static final String DOWNLOADS_DIRECTORY = "downloadsDir";
 
-    private final TorrentListener torrentListener;
+    private final RequestListener requestListener;
+    private AnswerListener answerListener;
 
     public TorrentClient(String host, int port) {
-        torrentListener = new TorrentListener(host, port);
-        Thread listenerThread = new Thread(torrentListener);
+        requestListener = new RequestListener(host, port);
+        Thread listenerThread = new Thread(requestListener);
         listenerThread.start();
     }
-    public void stopTorrentListener() {
-        if (torrentListener != null) {
-            torrentListener.stop();
+    public void stopTorrent() {
+        if (requestListener != null) {
+            requestListener.stop();
+        }
+        if (answerListener != null) {
+            answerListener.stop();
         }
     }
     public void selectFile(TorrentFile file) {
-        this.torrentFile = file;
-        this.tracker = new Tracker(torrentFile);
-        pieceManager = new PieceManager(torrentFile);
+        torrentFile = file;
+        tracker = new Tracker(torrentFile);
     }
-    public boolean start(){
-        if (torrentFile == null) {
-            System.err.println("No file selected!");
-            return false;
-        }
-        if (tracker.getPeers().isEmpty()) {
-            System.err.println("Peers not found!");
-            return false;
-        }
 
-        boolean complete = false;
-        while (!complete) {
-            for (Peer peer : tracker.getPeers()) {
-                try {
-                    SocketChannel socketChannel = peer.getSocketChannel();
-                    socketChannel.configureBlocking(false);
-                    socketChannel.connect(peer.getAddress());
-
-                    if (!socketChannel.isConnected()) {
-                        continue;
-                    }
-                    boolean success = Handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
-                    if (success) {
-                        availablePeers.add(peer);
-                    } else {
-                        socketChannel.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            while (!complete && !availablePeers.isEmpty()) {
-                for (Peer peer : availablePeers) {
-                    int missingPieceIndex = pieceManager.getNextPiece();
-                    if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-                        RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) torrentFile.getPieceLength());
-                        Uploader uploader = new Uploader(peer.getSocketChannel(), requestMessage, peer.getInfoHash());
-                        executor.submit(uploader);
-                    } else {
-                        complete = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        for (Peer peer : availablePeers) {
-            try {
-                peer.getSocketChannel().close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        availablePeers.clear();
-
-        return true;
-    }
-    public TorrentFile getFile() {
+    public static TorrentFile getFile() {
         return torrentFile;
     }
-    public Tracker getTracker() {
+    public static Tracker getTracker() {
         return tracker;
     }
 
-    public static Set<byte[]> getAvailableInfoHashes() {
-        Set<byte[]> infoHashes = new HashSet<>();
+    public static List<byte[]> getAvailableInfoHashes() {
+        List<byte[]> infoHashes = new ArrayList<>();
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
-        for (File torrentFile : Objects.requireNonNull(torrentsDir.listFiles())) {
-            TorrentFile tFile = new TorrentFile(torrentFile);
+        for (File file : Objects.requireNonNull(torrentsDir.listFiles())) {
+            TorrentFile tFile = new TorrentFile(file);
             infoHashes.add(tFile.getInfoHash());
         }
 
@@ -128,11 +70,21 @@ public class TorrentClient {
 
         return null;
     }
-
-    public int getDownloadedPieces() {
-        return pieceManager.getNumberOfDownloadedPieces();
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
-    public static synchronized void markPieceAsDownloaded(int index) {
-        pieceManager.markPieceAsDownloaded(index);
+
+    public void startDownload() {
+        answerListener = new AnswerListener(torrentFile);
+        Thread downloading = new Thread(answerListener);
+        downloading.start();
     }
 }

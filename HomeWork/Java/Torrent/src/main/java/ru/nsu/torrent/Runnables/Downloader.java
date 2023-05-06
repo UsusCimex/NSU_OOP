@@ -10,12 +10,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-public class DownloaderFile implements Runnable {
+public class Downloader implements Runnable {
     SocketChannel socketChannel;
     PieceMessage pieceMessage;
     byte[] infoHash;
 
-    public DownloaderFile(SocketChannel socketChannel, PieceMessage pieceMessage, byte[] infoHash) {
+    public Downloader(SocketChannel socketChannel, PieceMessage pieceMessage, byte[] infoHash) {
         this.socketChannel = socketChannel;
         this.pieceMessage = pieceMessage;
         this.infoHash = infoHash;
@@ -24,14 +24,18 @@ public class DownloaderFile implements Runnable {
     @Override
     public void run() {
         try {
-            System.err.println("[DownloaderFile] Start download!");
+            System.err.println("[Downloader] Start download!");
             int index = pieceMessage.getIndex();
             int offset = pieceMessage.getOffset();
             byte[] data = pieceMessage.getData();
 
             TorrentFile torrentFile = TorrentClient.getTorrentFileByInfoHash(infoHash);
             if (torrentFile == null) {
-                throw new IllegalStateException("[DownloaderFile] File not found... Hash exception!");
+                throw new IllegalStateException("[Downloader] File not found... Hash exception!");
+            }
+            if (torrentFile.getPieceManager().getPiece(index)) {
+                System.err.println("[Downloader] Piece " + index + " have.");
+                return;
             }
 
             MessageDigest md = null;
@@ -48,11 +52,11 @@ public class DownloaderFile implements Runnable {
                 try (RandomAccessFile raf = new RandomAccessFile(TorrentClient.getDownloadFileByTorrent(torrentFile), "rw")) {
                     raf.seek((long) index * pieceMessage.getData().length + offset);
                     raf.write(data);
-                    TorrentClient.markPieceAsDownloaded(index);
-                    System.err.println("[DownloaderFile] Downloaded: " + index + " piece, from " + socketChannel.getRemoteAddress());
+                    TorrentClient.getFile().markPieceAsDownloaded(index);
+                    System.err.println("[Downloader] Downloaded: " + index + " piece, from " + socketChannel.getRemoteAddress());
                 }
             } else {
-                System.err.println("[DownloaderFile] Hashes do not match for piece " + index);
+                System.err.println("[Downloader] Hashes do not match for piece " + index);
             }
         } catch (Exception e) {
             e.printStackTrace();

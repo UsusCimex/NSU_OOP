@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 
 public class PieceMessage extends Message {
     public static final byte PIECE = 7;
-    private int index;
-    private int offset;
-    private byte[] data;
+    private final int index;
+    private final int offset;
+    private final byte[] data;
 
     public PieceMessage(int index, int offset, byte[] data) {
         this.type = PIECE;

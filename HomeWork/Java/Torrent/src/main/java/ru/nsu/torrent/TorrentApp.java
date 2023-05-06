@@ -17,7 +17,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 
-
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -29,6 +28,7 @@ public class TorrentApp extends Application {
     public static void main(String[] args) throws UnknownHostException {
         InetAddress localAddress = InetAddress.getLocalHost();
         String localIP = localAddress.getHostAddress();
+        if (localIP.equals("172.26.128.1")) localIP = "192.168.31.164";
         torrentClient = new TorrentClient(localIP, 6969);
         launch(args);
     }
@@ -45,7 +45,7 @@ public class TorrentApp extends Application {
             File torrentFile = fileChooser.showOpenDialog(primaryStage);
             if (torrentFile != null) {
                 torrentClient.selectFile(new TorrentFile(torrentFile));
-                if (torrentClient.getTracker().getPeers().size() == 0) {
+                if (TorrentClient.getTracker().getPeers().size() == 0) {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     alert.setTitle("Внимание");
                     alert.setHeaderText(null);
@@ -53,13 +53,7 @@ public class TorrentApp extends Application {
                     alert.showAndWait();
                 }
 
-                if (torrentClient.start()) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Загрузка завершена!");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Файл \"" + torrentClient.getFile().getName() + "\" загружен!");
-                    alert.showAndWait();
-                }
+                torrentClient.startDownload();
             }
         });
 
@@ -79,19 +73,19 @@ public class TorrentApp extends Application {
     }
     @Override
     public void stop() {
-        torrentClient.stopTorrentListener();
+        torrentClient.stopTorrent();
     }
 
     private void updateProgress() {
-        if (torrentClient.getFile() != null) {
-            String fileName = torrentClient.getFile().getName();
-            long totalLength = torrentClient.getFile().getLength();
-            int totalPieces = torrentClient.getFile().getPieceHashes().size();
-            int downloadedPieces = torrentClient.getDownloadedPieces();
+        if (TorrentClient.getFile() != null) {
+            String fileName = TorrentClient.getFile().getName();
+            long totalLength = TorrentClient.getFile().getLength();
+            int totalPieces = TorrentClient.getFile().getPieceHashes().size();
+            int downloadedPieces = TorrentClient.getFile().getDownloadedPieces();
             int remainingPieces = totalPieces - downloadedPieces;
             double percentComplete = (double) downloadedPieces / totalPieces * 100;
-            int countPeers = torrentClient.getTracker().getPeers().size();
-            long pieceLength = torrentClient.getFile().getPieceLength();
+            int countPeers = TorrentClient.getTracker().getPeers().size();
+            long pieceLength = TorrentClient.getFile().getPieceLength();
 
             ObservableList<String> progressInfo = FXCollections.observableArrayList(
                     String.format("Загружается торрент: \"%s\"", fileName),
