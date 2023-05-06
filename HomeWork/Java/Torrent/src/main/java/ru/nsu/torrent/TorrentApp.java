@@ -53,14 +53,13 @@ public class TorrentApp extends Application {
                     alert.setContentText("Пиры не найдены!");
                     alert.showAndWait();
                 }
-                else {
-                    if (torrentClient.start()) {
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                        alert.setTitle("Загрузка завершена!");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Файл \"" + torrentClient.getFile().getName() + "\" загружен!");
-                        alert.showAndWait();
-                    }
+
+                if (torrentClient.start()) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Загрузка завершена!");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Файл \"" + torrentClient.getFile().getName() + "\" загружен!");
+                    alert.showAndWait();
                 }
             }
         });
