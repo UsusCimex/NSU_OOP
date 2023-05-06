@@ -19,13 +19,17 @@ import javafx.scene.control.ListView;
 
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class TorrentApp extends Application {
     private ListView<String> progressListView;
     private static TorrentClient torrentClient;
 
-    public static void main(String[] args) {
-        torrentClient = new TorrentClient("localhost", 6969);
+    public static void main(String[] args) throws UnknownHostException {
+        InetAddress localAddress = InetAddress.getLocalHost();
+        String localIP = localAddress.getHostAddress();
+        torrentClient = new TorrentClient(localIP, 6969);
         launch(args);
     }
 
