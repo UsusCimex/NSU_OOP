@@ -128,8 +128,7 @@ public class TorrentListener implements Runnable {
         }
 
         byte[] infoHash = peer.getInfoHash();
-
-        Message message = Message.fromBytes(byteBuffer.flip().toString().getBytes());
+        Message message = Message.fromBytes(byteBuffer.flip().array());
         if (message.getType() == 6) {
             RequestMessage requestMessage = (RequestMessage) message;
             Uploader uploader = new Uploader(socketChannel, requestMessage, infoHash);

@@ -1,5 +1,7 @@
 package ru.nsu.torrent;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.*;
@@ -7,6 +9,7 @@ import java.util.*;
 // По ТЗ не нужен, но пусть возвращает список пиров из файла
 public class Tracker {
     private final List<Peer> peers;
+    public final String TRACKERS_DIRECTORY = "trackersDir";
     public Tracker(TorrentFile torrentFile) {
         peers = generatePeers(torrentFile);
     }
@@ -14,10 +17,9 @@ public class Tracker {
         return peers;
     }
     private List<Peer> generatePeers(TorrentFile torrentFile) {
-        String fileName = "Tracker/" + torrentFile.getName() + ".txt";
+        String fileName = torrentFile.getName() + ".txt";
         List<Peer> peers = new ArrayList<>();
-        try {
-            Scanner scanner = new Scanner(Objects.requireNonNull(getClass().getResourceAsStream(fileName)));
+        try (Scanner scanner = new Scanner(new File(TRACKERS_DIRECTORY + "/" + fileName))) {
             while (scanner.hasNextLine()) {
                 String[] peerData = scanner.nextLine().split(":");
                 String ipAddress = peerData[0].trim();
@@ -34,7 +36,8 @@ public class Tracker {
                     System.err.println("Ошибка при создании SocketChannel для пира: " + ipAddress + ":" + port);
                 }
             }
-            scanner.close();
+        } catch (FileNotFoundException ex) {
+            return null;
         } catch (NullPointerException ex) {
             ex.getMessage();
         }
