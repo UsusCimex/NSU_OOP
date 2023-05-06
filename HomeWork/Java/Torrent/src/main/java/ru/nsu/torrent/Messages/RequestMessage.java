@@ -38,12 +38,10 @@ public class RequestMessage extends Message {
         buffer.putInt(pieceLength);
         return buffer.array();
     }
-
-    public static PieceMessage fromByteBuffer(ByteBuffer buffer, int length) {
+    public static RequestMessage fromByteBuffer(ByteBuffer buffer, int length) {
         int index = buffer.getInt();
         int offset = buffer.getInt();
-        byte[] data = new byte[length - 9];
-        buffer.get(data);
-        return new PieceMessage(index, offset, data);
+        int pieceLength = buffer.getInt();
+        return new RequestMessage(index, offset, pieceLength);
     }
 }
