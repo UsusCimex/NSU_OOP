@@ -6,7 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -26,11 +25,7 @@ public class TorrentApp extends Application {
     private static TorrentClient torrentClient;
 
     public static void main(String[] args) {
-//        if (args.length < 2) {
-//            throw new RuntimeException("Usage: ./torrent yourHost yourPort");
-//        }
-//        torrentClient = new TorrentClient(args[0], Integer.parseInt(args[1]));
-        torrentClient = new TorrentClient("localhost", 6969); //temp
+        torrentClient = new TorrentClient("localhost", 6969);
         launch(args);
     }
 
