@@ -37,44 +37,49 @@ public class TorrentClient {
         this.torrentFile = file;
         this.tracker = new Tracker(torrentFile);
         pieceManager = new PieceManager(torrentFile);
-        start();
     }
-    public void start(){
+    public boolean start(){
         if (torrentFile == null) {
             System.err.println("No file selected!");
-            return;
+            return false;
+        }
+        if (tracker.getPeers().isEmpty()) {
+            System.err.println("Peers not found!");
+            return false;
         }
 
-        for (Peer peer : tracker.getPeers()) {
-            try {
-                SocketChannel socketChannel = peer.getSocketChannel();
-                socketChannel.configureBlocking(false);
-                socketChannel.connect(peer.getAddress());
-
-                if (!socketChannel.isConnected()) {
-                    continue;
-                }
-                boolean success = Handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
-                if (success) {
-                    availablePeers.add(peer);
-                } else {
-                    socketChannel.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         boolean complete = false;
-        while(!complete && !availablePeers.isEmpty()) {
-            for (Peer peer : availablePeers) {
-                int missingPieceIndex = pieceManager.getNextPiece();
-                if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-                    RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) torrentFile.getPieceLength());
-                    Uploader uploader = new Uploader(peer.getSocketChannel(), requestMessage, peer.getInfoHash());
-                    executor.submit(uploader);
-                } else {
-                    complete = true;
-                    break;
+        while (!complete) {
+            for (Peer peer : tracker.getPeers()) {
+                try {
+                    SocketChannel socketChannel = peer.getSocketChannel();
+                    socketChannel.configureBlocking(false);
+                    socketChannel.connect(peer.getAddress());
+
+                    if (!socketChannel.isConnected()) {
+                        continue;
+                    }
+                    boolean success = Handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
+                    if (success) {
+                        availablePeers.add(peer);
+                    } else {
+                        socketChannel.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            while (!complete && !availablePeers.isEmpty()) {
+                for (Peer peer : availablePeers) {
+                    int missingPieceIndex = pieceManager.getNextPiece();
+                    if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
+                        RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) torrentFile.getPieceLength());
+                        Uploader uploader = new Uploader(peer.getSocketChannel(), requestMessage, peer.getInfoHash());
+                        executor.submit(uploader);
+                    } else {
+                        complete = true;
+                        break;
+                    }
                 }
             }
         }
@@ -87,6 +92,8 @@ public class TorrentClient {
             }
         }
         availablePeers.clear();
+
+        return true;
     }
     public TorrentFile getFile() {
         return torrentFile;
@@ -122,22 +129,10 @@ public class TorrentClient {
         return null;
     }
 
-    public int getTotalPieces() {
-        return torrentFile.getPieceHashes().size();
-    }
-
     public int getDownloadedPieces() {
         return pieceManager.getNumberOfDownloadedPieces();
     }
     public static synchronized void markPieceAsDownloaded(int index) {
         pieceManager.markPieceAsDownloaded(index);
-    }
-
-    public long getTotalLength() {
-        return torrentFile.getLength();
-    }
-
-    public long getPieceLength() {
-        return torrentFile.getPieceLength();
     }
 }

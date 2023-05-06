@@ -37,9 +37,9 @@ public class Tracker {
                 }
             }
         } catch (FileNotFoundException ex) {
-            return null;
+            System.err.println("Tracker not found.");
         } catch (NullPointerException ex) {
-            ex.getMessage();
+            ex.printStackTrace();
         }
         return peers;
     }

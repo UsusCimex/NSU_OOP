@@ -54,9 +54,14 @@ public class TorrentApp extends Application {
                     alert.showAndWait();
                 }
                 else {
-                    torrentClient.start();
+                    if (torrentClient.start()) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Загрузка завершена!");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Файл \"" + torrentClient.getFile().getName() + "\" загружен!");
+                        alert.showAndWait();
+                    }
                 }
-                updateProgress();
             }
         });
 
@@ -82,13 +87,13 @@ public class TorrentApp extends Application {
     private void updateProgress() {
         if (torrentClient.getFile() != null) {
             String fileName = torrentClient.getFile().getName();
-            long totalLength = torrentClient.getTotalLength();
-            int totalPieces = torrentClient.getTotalPieces();
+            long totalLength = torrentClient.getFile().getLength();
+            int totalPieces = torrentClient.getFile().getPieceHashes().size();
             int downloadedPieces = torrentClient.getDownloadedPieces();
             int remainingPieces = totalPieces - downloadedPieces;
             double percentComplete = (double) downloadedPieces / totalPieces * 100;
             int countPeers = torrentClient.getTracker().getPeers().size();
-            long pieceLength = torrentClient.getPieceLength();
+            long pieceLength = torrentClient.getFile().getPieceLength();
 
             ObservableList<String> progressInfo = FXCollections.observableArrayList(
                     String.format("Загружается торрент: \"%s\"", fileName),
