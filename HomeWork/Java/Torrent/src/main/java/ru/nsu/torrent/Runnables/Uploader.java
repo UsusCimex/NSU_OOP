@@ -11,12 +11,12 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-public class Uploader implements Runnable {
+public class UploaderFile implements Runnable {
     SocketChannel socketChannel;
     RequestMessage requestMessage;
     byte[] infoHash;
 
-    public Uploader(SocketChannel socketChannel, RequestMessage requestMessage, byte[] infoHash) {
+    public UploaderFile(SocketChannel socketChannel, RequestMessage requestMessage, byte[] infoHash) {
         this.socketChannel = socketChannel;
         this.requestMessage = requestMessage;
         this.infoHash = infoHash;
@@ -25,17 +25,18 @@ public class Uploader implements Runnable {
     @Override
     public void run() {
         try {
+            System.err.println("[UploaderFile] Start upload!");
             int pieceIndex = requestMessage.getIndex();
             int offset = requestMessage.getOffset();
             int length = requestMessage.getPieceLength();
 
             byte[] data = readPieceData(pieceIndex, offset, length);
             PieceMessage pieceMessage = new PieceMessage(pieceIndex, offset, data);
-
             ByteBuffer byteBuffer = ByteBuffer.wrap(pieceMessage.toBytes());
             while (byteBuffer.hasRemaining()) {
                 socketChannel.write(byteBuffer);
             }
+            System.err.println("[UploaderFile] Uploaded: " + new String(data) + ", to " + socketChannel.getRemoteAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -16,11 +16,12 @@ public class TorrentFile {
     private final long pieceLength;
     private final List<byte[]> pieceHashes;
     private final byte[] infoHash;
+    private final PieceManager pieceManager;
 
     public TorrentFile(File file) {
         try (
                 FileInputStream fis = new FileInputStream(file);
-                BencodeInputStream bin = new BencodeInputStream(fis, Charset.forName("ISO-8859-15"));
+                BencodeInputStream bin = new BencodeInputStream(fis, Charset.forName("ISO-8859-15"))
         ) {
             Type<?> type = bin.nextType();
             if (type != Type.DICTIONARY) {
@@ -35,6 +36,7 @@ public class TorrentFile {
                 this.pieceLength = (Long) infoDict.get("piece length");
                 this.pieceHashes = extractPieceHashes(((String) infoDict.get("pieces")).getBytes("ISO-8859-15"));
                 this.infoHash = calculateInfoHash(infoDict);
+                this.pieceManager = generateExistingPieces();
             } else {
                 throw new RuntimeException("Bencode failed");
             }
@@ -56,9 +58,8 @@ public class TorrentFile {
         return pieceHashes;
     }
 
-
     private byte[] calculateInfoHash(Map<String, Object> infoDict) {
-        Bencode bencode = new Bencode();
+        Bencode bencode = new Bencode(Charset.forName("ISO-8859-15"));
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
             return sha1.digest(bencode.encode(infoDict));
@@ -67,6 +68,43 @@ public class TorrentFile {
         }
     }
 
+    private PieceManager generateExistingPieces() {
+        PieceManager generatedPieceManager = new PieceManager(pieceHashes.size());
+        File targetFile = new File(TorrentClient.DOWNLOADS_DIRECTORY + "/" + name);
+        if (targetFile.exists() && targetFile.isFile()) {
+            try (RandomAccessFile raf = new RandomAccessFile(targetFile, "r")) {
+                MessageDigest md = MessageDigest.getInstance("SHA-1");
+                byte[] buffer = new byte[(int) pieceLength];
+
+                for (int i = 0; i < pieceHashes.size(); i++) {
+                    raf.seek((long) i * pieceLength);
+                    int bytesRead = raf.read(buffer);
+                    if (bytesRead > 0) {
+                        byte[] pieceData = Arrays.copyOf(buffer, bytesRead);
+                        byte[] pieceHash = md.digest(pieceData);
+
+                        if (Arrays.equals(pieceHash, pieceHashes.get(i))) {
+                            generatedPieceManager.markPieceAsDownloaded(i);
+                        }
+                    }
+                }
+            } catch (IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                System.err.println("[TorrentFile] Failed to update existing pieces");
+            }
+        }
+        return generatedPieceManager;
+    }
+
+    public int getDownloadedPieces() {
+        return pieceManager.getNumberOfDownloadedPieces();
+    }
+    public synchronized void markPieceAsDownloaded(int index) {
+        pieceManager.markPieceAsDownloaded(index);
+    }
+    public PieceManager getPieceManager() {
+        return pieceManager;
+    }
     public String getName() {
         return name;
     }

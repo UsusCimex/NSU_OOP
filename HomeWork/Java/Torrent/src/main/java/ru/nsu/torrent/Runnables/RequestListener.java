@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 public class TorrentListener implements Runnable {
     private final InetSocketAddress address;
@@ -25,7 +22,7 @@ public class TorrentListener implements Runnable {
     public TorrentListener(String host, int port) {
         this.address = new InetSocketAddress(host, port);
         this.session = new HashSet<>();
-        System.err.println("Server started: " + address);
+        System.err.println("[TorrentListener] Your address: " + address);
     }
 
     @Override
@@ -53,7 +50,7 @@ public class TorrentListener implements Runnable {
                 }
             }
         } catch (ClosedSelectorException e) {
-            System.err.println("Selector closed");
+            System.err.println("[TorrentClient] Selector closed!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -65,7 +62,8 @@ public class TorrentListener implements Runnable {
         socketChannel.configureBlocking(false);
 
         byte[] receivedInfoHash = Handshake.receiveHandshake(socketChannel);
-        Set<byte[]> availableInfoHashes = TorrentClient.getAvailableInfoHashes();
+        List<byte[]> availableInfoHashes = TorrentClient.getAvailableInfoHashes();
+
         byte[] validInfoHash = null;
         for (byte[] infoHash : availableInfoHashes) {
             if (receivedInfoHash != null && Arrays.equals(infoHash, receivedInfoHash)) {
@@ -78,12 +76,11 @@ public class TorrentListener implements Runnable {
             socketChannel.register(this.selector, SelectionKey.OP_READ);
             InetSocketAddress rmAddress = ((InetSocketAddress)socketChannel.getRemoteAddress());
             this.session.add(new Peer(rmAddress.getAddress().getHostAddress(), rmAddress.getPort() ,socketChannel, validInfoHash));
-            System.err.println("Session opened: " + socketChannel.getLocalAddress());
+            System.err.println("[TorrentListener] Session opened: " + rmAddress);
         } else {
             socketChannel.close();
         }
     }
-
 
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
@@ -97,7 +94,7 @@ public class TorrentListener implements Runnable {
         }
 
         if (peer == null) {
-            System.err.println("less not found...");
+            System.err.println("[TorrentClient] Peer not found... Socket exception!");
             socketChannel.close();
             key.cancel();
             return;
@@ -106,7 +103,7 @@ public class TorrentListener implements Runnable {
         ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
         int numRead = socketChannel.read(lengthBuffer);
         if (numRead == -1) {
-            System.err.println("Session closed: " + socketChannel.getLocalAddress());
+            System.err.println("[TorrentClient] Session closed: " + socketChannel.getRemoteAddress());
             this.session.remove(peer);
             socketChannel.close();
             key.cancel();
@@ -120,7 +117,7 @@ public class TorrentListener implements Runnable {
         byteBuffer.put(lengthBuffer);
         numRead = socketChannel.read(byteBuffer);
         if (numRead == -1) {
-            System.err.println("Session closed: " + socketChannel.getLocalAddress());
+            System.err.println("[TorrentClient] Session closed: " + socketChannel.getRemoteAddress());
             this.session.remove(peer);
             socketChannel.close();
             key.cancel();
