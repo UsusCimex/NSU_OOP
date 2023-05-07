@@ -47,10 +47,8 @@ public class AnswerListener implements Runnable {
             }
 
             boolean complete = false;
-            while (!Thread.currentThread().isInterrupted()) {
-                complete = sendRequest();
-                if (complete) break;
-                this.selector.select(1000);
+            while (!Thread.currentThread().isInterrupted() && !complete) {
+                this.selector.selectNow();
                 Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
@@ -65,6 +63,7 @@ public class AnswerListener implements Runnable {
                         read(key);
                     }
                 }
+                complete = sendRequest();
             }
             if (complete) System.err.println("[AnswerListener] File download complete: " + torrentFile.getName());
             stop();
@@ -122,7 +121,6 @@ public class AnswerListener implements Runnable {
         }
         lengthBuffer.flip();
         int messageLength = lengthBuffer.getInt();
-        System.err.println("[DEBUG] mesLength: " + messageLength);
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(messageLength + 4);
         lengthBuffer.flip();
@@ -143,6 +141,7 @@ public class AnswerListener implements Runnable {
         if (message.getType() == 7) {
             PieceMessage pieceMessage = (PieceMessage) message;
             Downloader downloader = new Downloader(socketChannel, pieceMessage, infoHash);
+            peer.getActiveRequests().decrementAndGet();
             TorrentClient.executor.submit(downloader);
         }
     }
@@ -150,11 +149,15 @@ public class AnswerListener implements Runnable {
         try {
             for (Peer pr : session) {
                 if (!pr.getSocketChannel().finishConnect()) continue;
+                if (pr.getActiveRequests().get() >= 5) {
+                    continue;
+                }
                 int missingPieceIndex = torrentFile.getPieceManager().getNextRandomPiece();
                 System.err.println("[AnswerListener] Request: " + missingPieceIndex + " piece, to " + pr.getSocketChannel().getRemoteAddress());
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
                     RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
                     Requester requester = new Requester(pr.getSocketChannel(), requestMessage, pr.getInfoHash());
+                    pr.getActiveRequests().incrementAndGet();
                     TorrentClient.executor.submit(requester);
                 } else {
                     return true;
@@ -167,6 +170,8 @@ public class AnswerListener implements Runnable {
     }
     public void stop() {
         try {
+            Thread.currentThread().interrupt();
+
             for (Peer peer : session) {
                 if (peer.getSocketChannel() != null) {
                     peer.getSocketChannel().close();
@@ -176,10 +181,7 @@ public class AnswerListener implements Runnable {
 
             if (selector != null) {
                 selector.close();
-                System.err.println("[AnswerListener] Selector closed!");
             }
-
-            Thread.currentThread().interrupt();
         } catch (IOException e) {
             e.printStackTrace();
         }

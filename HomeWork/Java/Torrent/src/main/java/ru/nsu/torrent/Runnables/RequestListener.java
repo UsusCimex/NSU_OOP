@@ -35,7 +35,7 @@ public class RequestListener implements Runnable {
             serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
 
             while (!Thread.currentThread().isInterrupted()) {
-                this.selector.select(100);
+                this.selector.selectNow();
                 Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
@@ -139,6 +139,8 @@ public class RequestListener implements Runnable {
 
     public void stop() {
         try {
+            Thread.currentThread().interrupt();
+
             if (serverSocketChannel != null) {
                 serverSocketChannel.close();
             }
@@ -148,13 +150,11 @@ public class RequestListener implements Runnable {
                     peer.getSocketChannel().close();
                 }
             }
+            session.clear();
 
             if (selector != null) {
                 selector.close();
-                System.err.println("[RequestListener] Selector closed!");
             }
-
-            Thread.currentThread().interrupt();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -19,15 +19,18 @@ public class Requester implements Runnable {
 
     @Override
     public void run() {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(requestMessage.toBytes());
         try {
-            System.err.println("[Requester] Start upload request!");
-            ByteBuffer byteBuffer = ByteBuffer.wrap(requestMessage.toBytes());
             while (byteBuffer.hasRemaining()) {
-                socketChannel.write(byteBuffer);
+                int numWrite = socketChannel.write(byteBuffer);
+                if (numWrite == -1) {
+                    socketChannel.close();
+                    throw new RuntimeException("Error socket write");
+                }
             }
-            System.err.println("[Requester] Requested: " + requestMessage.getIndex() + ", to " + socketChannel.getRemoteAddress());
+            System.err.println("[Requester] Requested: piece(" + requestMessage.getIndex() + "), to " + socketChannel.getRemoteAddress());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("[Requester] Request not uploaded...");
         }
     }
 }

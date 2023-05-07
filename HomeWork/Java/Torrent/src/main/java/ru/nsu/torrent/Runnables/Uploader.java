@@ -24,26 +24,29 @@ public class Uploader implements Runnable {
 
     @Override
     public void run() {
-        try {
-            System.err.println("[Uploader] Start upload!");
-            int index = requestMessage.getIndex();
-            int offset = requestMessage.getOffset();
-            int length = requestMessage.getPieceLength();
+        int index = requestMessage.getIndex();
+        int offset = requestMessage.getOffset();
+        int length = requestMessage.getPieceLength();
 
-            byte[] data = readPieceData(index, offset, length);
-            if (data == null) return;
-            PieceMessage pieceMessage = new PieceMessage(index, offset, data);
-            ByteBuffer byteBuffer = ByteBuffer.wrap(pieceMessage.toBytes());
+        byte[] data = readPieceData(index, offset, length);
+        if (data == null) return;
+        PieceMessage pieceMessage = new PieceMessage(index, offset, data);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(pieceMessage.toBytes());
+        try {
             while (byteBuffer.hasRemaining()) {
-                socketChannel.write(byteBuffer);
+                int numWrite = socketChannel.write(byteBuffer);
+                if (numWrite == -1) {
+                    socketChannel.close();
+                    throw new RuntimeException("Error socket write");
+                }
             }
-            System.err.println("[Uploader] Uploaded: " + index + " piece, to " + socketChannel.getRemoteAddress());
+            System.err.println("[Uploader] Uploaded: piece(" + index + "), to " + socketChannel.getRemoteAddress());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("[Uploader] Piece(" + index + ") not uploaded...");
         }
     }
 
-    private byte[] readPieceData(int index, int offset, int length) throws IOException {
+    private byte[] readPieceData(int index, int offset, int length) {
         TorrentFile tFile = TorrentClient.getTorrentFileByInfoHash(infoHash);
         assert tFile != null;
         if (!tFile.getPieceManager().getPiece(index)) {
@@ -57,6 +60,9 @@ public class Uploader implements Runnable {
             file.read(data);
 
             return data;
+        } catch (IOException e) {
+            System.err.println("[Uploader] Mistake in file reader!");
         }
+        return null;
     }
 }

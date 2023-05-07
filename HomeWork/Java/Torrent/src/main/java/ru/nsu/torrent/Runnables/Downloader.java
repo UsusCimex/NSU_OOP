@@ -24,7 +24,6 @@ public class Downloader implements Runnable {
     @Override
     public void run() {
         try {
-            System.err.println("[Downloader] Start download!");
             int index = pieceMessage.getIndex();
             int offset = pieceMessage.getOffset();
             byte[] data = pieceMessage.getData();
@@ -34,17 +33,16 @@ public class Downloader implements Runnable {
                 throw new IllegalStateException("[Downloader] File not found... Hash exception!");
             }
             if (torrentFile.getPieceManager().getPiece(index)) {
-                System.err.println("[Downloader] Piece " + index + " have.");
                 return;
             }
 
-            MessageDigest md = null;
+            MessageDigest md;
             try {
                 md = MessageDigest.getInstance("SHA-1");
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                System.err.println("[Downloader] Algorithm SHA-1 not found!");
+                throw new RuntimeException(e);
             }
-            assert md != null;
             byte[] calculatedHash = md.digest(data);
             byte[] expectedHash = torrentFile.getPieceHashes().get(index);
 
@@ -53,13 +51,13 @@ public class Downloader implements Runnable {
                     raf.seek((long) index * torrentFile.getPieceLength() + offset);
                     raf.write(data);
                     TorrentClient.getFile().markPieceAsDownloaded(index);
-                    System.err.println("[Downloader] Downloaded: " + index + " piece, from " + socketChannel.getRemoteAddress());
+                    System.err.println("[Downloader] Downloaded: piece(" + index + "), from " + socketChannel.getRemoteAddress());
                 }
             } else {
                 System.err.println("[Downloader] Hashes do not match for piece " + index);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("[Downloader] File download error...");
         }
     }
 }
