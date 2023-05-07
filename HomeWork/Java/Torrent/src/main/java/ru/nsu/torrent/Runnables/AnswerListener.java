@@ -127,13 +127,15 @@ public class AnswerListener implements Runnable {
         ByteBuffer byteBuffer = ByteBuffer.allocate(messageLength + 4);
         lengthBuffer.flip();
         byteBuffer.put(lengthBuffer);
-        numRead = socketChannel.read(byteBuffer);
-        if (numRead == -1) {
-            System.err.println("[AnswerListener] Session closed: " + socketChannel.getRemoteAddress());
-            this.session.remove(peer);
-            socketChannel.close();
-            key.cancel();
-            return;
+        while (byteBuffer.hasRemaining()) {
+            numRead = socketChannel.read(byteBuffer);
+            if (numRead == -1) {
+                System.err.println("[AnswerListener] Session closed: " + socketChannel.getRemoteAddress());
+                this.session.remove(peer);
+                socketChannel.close();
+                key.cancel();
+                return;
+            }
         }
 
         byte[] infoHash = peer.getInfoHash();

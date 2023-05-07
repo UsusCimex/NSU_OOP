@@ -101,27 +101,31 @@ public class RequestListener implements Runnable {
         }
 
         ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-        int numRead = socketChannel.read(lengthBuffer);
-        if (numRead == -1) {
-            System.err.println("[RequestListener] Session closed: " + socketChannel.getRemoteAddress());
-            this.session.remove(peer);
-            socketChannel.close();
-            key.cancel();
-            return;
+        while (lengthBuffer.hasRemaining()) {
+            int numRead = socketChannel.read(lengthBuffer);
+            if (numRead == -1) {
+                System.err.println("[RequestListener] Session closed: " + socketChannel.getRemoteAddress());
+                this.session.remove(peer);
+                socketChannel.close();
+                key.cancel();
+                return;
+            }
         }
         lengthBuffer.flip();
         int messageLength = lengthBuffer.getInt();
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(messageLength + 4);
         lengthBuffer.flip();
-        byteBuffer.put(lengthBuffer);
-        numRead = socketChannel.read(byteBuffer);
-        if (numRead == -1) {
-            System.err.println("[RequestListener] Session closed: " + socketChannel.getRemoteAddress());
-            this.session.remove(peer);
-            socketChannel.close();
-            key.cancel();
-            return;
+        while(byteBuffer.hasRemaining()) {
+            byteBuffer.put(lengthBuffer);
+            int numRead = socketChannel.read(byteBuffer);
+            if (numRead == -1) {
+                System.err.println("[RequestListener] Session closed: " + socketChannel.getRemoteAddress());
+                this.session.remove(peer);
+                socketChannel.close();
+                key.cancel();
+                return;
+            }
         }
 
         byte[] infoHash = peer.getInfoHash();
