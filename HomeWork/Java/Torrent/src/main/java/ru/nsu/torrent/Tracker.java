@@ -17,7 +17,13 @@ public class Tracker {
         return peers;
     }
     private List<Peer> generatePeers(TorrentFile torrentFile) {
-        String fileName = torrentFile.getName() + ".txt";
+        int indexOfDot = torrentFile.getName().lastIndexOf('.');
+        String fileName;
+        if (indexOfDot != -1) {
+            fileName = torrentFile.getName().substring(0, torrentFile.getName().lastIndexOf('.')) + ".txt";
+        } else {
+            fileName = torrentFile.getName() + ".txt";
+        }
         List<Peer> peers = new ArrayList<>();
         try (Scanner scanner = new Scanner(new File(TRACKERS_DIRECTORY + "/" + fileName))) {
             while (scanner.hasNextLine()) {
