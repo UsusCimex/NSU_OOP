@@ -50,7 +50,7 @@ public class Downloader implements Runnable {
 
             if (Arrays.equals(calculatedHash, expectedHash)) {
                 try (RandomAccessFile raf = new RandomAccessFile(TorrentClient.getDownloadFileByTorrent(torrentFile), "rw")) {
-                    raf.seek((long) index * pieceMessage.getData().length + offset);
+                    raf.seek((long) index * torrentFile.getPieceLength() + offset);
                     raf.write(data);
                     TorrentClient.getFile().markPieceAsDownloaded(index);
                     System.err.println("[Downloader] Downloaded: " + index + " piece, from " + socketChannel.getRemoteAddress());

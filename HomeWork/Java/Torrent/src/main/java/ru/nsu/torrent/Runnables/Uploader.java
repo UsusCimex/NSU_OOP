@@ -51,7 +51,7 @@ public class Uploader implements Runnable {
         }
         File fileByInfoHash = TorrentClient.getDownloadFileByTorrent(tFile);
         try (RandomAccessFile file = new RandomAccessFile(fileByInfoHash, "r")) {
-            file.seek((long) index * length + offset);
+            file.seek((long) index * tFile.getPieceLength() + offset);
 
             byte[] data = new byte[length];
             file.read(data);
