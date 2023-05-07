@@ -28,7 +28,6 @@ public class TorrentApp extends Application {
     public static void main(String[] args) throws UnknownHostException {
         InetAddress localAddress = InetAddress.getLocalHost();
         String localIP = localAddress.getHostAddress();
-        if (localIP.equals("172.26.128.1")) localIP = "192.168.31.164";
         torrentClient = new TorrentClient(localIP, 6969);
         launch(args);
     }
