@@ -31,6 +31,9 @@ public class TorrentClient {
         if (answerListener != null) {
             answerListener.stop();
         }
+        if (!executor.isShutdown()) {
+            executor.shutdown();
+        }
     }
     public void selectFile(TorrentFile file) {
         torrentFile = file;
