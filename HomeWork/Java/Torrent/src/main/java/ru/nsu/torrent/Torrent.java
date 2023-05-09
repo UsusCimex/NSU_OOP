@@ -1,14 +1,14 @@
 package ru.nsu.torrent;
 
-import ru.nsu.torrent.Runnables.AnswerListener;
-import ru.nsu.torrent.Runnables.RequestListener;
+import ru.nsu.torrent.Runnables.TorrentClient;
+import ru.nsu.torrent.Runnables.TorrentServer;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class TorrentClient {
+public class Torrent {
     public static ExecutorService executor = Executors.newFixedThreadPool(3);
     private static TorrentFile torrentFile = null;
     private static Tracker tracker;
@@ -16,20 +16,20 @@ public class TorrentClient {
     public static final String TORRENTS_DIRECTORY = "torrentsDir";
     public static final String DOWNLOADS_DIRECTORY = "downloadsDir";
 
-    private final RequestListener requestListener;
-    private AnswerListener answerListener;
+    private final TorrentServer torrentServer;
+    private TorrentClient torrentClient;
 
-    public TorrentClient(String host, int port) {
-        requestListener = new RequestListener(host, port);
-        Thread listenerThread = new Thread(requestListener);
+    public Torrent(String host, int port) {
+        torrentServer = new TorrentServer(host, port);
+        Thread listenerThread = new Thread(torrentServer);
         listenerThread.start();
     }
     public void stopTorrent() {
-        if (requestListener != null) {
-            requestListener.stop();
+        if (torrentServer != null) {
+            torrentServer.stop();
         }
-        if (answerListener != null) {
-            answerListener.stop();
+        if (torrentClient != null) {
+            torrentClient.stop();
         }
         if (!executor.isShutdown()) {
             executor.shutdown();
@@ -86,8 +86,8 @@ public class TorrentClient {
     }
 
     public void startDownload() {
-        answerListener = new AnswerListener(torrentFile);
-        Thread downloading = new Thread(answerListener);
+        torrentClient = new TorrentClient(torrentFile);
+        Thread downloading = new Thread(torrentClient);
         downloading.start();
     }
 }

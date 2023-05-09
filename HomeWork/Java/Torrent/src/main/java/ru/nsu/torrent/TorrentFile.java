@@ -70,7 +70,7 @@ public class TorrentFile {
 
     private PieceManager generateExistingPieces() {
         PieceManager generatedPieceManager = new PieceManager(pieceHashes.size());
-        File targetFile = new File(TorrentClient.DOWNLOADS_DIRECTORY + "/" + name);
+        File targetFile = new File(Torrent.DOWNLOADS_DIRECTORY + "/" + name);
         if (targetFile.exists() && targetFile.isFile()) {
             try (RandomAccessFile raf = new RandomAccessFile(targetFile, "r")) {
                 MessageDigest md = MessageDigest.getInstance("SHA-1");

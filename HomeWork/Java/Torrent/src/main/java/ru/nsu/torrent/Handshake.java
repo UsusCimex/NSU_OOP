@@ -13,7 +13,7 @@ public abstract class Handshake {
     public static void sendHandshake(SocketChannel socketChannel, byte[] infoHash, byte[] peerId) throws IOException {
         ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
 
-        System.err.println("[Handshake] Start sending(" + TorrentClient.bytesToHex(infoHash) + ") to " + socketChannel.getRemoteAddress());
+        System.err.println("[Handshake] Start sending(" + Torrent.bytesToHex(infoHash) + ") to " + socketChannel.getRemoteAddress());
 
         handshakeBuffer.put((byte) PROTOCOL_STRING.length());
         handshakeBuffer.put(PROTOCOL_STRING.getBytes(Charset.forName("ISO-8859-15")));
@@ -45,7 +45,7 @@ public abstract class Handshake {
             handshakeBuffer.get(reserved);
             handshakeBuffer.get(receivedInfoHash);
             handshakeBuffer.get(peerID);
-            System.err.println("[Handshake] Received : " + TorrentClient.bytesToHex(receivedInfoHash) + ", from " + socketChannel.getRemoteAddress());
+            System.err.println("[Handshake] Received : " + Torrent.bytesToHex(receivedInfoHash) + ", from " + socketChannel.getRemoteAddress());
             return receivedInfoHash;
         } else {
             return null;
