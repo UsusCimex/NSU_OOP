@@ -25,10 +25,10 @@ public class Sender implements Runnable {
                     int numWrite = peer.getSocketChannel().write(byteBuffer);
                     if (numWrite == -1) {
                         peer.getSocketChannel().close();
-                        throw new RuntimeException("Error socket write");
+                        throw new RuntimeException("[Sender] Error socket write");
                     }
                 }
-                System.err.println("[Sender] Message(Type = " + message.getType() + "), send to " + peer.getSocketChannel().getRemoteAddress());
+                printMessage(message, peer);
             } else {
                 for (Peer pr : Torrent.getTracker().getPeers()) {
                     if (pr.getSocketChannel().isConnected()) {
@@ -40,12 +40,20 @@ public class Sender implements Runnable {
                                 break;
                             }
                         }
-                        System.err.println("[Sender] Message(Type = " + message.getType() + "), send to " + peer.getSocketChannel().getRemoteAddress());
+                        printMessage(message, pr);
                     }
                 }
             }
         } catch (IOException e){
             System.err.println("[Sender] Message(Type = " + message.getType() + ") not uploaded...");
+        }
+    }
+
+    private void printMessage(Message message, Peer peer) throws IOException {
+        if (message.getType() == Request.REQUEST) {
+            System.err.println("[Sender] REQUEST piece: \"" + ((Request) message).getIndex() + "\" to: " + peer.getAddress());
+        } else if (message.getType() == Piece.PIECE) {
+            System.err.println("[SENDER] PIECE piece: \"" + ((Piece) message).getIndex() + "\" to: " + peer.getAddress());
         }
     }
 }

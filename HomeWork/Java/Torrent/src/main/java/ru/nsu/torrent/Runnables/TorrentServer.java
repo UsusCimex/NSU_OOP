@@ -72,8 +72,7 @@ public class TorrentServer implements Runnable {
         }
 
         if (validInfoHash != null) {
-            InetSocketAddress rmAddress = ((InetSocketAddress)socketChannel.getRemoteAddress());
-            Peer peer = new Peer(rmAddress.getAddress().getHostAddress(), rmAddress.getPort() ,socketChannel, validInfoHash);
+            Peer peer = new Peer(socketChannel, validInfoHash);
             peer.setAvailablePieces(Torrent.getTorrentFileByInfoHash(validInfoHash).getPieceManager().getAvailablePieces());
 
             Bitfield bitfield = new Bitfield(peer.getAvailablePieces());
@@ -82,7 +81,7 @@ public class TorrentServer implements Runnable {
 
             socketChannel.register(this.selector, SelectionKey.OP_READ);
             this.session.add(peer);
-            System.err.println("[TorrentServer] Session opened: " + rmAddress);
+            System.err.println("[TorrentServer] Session opened: " + peer.getAddress());
         } else {
             socketChannel.close();
         }

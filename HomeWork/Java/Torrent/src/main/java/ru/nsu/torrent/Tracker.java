@@ -3,6 +3,7 @@ package ru.nsu.torrent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 
@@ -34,9 +35,10 @@ public class Tracker {
                 try {
                     SocketChannel socketChannel = SocketChannel.open();
                     socketChannel.configureBlocking(false);
+                    socketChannel.connect(new InetSocketAddress(ipAddress, port));
 
                     // Создаем объект Peer с данным SocketChannel и хэшем торрента.
-                    Peer peer = new Peer(ipAddress, port, socketChannel, torrentFile.getInfoHash());
+                    Peer peer = new Peer(socketChannel, torrentFile.getInfoHash());
                     peers.add(peer);
                 } catch (IOException e) {
                     System.err.println("Ошибка при создании SocketChannel для пира: " + ipAddress + ":" + port);

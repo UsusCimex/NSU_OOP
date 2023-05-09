@@ -66,7 +66,6 @@ public class Handler implements Runnable {
                         raf.seek((long) index * torrentFile.getPieceLength() + offset);
                         raf.write(data);
                         Torrent.getFile().markPieceAsDownloaded(index);
-                        System.err.println("[Handler] Downloaded: piece(" + index + "), from " + peer.getSocketChannel().getRemoteAddress());
                     } catch (IOException e) {
                         throw new RuntimeException("[Handler] File not found!", e);
                     }
@@ -88,6 +87,11 @@ public class Handler implements Runnable {
                 peer.setAvailablePieces(bitfield.getBitSet());
             }
         }
+        try {
+            printMessage(message, peer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private byte[] readPieceData(int index, int offset, int length) {
@@ -108,5 +112,12 @@ public class Handler implements Runnable {
             System.err.println("[Handler] Mistake in file reader!");
         }
         return null;
+    }
+    private void printMessage(Message message, Peer peer) throws IOException {
+        if (message.getType() == Request.REQUEST) {
+            System.err.println("[Handler] REQUEST piece: \"" + ((Request) message).getIndex() + "\" from: " + peer.getAddress());
+        } else if (message.getType() == Piece.PIECE) {
+            System.err.println("[Handler] PIECE piece: \"" + ((Piece) message).getIndex() + "\" from: " + peer.getAddress());
+        }
     }
 }
