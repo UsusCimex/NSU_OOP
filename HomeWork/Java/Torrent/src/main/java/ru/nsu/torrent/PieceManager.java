@@ -12,24 +12,23 @@ public class PieceManager {
         this.numberPieces = numberPieces;
         this.availablePieces = new BitSet(numberPieces);
     }
-    public PieceManager(int numberPieces, byte[] init) {
-        this.numberPieces = numberPieces;
-        this.availablePieces = BitSet.valueOf(init);
-    }
-    public synchronized int getNextRandomPiece() {
-        Random random = new Random();
+    public int getIndexOfSearchedPiece(BitSet accessBit) {
+        BitSet neededPieces = new BitSet(numberPieces);
+        neededPieces.or(accessBit);
+        neededPieces.and(availablePieces);
+        if (neededPieces.cardinality() != 0) {
+            Random random = new Random();
 
-        List<Integer> missingPieces = IntStream.range(0, numberPieces)
-                .filter(index -> !availablePieces.get(index))
-                .boxed()
-                .toList();
+            List<Integer> missingPieces = IntStream.range(0, numberPieces)
+                    .filter(index -> !neededPieces.get(index))
+                    .boxed()
+                    .toList();
 
-        if (missingPieces.isEmpty()) {
-            return -1;
+            if (!missingPieces.isEmpty()) {
+                return random.nextInt(missingPieces.size());
+            }
         }
-
-        int randomIndex = random.nextInt(missingPieces.size());
-        return missingPieces.get(randomIndex);
+        return -1;
     }
     public boolean getPiece(int index) { return availablePieces.get(index); }
     public synchronized void markPieceAsAvailable(int pieceIndex) {

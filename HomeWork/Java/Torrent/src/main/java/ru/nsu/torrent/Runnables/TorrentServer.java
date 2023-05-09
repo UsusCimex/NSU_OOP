@@ -1,6 +1,7 @@
 package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.Handshake;
+import ru.nsu.torrent.Messages.Bitfield;
 import ru.nsu.torrent.Messages.Message;
 import ru.nsu.torrent.Peer;
 import ru.nsu.torrent.Torrent;
@@ -71,9 +72,16 @@ public class TorrentServer implements Runnable {
         }
 
         if (validInfoHash != null) {
-            socketChannel.register(this.selector, SelectionKey.OP_READ);
             InetSocketAddress rmAddress = ((InetSocketAddress)socketChannel.getRemoteAddress());
-            this.session.add(new Peer(rmAddress.getAddress().getHostAddress(), rmAddress.getPort() ,socketChannel, validInfoHash));
+            Peer peer = new Peer(rmAddress.getAddress().getHostAddress(), rmAddress.getPort() ,socketChannel, validInfoHash);
+            peer.setAvailablePieces(Torrent.getTorrentFileByInfoHash(validInfoHash).getPieceManager().getAvailablePieces());
+
+            Bitfield bitfield = new Bitfield(peer.getAvailablePieces());
+            Sender sender = new Sender(peer, bitfield);
+            Torrent.executor.submit(sender);
+
+            socketChannel.register(this.selector, SelectionKey.OP_READ);
+            this.session.add(peer);
             System.err.println("[TorrentServer] Session opened: " + rmAddress);
         } else {
             socketChannel.close();
