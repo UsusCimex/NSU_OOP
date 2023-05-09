@@ -84,7 +84,7 @@ public class TorrentFile {
                         byte[] pieceHash = md.digest(pieceData);
 
                         if (Arrays.equals(pieceHash, pieceHashes.get(i))) {
-                            generatedPieceManager.markPieceAsDownloaded(i);
+                            generatedPieceManager.markPieceAsAvailable(i);
                         }
                     }
                 }
@@ -97,10 +97,10 @@ public class TorrentFile {
     }
 
     public int getDownloadedPieces() {
-        return pieceManager.getNumberOfDownloadedPieces();
+        return pieceManager.getNumberOfAvailablePieces();
     }
     public synchronized void markPieceAsDownloaded(int index) {
-        pieceManager.markPieceAsDownloaded(index);
+        pieceManager.markPieceAsAvailable(index);
     }
     public PieceManager getPieceManager() {
         return pieceManager;

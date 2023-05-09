@@ -138,23 +138,23 @@ public class TorrentClient implements Runnable {
 
         byte[] infoHash = peer.getInfoHash();
         Message message = Message.fromBytes(byteBuffer.flip().array());
-        Handler handler = new Handler(socketChannel, message, infoHash);
+        Handler handler = new Handler(peer, message, infoHash);
         peer.getActiveRequests().decrementAndGet(); //problem
         Torrent.executor.submit(handler);
     }
     private boolean sendRequest() {
         try {
-            for (Peer pr : session) {
-                if (!pr.getSocketChannel().finishConnect()) continue;
-                if (pr.getActiveRequests().get() >= 5) { //problem
+            for (Peer peer : session) {
+                if (!peer.getSocketChannel().finishConnect()) continue;
+                if (peer.getActiveRequests().get() >= 5) { //problem
                     continue;
                 }
                 int missingPieceIndex = torrentFile.getPieceManager().getNextRandomPiece();
-                System.err.println("[TorrentClient] Request: " + missingPieceIndex + " piece, to " + pr.getSocketChannel().getRemoteAddress());
+                System.err.println("[TorrentClient] Request: " + missingPieceIndex + " piece, to " + peer.getSocketChannel().getRemoteAddress());
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
                     Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
-                    Sender sender = new Sender(pr.getSocketChannel(), request, pr.getInfoHash());
-                    pr.getActiveRequests().incrementAndGet(); //problem
+                    Sender sender = new Sender(peer, request, peer.getInfoHash());
+                    peer.getActiveRequests().incrementAndGet(); //problem
                     Torrent.executor.submit(sender);
                 } else {
                     return true;

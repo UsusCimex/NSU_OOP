@@ -1,43 +1,53 @@
 package ru.nsu.torrent.Runnables;
 
-import ru.nsu.torrent.Messages.Message;
-import ru.nsu.torrent.Messages.Request;
+import ru.nsu.torrent.Messages.*;
+import ru.nsu.torrent.Peer;
+import ru.nsu.torrent.Torrent;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 public class Sender implements Runnable {
-    SocketChannel socketChannel;
-    Message message;
-    byte[] infoHash;
+    private final Peer peer;
+    private final Message message;
+    private final byte[] infoHash;
 
-    public Sender(SocketChannel socketChannel, Message message, byte[] infoHash) {
-        this.socketChannel = socketChannel;
+    public Sender(Peer peer, Message message, byte[] infoHash) {
+        this.peer = peer;
         this.message = message;
         this.infoHash = infoHash;
     }
 
     @Override
     public void run() {
-        byte type = message.getType();
-        switch (type) {
-            case (Request.REQUEST) -> {
-                Request request = (Request) message;
-                ByteBuffer byteBuffer = ByteBuffer.wrap(request.toBytes());
-                try {
-                    while (byteBuffer.hasRemaining()) {
-                        int numWrite = socketChannel.write(byteBuffer);
-                        if (numWrite == -1) {
-                            socketChannel.close();
-                            throw new RuntimeException("Error socket write");
-                        }
+        try {
+            if (peer != null) {
+                ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
+                while (byteBuffer.hasRemaining()) {
+                    int numWrite = peer.getSocketChannel().write(byteBuffer);
+                    if (numWrite == -1) {
+                        peer.getSocketChannel().close();
+                        throw new RuntimeException("Error socket write");
                     }
-                    System.err.println("[Sender] Requested: piece(" + request.getIndex() + "), to " + socketChannel.getRemoteAddress());
-                } catch (IOException e) {
-                    System.err.println("[Sender] Request not uploaded...");
+                }
+                System.err.println("[Sender] Message(Type = " + message.getType() + "), send to " + peer.getSocketChannel().getRemoteAddress());
+            } else {
+                for (Peer pr : Torrent.getTracker().getPeers()) {
+                    if (pr.getSocketChannel().isConnected()) {
+                        ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
+                        while (byteBuffer.hasRemaining()) {
+                            int numWrite = peer.getSocketChannel().write(byteBuffer);
+                            if (numWrite == -1) {
+                                peer.getSocketChannel().close();
+                                break;
+                            }
+                        }
+                        System.err.println("[Sender] Message(Type = " + message.getType() + "), send to " + peer.getSocketChannel().getRemoteAddress());
+                    }
                 }
             }
+        } catch (IOException e){
+            System.err.println("[Sender] Message(Type = " + message.getType() + ") not uploaded...");
         }
     }
 }

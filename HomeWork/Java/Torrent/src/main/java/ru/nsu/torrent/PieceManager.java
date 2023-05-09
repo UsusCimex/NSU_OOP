@@ -12,8 +12,9 @@ public class PieceManager {
         this.numberPieces = numberPieces;
         this.availablePieces = new BitSet(numberPieces);
     }
-    public synchronized int getNextPiece() {
-        return availablePieces.nextClearBit(0);
+    public PieceManager(int numberPieces, byte[] init) {
+        this.numberPieces = numberPieces;
+        this.availablePieces = BitSet.valueOf(init);
     }
     public synchronized int getNextRandomPiece() {
         Random random = new Random();
@@ -31,10 +32,10 @@ public class PieceManager {
         return missingPieces.get(randomIndex);
     }
     public boolean getPiece(int index) { return availablePieces.get(index); }
-    public synchronized void markPieceAsDownloaded(int pieceIndex) {
+    public synchronized void markPieceAsAvailable(int pieceIndex) {
         availablePieces.set(pieceIndex);
     }
-    public int getNumberOfDownloadedPieces() { return availablePieces.cardinality(); }
+    public int getNumberOfAvailablePieces() { return availablePieces.cardinality(); }
     public int getNumberPieces() { return numberPieces; }
     public BitSet getAvailablePieces() {
         return availablePieces;

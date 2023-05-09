@@ -1,8 +1,8 @@
 package ru.nsu.torrent.Runnables;
 
-import ru.nsu.torrent.Messages.Message;
-import ru.nsu.torrent.Messages.Piece;
-import ru.nsu.torrent.Messages.Request;
+import ru.nsu.torrent.Messages.*;
+import ru.nsu.torrent.Peer;
+import ru.nsu.torrent.PieceManager;
 import ru.nsu.torrent.Torrent;
 import ru.nsu.torrent.TorrentFile;
 
@@ -16,12 +16,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class Handler implements Runnable {
-    SocketChannel socketChannel;
-    Message message;
-    byte[] infoHash;
+    private final Peer peer;
+    private final Message message;
+    private final byte[] infoHash;
 
-    public Handler(SocketChannel socketChannel, Message message, byte[] infoHash) {
-        this.socketChannel = socketChannel;
+    public Handler(Peer peer, Message message, byte[] infoHash) {
+        this.peer = peer;
         this.message = message;
         this.infoHash = infoHash;
     }
@@ -39,19 +39,8 @@ public class Handler implements Runnable {
                 byte[] data = readPieceData(index, offset, length);
                 if (data == null) return;
                 Piece piece = new Piece(index, offset, data);
-                ByteBuffer byteBuffer = ByteBuffer.wrap(piece.toBytes());
-                try {
-                    while (byteBuffer.hasRemaining()) {
-                        int numWrite = socketChannel.write(byteBuffer);
-                        if (numWrite == -1) {
-                            socketChannel.close();
-                            throw new RuntimeException("Error socket write");
-                        }
-                    }
-                    System.err.println("[Handler] Uploaded: piece(" + index + "), to " + socketChannel.getRemoteAddress());
-                } catch (IOException e) {
-                    System.err.println("[Handler] Piece(" + index + ") not uploaded...");
-                }
+                Sender sender = new Sender(peer, piece, infoHash);
+                Torrent.executor.submit(sender);
             }
             case (Piece.PIECE) -> {
                 Piece piece = (Piece) message;
@@ -82,13 +71,26 @@ public class Handler implements Runnable {
                         raf.seek((long) index * torrentFile.getPieceLength() + offset);
                         raf.write(data);
                         Torrent.getFile().markPieceAsDownloaded(index);
-                        System.err.println("[Handler] Downloaded: piece(" + index + "), from " + socketChannel.getRemoteAddress());
+                        System.err.println("[Handler] Downloaded: piece(" + index + "), from " + peer.getSocketChannel().getRemoteAddress());
                     } catch (IOException e) {
                         throw new RuntimeException("[Handler] File not found!", e);
                     }
+
+                    Have have = new Have(index);
+                    Sender sender = new Sender(null, have, infoHash);
+                    Torrent.executor.submit(sender);
                 } else {
                     System.err.println("[Handler] Hashes do not match for piece " + index);
                 }
+            }
+            case (Have.HAVE) -> {
+                Have have = (Have) message;
+                int index = have.getIndex();
+                peer.getAvailablePieces().set(index);
+            }
+            case (Bitfield.BITFIELD) -> {
+                Bitfield bitfield = (Bitfield) message;
+                peer.setAvailablePieces(bitfield.getBitSet());
             }
         }
     }
