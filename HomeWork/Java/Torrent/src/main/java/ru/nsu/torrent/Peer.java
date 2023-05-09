@@ -1,5 +1,7 @@
 package ru.nsu.torrent;
 
+import ru.nsu.torrent.Messages.Message;
+
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicInteger;

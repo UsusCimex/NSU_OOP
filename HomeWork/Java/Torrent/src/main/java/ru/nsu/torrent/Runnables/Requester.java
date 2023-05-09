@@ -1,6 +1,6 @@
 package ru.nsu.torrent.Runnables;
 
-import ru.nsu.torrent.Messages.RequestMessage;
+import ru.nsu.torrent.Messages.Request;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -8,18 +8,18 @@ import java.nio.channels.SocketChannel;
 
 public class Requester implements Runnable {
     SocketChannel socketChannel;
-    RequestMessage requestMessage;
+    Request request;
     byte[] infoHash;
 
-    public Requester(SocketChannel socketChannel, RequestMessage requestMessage, byte[] infoHash) {
+    public Requester(SocketChannel socketChannel, Request request, byte[] infoHash) {
         this.socketChannel = socketChannel;
-        this.requestMessage = requestMessage;
+        this.request = request;
         this.infoHash = infoHash;
     }
 
     @Override
     public void run() {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(requestMessage.toBytes());
+        ByteBuffer byteBuffer = ByteBuffer.wrap(request.toBytes());
         try {
             while (byteBuffer.hasRemaining()) {
                 int numWrite = socketChannel.write(byteBuffer);
@@ -28,7 +28,7 @@ public class Requester implements Runnable {
                     throw new RuntimeException("Error socket write");
                 }
             }
-            System.err.println("[Requester] Requested: piece(" + requestMessage.getIndex() + "), to " + socketChannel.getRemoteAddress());
+            System.err.println("[Requester] Requested: piece(" + request.getIndex() + "), to " + socketChannel.getRemoteAddress());
         } catch (IOException e) {
             System.err.println("[Requester] Request not uploaded...");
         }

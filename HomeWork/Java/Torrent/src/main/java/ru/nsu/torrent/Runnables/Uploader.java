@@ -1,7 +1,7 @@
 package ru.nsu.torrent.Runnables;
 
-import ru.nsu.torrent.Messages.PieceMessage;
-import ru.nsu.torrent.Messages.RequestMessage;
+import ru.nsu.torrent.Messages.Piece;
+import ru.nsu.torrent.Messages.Request;
 import ru.nsu.torrent.TorrentClient;
 import ru.nsu.torrent.TorrentFile;
 
@@ -13,25 +13,25 @@ import java.nio.channels.SocketChannel;
 
 public class Uploader implements Runnable {
     SocketChannel socketChannel;
-    RequestMessage requestMessage;
+    Request request;
     byte[] infoHash;
 
-    public Uploader(SocketChannel socketChannel, RequestMessage requestMessage, byte[] infoHash) {
+    public Uploader(SocketChannel socketChannel, Request request, byte[] infoHash) {
         this.socketChannel = socketChannel;
-        this.requestMessage = requestMessage;
+        this.request = request;
         this.infoHash = infoHash;
     }
 
     @Override
     public void run() {
-        int index = requestMessage.getIndex();
-        int offset = requestMessage.getOffset();
-        int length = requestMessage.getPieceLength();
+        int index = request.getIndex();
+        int offset = request.getOffset();
+        int length = request.getPieceLength();
 
         byte[] data = readPieceData(index, offset, length);
         if (data == null) return;
-        PieceMessage pieceMessage = new PieceMessage(index, offset, data);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(pieceMessage.toBytes());
+        Piece piece = new Piece(index, offset, data);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(piece.toBytes());
         try {
             while (byteBuffer.hasRemaining()) {
                 int numWrite = socketChannel.write(byteBuffer);

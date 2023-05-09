@@ -17,8 +17,10 @@ public abstract class Message {
         byte type = buffer.get();
 
         return switch (type) {
-            case RequestMessage.REQUEST -> RequestMessage.fromByteBuffer(buffer, length);
-            case PieceMessage.PIECE -> PieceMessage.fromByteBuffer(buffer, length);
+            case Have.HAVE -> Have.fromByteBuffer(buffer, length);
+            case Bitfield.BITFIELD -> Bitfield.fromByteBuffer(buffer, length);
+            case Request.REQUEST -> Request.fromByteBuffer(buffer, length);
+            case Piece.PIECE -> Piece.fromByteBuffer(buffer, length);
             default -> throw new IllegalArgumentException("Unsupported message type: " + type);
         };
     }

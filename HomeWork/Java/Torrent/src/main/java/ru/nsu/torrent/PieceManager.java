@@ -36,4 +36,7 @@ public class PieceManager {
     }
     public int getNumberOfDownloadedPieces() { return availablePieces.cardinality(); }
     public int getNumberPieces() { return numberPieces; }
+    public BitSet getAvailablePieces() {
+        return availablePieces;
+    }
 }

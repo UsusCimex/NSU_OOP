@@ -1,6 +1,6 @@
 package ru.nsu.torrent.Runnables;
 
-import ru.nsu.torrent.Messages.PieceMessage;
+import ru.nsu.torrent.Messages.Piece;
 import ru.nsu.torrent.TorrentClient;
 import ru.nsu.torrent.TorrentFile;
 
@@ -12,21 +12,21 @@ import java.util.Arrays;
 
 public class Downloader implements Runnable {
     SocketChannel socketChannel;
-    PieceMessage pieceMessage;
+    Piece piece;
     byte[] infoHash;
 
-    public Downloader(SocketChannel socketChannel, PieceMessage pieceMessage, byte[] infoHash) {
+    public Downloader(SocketChannel socketChannel, Piece piece, byte[] infoHash) {
         this.socketChannel = socketChannel;
-        this.pieceMessage = pieceMessage;
+        this.piece = piece;
         this.infoHash = infoHash;
     }
 
     @Override
     public void run() {
         try {
-            int index = pieceMessage.getIndex();
-            int offset = pieceMessage.getOffset();
-            byte[] data = pieceMessage.getData();
+            int index = piece.getIndex();
+            int offset = piece.getOffset();
+            byte[] data = piece.getData();
 
             TorrentFile torrentFile = TorrentClient.getTorrentFileByInfoHash(infoHash);
             if (torrentFile == null) {

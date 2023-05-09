@@ -2,8 +2,7 @@ package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.Handshake;
 import ru.nsu.torrent.Messages.Message;
-import ru.nsu.torrent.Messages.PieceMessage;
-import ru.nsu.torrent.Messages.RequestMessage;
+import ru.nsu.torrent.Messages.Request;
 import ru.nsu.torrent.Peer;
 import ru.nsu.torrent.TorrentClient;
 
@@ -131,8 +130,8 @@ public class RequestListener implements Runnable {
         byte[] infoHash = peer.getInfoHash();
         Message message = Message.fromBytes(byteBuffer.flip().array());
         if (message.getType() == 6) {
-            RequestMessage requestMessage = (RequestMessage) message;
-            Uploader uploader = new Uploader(socketChannel, requestMessage, infoHash);
+            Request request = (Request) message;
+            Uploader uploader = new Uploader(socketChannel, request, infoHash);
             TorrentClient.executor.submit(uploader);
         }
     }

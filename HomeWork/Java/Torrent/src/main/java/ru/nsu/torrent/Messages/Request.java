@@ -2,13 +2,13 @@ package ru.nsu.torrent.Messages;
 
 import java.nio.ByteBuffer;
 
-public class RequestMessage extends Message {
+public class Request extends Message {
     public static final byte REQUEST = 6;
     private final int index;
     private final int offset;
     private final int pieceLength;
 
-    public RequestMessage(int index, int offset, int pieceLength) {
+    public Request(int index, int offset, int pieceLength) {
         this.type = REQUEST;
         this.index = index;
         this.offset = offset;
@@ -38,10 +38,10 @@ public class RequestMessage extends Message {
         buffer.putInt(pieceLength);
         return buffer.array();
     }
-    public static RequestMessage fromByteBuffer(ByteBuffer buffer, int length) {
+    protected static Request fromByteBuffer(ByteBuffer buffer, int length) {
         int index = buffer.getInt();
         int offset = buffer.getInt();
         int pieceLength = buffer.getInt();
-        return new RequestMessage(index, offset, pieceLength);
+        return new Request(index, offset, pieceLength);
     }
 }

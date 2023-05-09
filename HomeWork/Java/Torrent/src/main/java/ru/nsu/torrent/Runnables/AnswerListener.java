@@ -2,8 +2,8 @@ package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.*;
 import ru.nsu.torrent.Messages.Message;
-import ru.nsu.torrent.Messages.PieceMessage;
-import ru.nsu.torrent.Messages.RequestMessage;
+import ru.nsu.torrent.Messages.Piece;
+import ru.nsu.torrent.Messages.Request;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -139,8 +139,8 @@ public class AnswerListener implements Runnable {
         byte[] infoHash = peer.getInfoHash();
         Message message = Message.fromBytes(byteBuffer.flip().array());
         if (message.getType() == 7) {
-            PieceMessage pieceMessage = (PieceMessage) message;
-            Downloader downloader = new Downloader(socketChannel, pieceMessage, infoHash);
+            Piece piece = (Piece) message;
+            Downloader downloader = new Downloader(socketChannel, piece, infoHash);
             peer.getActiveRequests().decrementAndGet();
             TorrentClient.executor.submit(downloader);
         }
@@ -155,8 +155,8 @@ public class AnswerListener implements Runnable {
                 int missingPieceIndex = torrentFile.getPieceManager().getNextRandomPiece();
                 System.err.println("[AnswerListener] Request: " + missingPieceIndex + " piece, to " + pr.getSocketChannel().getRemoteAddress());
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-                    RequestMessage requestMessage = new RequestMessage(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
-                    Requester requester = new Requester(pr.getSocketChannel(), requestMessage, pr.getInfoHash());
+                    Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
+                    Requester requester = new Requester(pr.getSocketChannel(), request, pr.getInfoHash());
                     pr.getActiveRequests().incrementAndGet();
                     TorrentClient.executor.submit(requester);
                 } else {
