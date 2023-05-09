@@ -2,15 +2,12 @@ package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.Messages.*;
 import ru.nsu.torrent.Peer;
-import ru.nsu.torrent.PieceManager;
 import ru.nsu.torrent.Torrent;
 import ru.nsu.torrent.TorrentFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -18,12 +15,10 @@ import java.util.Arrays;
 public class Handler implements Runnable {
     private final Peer peer;
     private final Message message;
-    private final byte[] infoHash;
 
-    public Handler(Peer peer, Message message, byte[] infoHash) {
+    public Handler(Peer peer, Message message) {
         this.peer = peer;
         this.message = message;
-        this.infoHash = infoHash;
     }
 
     @Override
@@ -39,7 +34,7 @@ public class Handler implements Runnable {
                 byte[] data = readPieceData(index, offset, length);
                 if (data == null) return;
                 Piece piece = new Piece(index, offset, data);
-                Sender sender = new Sender(peer, piece, infoHash);
+                Sender sender = new Sender(peer, piece);
                 Torrent.executor.submit(sender);
             }
             case (Piece.PIECE) -> {
@@ -48,7 +43,7 @@ public class Handler implements Runnable {
                 int offset = piece.getOffset();
                 byte[] data = piece.getData();
 
-                TorrentFile torrentFile = Torrent.getTorrentFileByInfoHash(infoHash);
+                TorrentFile torrentFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
                 if (torrentFile == null) {
                     throw new IllegalStateException("[Handler] File not found... Hash exception!");
                 }
@@ -77,7 +72,7 @@ public class Handler implements Runnable {
                     }
 
                     Have have = new Have(index);
-                    Sender sender = new Sender(null, have, infoHash);
+                    Sender sender = new Sender(null, have);
                     Torrent.executor.submit(sender);
                 } else {
                     System.err.println("[Handler] Hashes do not match for piece " + index);
@@ -96,7 +91,7 @@ public class Handler implements Runnable {
     }
 
     private byte[] readPieceData(int index, int offset, int length) {
-        TorrentFile tFile = Torrent.getTorrentFileByInfoHash(infoHash);
+        TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
         assert tFile != null;
         if (!tFile.getPieceManager().getPiece(index)) {
             return null;

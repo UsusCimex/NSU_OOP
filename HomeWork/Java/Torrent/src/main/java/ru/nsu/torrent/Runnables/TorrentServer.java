@@ -126,9 +126,8 @@ public class TorrentServer implements Runnable {
             }
         }
 
-        byte[] infoHash = peer.getInfoHash();
         Message message = Message.fromBytes(byteBuffer.flip().array());
-        Handler sender = new Handler(socketChannel, message, infoHash);
+        Handler sender = new Handler(peer, message);
         Torrent.executor.submit(sender);
     }
 

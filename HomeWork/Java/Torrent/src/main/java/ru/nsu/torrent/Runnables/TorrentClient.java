@@ -136,9 +136,8 @@ public class TorrentClient implements Runnable {
             }
         }
 
-        byte[] infoHash = peer.getInfoHash();
         Message message = Message.fromBytes(byteBuffer.flip().array());
-        Handler handler = new Handler(peer, message, infoHash);
+        Handler handler = new Handler(peer, message);
         peer.getActiveRequests().decrementAndGet(); //problem
         Torrent.executor.submit(handler);
     }
@@ -153,7 +152,7 @@ public class TorrentClient implements Runnable {
                 System.err.println("[TorrentClient] Request: " + missingPieceIndex + " piece, to " + peer.getSocketChannel().getRemoteAddress());
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
                     Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
-                    Sender sender = new Sender(peer, request, peer.getInfoHash());
+                    Sender sender = new Sender(peer, request);
                     peer.getActiveRequests().incrementAndGet(); //problem
                     Torrent.executor.submit(sender);
                 } else {

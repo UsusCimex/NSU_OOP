@@ -10,12 +10,10 @@ import java.nio.ByteBuffer;
 public class Sender implements Runnable {
     private final Peer peer;
     private final Message message;
-    private final byte[] infoHash;
 
-    public Sender(Peer peer, Message message, byte[] infoHash) {
+    public Sender(Peer peer, Message message) {
         this.peer = peer;
         this.message = message;
-        this.infoHash = infoHash;
     }
 
     @Override
@@ -36,9 +34,9 @@ public class Sender implements Runnable {
                     if (pr.getSocketChannel().isConnected()) {
                         ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
                         while (byteBuffer.hasRemaining()) {
-                            int numWrite = peer.getSocketChannel().write(byteBuffer);
+                            int numWrite = pr.getSocketChannel().write(byteBuffer);
                             if (numWrite == -1) {
-                                peer.getSocketChannel().close();
+                                pr.getSocketChannel().close();
                                 break;
                             }
                         }
