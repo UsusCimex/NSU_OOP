@@ -49,7 +49,7 @@ public class TorrentClient implements Runnable {
 
             boolean complete = false;
             while (!Thread.currentThread().isInterrupted() && !complete) {
-                this.selector.selectNow();
+                this.selector.select(50);
                 Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
