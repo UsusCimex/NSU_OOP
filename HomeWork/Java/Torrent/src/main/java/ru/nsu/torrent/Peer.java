@@ -9,6 +9,8 @@ public class Peer {
     private final byte[] infoHash;
     private final SocketChannel socketChannel;
     private BitSet availablePieces = null;
+    private boolean interested = false;
+    private boolean choked = false;
 
     public Peer(SocketChannel socketChannel, byte[] infoHash) {
         this.socketChannel = socketChannel;
@@ -28,5 +30,17 @@ public class Peer {
     }
     public InetSocketAddress getAddress() throws IOException {
         return (InetSocketAddress) socketChannel.getRemoteAddress();
+    }
+    public boolean isInterested() {
+        return interested;
+    }
+    public boolean isChoked() {
+        return choked;
+    }
+    public void setInterested(boolean interested) {
+        this.interested = interested;
+    }
+    public void setChoked(boolean choked) {
+        this.choked = choked;
     }
 }

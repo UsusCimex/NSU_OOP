@@ -17,6 +17,10 @@ public abstract class Message {
         byte type = buffer.get();
 
         return switch (type) {
+            case Choke.CHOKE -> Choke.fromByteBuffer(buffer, length);
+            case Unchoke.UNCHOKE -> Unchoke.fromByteBuffer(buffer, length);
+            case Interested.INTERESTED -> Interested.fromByteBuffer(buffer,length);
+            case NotInterested.NOT_INTERESTED -> NotInterested.fromByteBuffer(buffer, length);
             case Have.HAVE -> Have.fromByteBuffer(buffer, length);
             case Bitfield.BITFIELD -> Bitfield.fromByteBuffer(buffer, length);
             case Request.REQUEST -> Request.fromByteBuffer(buffer, length);
