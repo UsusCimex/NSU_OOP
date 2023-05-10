@@ -26,7 +26,7 @@ public class PieceManager {
                     .toList();
 
             if (!missingPieces.isEmpty()) {
-                return random.nextInt(missingPieces.size());
+                return missingPieces.get(random.nextInt(missingPieces.size()));
             }
         }
         return -1;

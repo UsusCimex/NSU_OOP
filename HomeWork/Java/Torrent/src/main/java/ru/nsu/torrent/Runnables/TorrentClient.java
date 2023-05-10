@@ -145,6 +145,8 @@ public class TorrentClient implements Runnable {
                 NotInterested notInterested = new NotInterested();
                 Sender sender = new Sender(peer, notInterested);
                 Torrent.executor.submit(sender);
+
+                peer.setInterested(false);
             }
         }
     }

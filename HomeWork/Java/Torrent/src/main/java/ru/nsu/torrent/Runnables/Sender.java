@@ -19,21 +19,10 @@ public class Sender implements Runnable {
     @Override
     public void run() {
         try {
-            if (peer != null) {
-                if ((!peer.isChoked()) || (message.getType() == Unchoke.UNCHOKE)) {
-                    ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
-                    while (byteBuffer.hasRemaining()) {
-                        int numWrite = peer.getSocketChannel().write(byteBuffer);
-                        if (numWrite == -1) {
-                            peer.getSocketChannel().close();
-                            throw new RuntimeException("[Sender] Error socket write");
-                        }
-                    }
-                    printMessage(message, peer);
-                }
-            } else {
+            if (message instanceof Have) {
                 for (Peer pr : Torrent.getTracker().getPeers()) {
                     if (pr.getSocketChannel().isConnected()) {
+                        if (pr == peer) continue;
                         if (!pr.isInterested() && !pr.isChoked()) {
                             ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
                             while (byteBuffer.hasRemaining()) {
@@ -48,9 +37,21 @@ public class Sender implements Runnable {
                     }
                 }
             }
+            else {
+                if ((!peer.isChoked()) || (message.getType() == Unchoke.UNCHOKE)) {
+                    ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
+                    while (byteBuffer.hasRemaining()) {
+                        int numWrite = peer.getSocketChannel().write(byteBuffer);
+                        if (numWrite == -1) {
+                            peer.getSocketChannel().close();
+                            throw new RuntimeException("[Sender] Error socket write");
+                        }
+                    }
+                    printMessage(message, peer);
+                }
+            }
         } catch (IOException e){
             System.err.println("[Sender] Message(Type = " + message.getType() + ") not uploaded...");
-            e.printStackTrace();
         }
     }
 
@@ -58,7 +59,7 @@ public class Sender implements Runnable {
         if (message.getType() == Request.REQUEST) {
             System.err.println("[Sender] REQUEST piece: \"" + ((Request) message).getIndex() + "\". Send to: " + peer.getAddress());
         } else if (message.getType() == Piece.PIECE) {
-            System.err.println("[SENDER] PIECE piece: \"" + ((Piece) message).getIndex() + "\". Send to: " + peer.getAddress());
+            System.err.println("[Sender] PIECE piece: \"" + ((Piece) message).getIndex() + "\". Send to: " + peer.getAddress());
         } else if (message.getType() == Bitfield.BITFIELD) {
             System.err.println("[Sender] BITFIELD send to: " + peer.getAddress());
         } else if (message.getType() == Interested.INTERESTED) {

@@ -72,7 +72,7 @@ public class Handler implements Runnable {
                     }
 
                     Have have = new Have(index);
-                    Sender sender = new Sender(null, have);
+                    Sender sender = new Sender(peer, have);
                     Torrent.executor.submit(sender);
                 } else {
                     System.err.println("[Handler] Hashes do not match for piece " + index);
@@ -85,6 +85,7 @@ public class Handler implements Runnable {
 
                 TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
                 BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
+                availablePieces.or(tFile.getPieceManager().getAvailablePieces());
                 if (!availablePieces.get(index)) {
                     Sender sender = new Sender(peer, new Interested());
                     Torrent.executor.submit(sender);
@@ -154,7 +155,7 @@ public class Handler implements Runnable {
         if (message.getType() == Request.REQUEST) {
             System.err.println("[Handler] REQUEST piece: \"" + ((Request) message).getIndex() + "\". From: " + peer.getAddress());
         } else if (message.getType() == Piece.PIECE) {
-            System.err.println("[SENDER] PIECE piece: \"" + ((Piece) message).getIndex() + "\". From: " + peer.getAddress());
+            System.err.println("[Handler] PIECE piece: \"" + ((Piece) message).getIndex() + "\". From: " + peer.getAddress());
         } else if (message.getType() == Bitfield.BITFIELD) {
             System.err.println("[Handler] BITFIELD from: " + peer.getAddress());
         } else if (message.getType() == Interested.INTERESTED) {
