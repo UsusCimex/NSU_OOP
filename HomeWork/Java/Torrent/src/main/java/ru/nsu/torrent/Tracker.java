@@ -45,7 +45,7 @@ public class Tracker {
                 }
             }
         } catch (FileNotFoundException ex) {
-            System.err.println("Tracker not found.");
+            System.err.println("Tracker not found. Path: " + TRACKERS_DIRECTORY + "/" + fileName);
         } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
