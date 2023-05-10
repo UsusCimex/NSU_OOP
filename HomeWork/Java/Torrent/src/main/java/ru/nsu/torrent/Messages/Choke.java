@@ -16,7 +16,7 @@ public class Choke extends Message {
         return buffer.array();
     }
 
-    protected static Choke fromByteBuffer(ByteBuffer buffer, int length) {
+    protected static Choke fromByteBuffer(ByteBuffer ignoredBuffer, int ignoredLength) {
         return new Choke();
     }
 }

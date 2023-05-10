@@ -1,13 +1,11 @@
 package ru.nsu.torrent.Messages;
 
-import ru.nsu.torrent.PieceManager;
-
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 
 public class Bitfield extends Message {
     public static final byte BITFIELD = 5;
-    private BitSet bitSet;
+    private final BitSet bitSet;
     public Bitfield(BitSet bitSet) {
         this.type = BITFIELD;
         this.bitSet = bitSet;

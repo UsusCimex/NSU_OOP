@@ -21,7 +21,7 @@ public class Have extends Message {
         buffer.putInt(index);
         return buffer.array();
     }
-    protected static Have fromByteBuffer(ByteBuffer buffer, int length) {
+    protected static Have fromByteBuffer(ByteBuffer buffer, int ignoredLength) {
         int index = buffer.getInt();
         return new Have(index);
     }

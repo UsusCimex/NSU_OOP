@@ -38,7 +38,7 @@ public class Request extends Message {
         buffer.putInt(pieceLength);
         return buffer.array();
     }
-    protected static Request fromByteBuffer(ByteBuffer buffer, int length) {
+    protected static Request fromByteBuffer(ByteBuffer buffer, int ignoredLength) {
         int index = buffer.getInt();
         int offset = buffer.getInt();
         int pieceLength = buffer.getInt();

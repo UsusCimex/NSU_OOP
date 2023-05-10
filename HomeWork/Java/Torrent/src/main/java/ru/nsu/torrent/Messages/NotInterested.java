@@ -16,7 +16,7 @@ public class NotInterested extends Message{
         return buffer.array();
     }
 
-    protected static NotInterested fromByteBuffer(ByteBuffer buffer, int length) {
+    protected static NotInterested fromByteBuffer(ByteBuffer ignoredBuffer, int ignoredLength) {
         return new NotInterested();
     }
 }

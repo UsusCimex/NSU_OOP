@@ -84,6 +84,7 @@ public class Handler implements Runnable {
                 peer.getAvailablePieces().set(index);
 
                 TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+                assert tFile != null;
                 BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
                 availablePieces.or(tFile.getPieceManager().getAvailablePieces());
                 if (!availablePieces.get(index)) {
@@ -96,6 +97,7 @@ public class Handler implements Runnable {
                 peer.setAvailablePieces(bitfield.getBitSet());
 
                 TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+                assert tFile != null;
                 BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
                 availablePieces.or(tFile.getPieceManager().getAvailablePieces());
                 BitSet peerPieces = peer.getAvailablePieces();
@@ -112,18 +114,10 @@ public class Handler implements Runnable {
                 }
                 Torrent.executor.submit(sender);
             }
-            case (Choke.CHOKE) -> {
-                peer.setChoked(true);
-            }
-            case (Unchoke.UNCHOKE) -> {
-                peer.setChoked(false);
-            }
-            case (Interested.INTERESTED) -> {
-                peer.setInterested(true);
-            }
-            case (NotInterested.NOT_INTERESTED) -> {
-                peer.setInterested(false);
-            }
+            case (Choke.CHOKE) -> peer.setChoked(true);
+            case (Unchoke.UNCHOKE) -> peer.setChoked(false);
+            case (Interested.INTERESTED) -> peer.setInterested(true);
+            case (NotInterested.NOT_INTERESTED) -> peer.setInterested(false);
         }
         try {
             printMessage(message, peer);

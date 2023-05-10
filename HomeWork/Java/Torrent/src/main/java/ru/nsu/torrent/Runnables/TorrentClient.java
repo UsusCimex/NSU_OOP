@@ -7,7 +7,6 @@ import ru.nsu.torrent.Messages.Request;
 import ru.nsu.torrent.Torrent;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
@@ -54,9 +53,7 @@ public class TorrentClient implements Runnable {
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
                     keys.remove();
-                    if (!key.isValid()) {
-                        continue;
-                    } else if (key.isConnectable()) {
+                    if (key.isConnectable()) {
                         if (((SocketChannel)key.channel()).finishConnect()) {
                             connect(key);
                         }

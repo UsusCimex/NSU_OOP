@@ -16,7 +16,7 @@ public class Interested extends Message{
         return buffer.array();
     }
 
-    protected static Interested fromByteBuffer(ByteBuffer buffer, int length) {
+    protected static Interested fromByteBuffer(ByteBuffer ignoredBuffer, int ignoredLength) {
         return new Interested();
     }
 }

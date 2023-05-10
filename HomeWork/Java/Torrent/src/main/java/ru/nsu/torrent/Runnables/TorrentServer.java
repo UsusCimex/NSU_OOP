@@ -39,9 +39,7 @@ public class TorrentServer implements Runnable {
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
                     keys.remove();
-                    if (!key.isValid()) {
-                        continue;
-                    } else if (key.isAcceptable()) {
+                    if (key.isAcceptable()) {
                         accept(key);
                     } else if (key.isReadable()) {
                         read(key);
@@ -74,7 +72,7 @@ public class TorrentServer implements Runnable {
 
         if (validInfoHash != null) {
             Peer peer = new Peer(socketChannel, validInfoHash);
-            peer.setAvailablePieces(Torrent.getTorrentFileByInfoHash(validInfoHash).getPieceManager().getAvailablePieces());
+            peer.setAvailablePieces(Objects.requireNonNull(Torrent.getTorrentFileByInfoHash(validInfoHash)).getPieceManager().getAvailablePieces());
 
             Bitfield bitfield = new Bitfield(peer.getAvailablePieces());
             Sender sender = new Sender(peer, bitfield);

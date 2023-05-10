@@ -16,7 +16,7 @@ public class Unchoke extends Message {
         return buffer.array();
     }
 
-    protected static Unchoke fromByteBuffer(ByteBuffer buffer, int length) {
+    protected static Unchoke fromByteBuffer(ByteBuffer ignoredBuffer, int ignoredLength) {
         return new Unchoke();
     }
 }
