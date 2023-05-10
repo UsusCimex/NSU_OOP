@@ -14,13 +14,13 @@ import java.util.*;
 
 public class TorrentServer implements Runnable {
     private final InetSocketAddress address;
-    private final Set<Peer> session;
+    private final Map<SocketChannel, Peer> session;
     private Selector selector;
     private ServerSocketChannel serverSocketChannel;
 
     public TorrentServer(String host, int port) {
         this.address = new InetSocketAddress(host, port);
-        this.session = new HashSet<>();
+        this.session = new HashMap<>();
         System.err.println("[TorrentServer] Your address: " + address);
     }
 
@@ -80,7 +80,7 @@ public class TorrentServer implements Runnable {
             Torrent.executor.submit(sender);
 
             socketChannel.register(this.selector, SelectionKey.OP_READ);
-            this.session.add(peer);
+            this.session.put(socketChannel, peer);
             System.err.println("[TorrentServer] Session opened: " + peer.getAddress());
         } else {
             socketChannel.close();
@@ -90,13 +90,7 @@ public class TorrentServer implements Runnable {
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
-        Peer peer = null;
-        for (Peer pr : session) {
-            if (pr.getSocketChannel().equals(socketChannel)) {
-                peer = pr;
-                break;
-            }
-        }
+        Peer peer = session.get(socketChannel);
 
         if (peer == null) {
             System.err.println("[TorrentServer] Peer not found... Socket exception!");
@@ -110,7 +104,7 @@ public class TorrentServer implements Runnable {
             int numRead = socketChannel.read(lengthBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentServer] Session closed: " + socketChannel.getRemoteAddress());
-                this.session.remove(peer);
+                this.session.remove(socketChannel);
                 socketChannel.close();
                 key.cancel();
                 return;
@@ -126,7 +120,7 @@ public class TorrentServer implements Runnable {
             int numRead = socketChannel.read(byteBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentServer] Session closed: " + socketChannel.getRemoteAddress());
-                this.session.remove(peer);
+                this.session.remove(socketChannel);
                 socketChannel.close();
                 key.cancel();
                 return;
@@ -146,12 +140,17 @@ public class TorrentServer implements Runnable {
                 serverSocketChannel.close();
             }
 
-            for (Peer peer : session) {
-                if (peer.getSocketChannel() != null) {
-                    peer.getSocketChannel().close();
+            Iterator<Map.Entry<SocketChannel, Peer>> iterator = session.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<SocketChannel, Peer> entry = iterator.next();
+                SocketChannel socketChannel = entry.getKey();
+                try {
+                    socketChannel.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                iterator.remove();
             }
-            session.clear();
 
             if (selector != null) {
                 selector.close();

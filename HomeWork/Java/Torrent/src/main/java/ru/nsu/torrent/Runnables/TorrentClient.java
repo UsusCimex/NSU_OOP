@@ -13,7 +13,7 @@ import java.util.*;
 public class TorrentClient implements Runnable {
     private final TorrentFile torrentFile;
     private Selector selector;
-    private final List<Peer> session = new ArrayList<>();
+    private final Map<SocketChannel, Peer> session = new HashMap<>();
 
     public TorrentClient(TorrentFile torrentFile) {
         this.torrentFile = torrentFile;
@@ -41,7 +41,7 @@ public class TorrentClient implements Runnable {
                 socketChannel.configureBlocking(false);
                 socketChannel.connect(peer.getAddress());
                 socketChannel.register(this.selector, SelectionKey.OP_CONNECT);
-                session.add(peer);
+                session.put(socketChannel, peer);
             }
 
             boolean complete = false;
@@ -75,13 +75,7 @@ public class TorrentClient implements Runnable {
     private void connect(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
-        Peer peer = null;
-        for (Peer pr : session) {
-            if (pr.getSocketChannel().equals(socketChannel)) {
-                peer = pr;
-                break;
-            }
-        }
+        Peer peer = session.get(socketChannel);
         if (peer == null) {
             System.err.println("Peer not found!");
             return;
@@ -93,13 +87,7 @@ public class TorrentClient implements Runnable {
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
-        Peer peer = null;
-        for (Peer pr : session) {
-            if (pr.getSocketChannel().equals(socketChannel)) {
-                peer = pr;
-                break;
-            }
-        }
+        Peer peer = session.get(socketChannel);
 
         if (peer == null) {
             System.err.println("[TorrentClient] Peer not found... Socket exception!");
@@ -112,7 +100,7 @@ public class TorrentClient implements Runnable {
         int numRead = socketChannel.read(lengthBuffer);
         if (numRead == -1) {
             System.err.println("[Torrent] Session closed: " + socketChannel.getRemoteAddress());
-            this.session.remove(peer);
+            this.session.remove(socketChannel);
             socketChannel.close();
             key.cancel();
             return;
@@ -127,7 +115,7 @@ public class TorrentClient implements Runnable {
             numRead = socketChannel.read(byteBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentClient] Session closed: " + socketChannel.getRemoteAddress());
-                this.session.remove(peer);
+                this.session.remove(socketChannel);
                 socketChannel.close();
                 key.cancel();
                 return;
@@ -140,7 +128,8 @@ public class TorrentClient implements Runnable {
     }
     private boolean sendRequest() {
         try {
-            for (Peer peer : session) {
+            for (Map.Entry<SocketChannel, Peer> entry : session.entrySet()) {
+                Peer peer = entry.getValue();
                 if (!peer.getSocketChannel().finishConnect()) continue;
                 int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
@@ -161,12 +150,17 @@ public class TorrentClient implements Runnable {
         try {
             Thread.currentThread().interrupt();
 
-            for (Peer peer : session) {
-                if (peer.getSocketChannel() != null) {
-                    peer.getSocketChannel().close();
+            Iterator<Map.Entry<SocketChannel, Peer>> iterator = session.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<SocketChannel, Peer> entry = iterator.next();
+                SocketChannel socketChannel = entry.getKey();
+                try {
+                    socketChannel.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                iterator.remove();
             }
-            session.clear();
 
             if (selector != null) {
                 selector.close();
