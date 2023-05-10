@@ -14,8 +14,9 @@ public class PieceManager {
     }
     public int getIndexOfSearchedPiece(BitSet accessBit) {
         BitSet neededPieces = new BitSet(numberPieces);
-        neededPieces.or(accessBit);
-        neededPieces.and(availablePieces);
+        neededPieces.or(availablePieces);
+        neededPieces.flip(0, numberPieces);
+        neededPieces.and(accessBit);
         if (neededPieces.cardinality() != 0) {
             Random random = new Random();
 

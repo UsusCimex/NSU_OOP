@@ -88,7 +88,8 @@ public class Handler implements Runnable {
                 peer.setAvailablePieces(bitfield.getBitSet());
 
                 TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
-                BitSet availablePieces = tFile.getPieceManager().getAvailablePieces();
+                BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
+                availablePieces.or(tFile.getPieceManager().getAvailablePieces());
                 BitSet peerPieces = peer.getAvailablePieces();
 
                 availablePieces.flip(0, tFile.getPieceManager().getNumberPieces());
