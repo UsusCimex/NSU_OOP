@@ -21,7 +21,7 @@ public class PieceManager {
             Random random = new Random();
 
             List<Integer> missingPieces = IntStream.range(0, numberPieces)
-                    .filter(index -> !neededPieces.get(index))
+                    .filter(index -> neededPieces.get(index))
                     .boxed()
                     .toList();
 

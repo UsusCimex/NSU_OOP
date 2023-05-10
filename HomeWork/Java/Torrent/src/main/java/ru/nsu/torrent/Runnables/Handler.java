@@ -103,8 +103,10 @@ public class Handler implements Runnable {
                 availablePieces.and(peerPieces);
                 Sender sender;
                 if (availablePieces.cardinality() != 0) {
+                    peer.setInterested(true);
                     sender = new Sender(peer, new Interested());
                 } else {
+                    peer.setInterested(false);
                     sender = new Sender(peer, new NotInterested());
                 }
                 Torrent.executor.submit(sender);

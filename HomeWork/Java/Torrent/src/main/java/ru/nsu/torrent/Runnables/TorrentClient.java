@@ -2,6 +2,7 @@ package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.*;
 import ru.nsu.torrent.Messages.Message;
+import ru.nsu.torrent.Messages.NotInterested;
 import ru.nsu.torrent.Messages.Request;
 import ru.nsu.torrent.Torrent;
 
@@ -63,7 +64,8 @@ public class TorrentClient implements Runnable {
                         read(key);
                     }
                 }
-                complete = sendRequest();
+                sendRequest();
+                complete = torrentFile.getPieceManager().getNumberOfAvailablePieces() == torrentFile.getPieceManager().getNumberPieces();
             }
             if (complete) System.err.println("[TorrentClient] File download complete: " + torrentFile.getName());
             stop();
@@ -128,24 +130,22 @@ public class TorrentClient implements Runnable {
         Handler handler = new Handler(peer, message);
         Torrent.executor.submit(handler);
     }
-    private boolean sendRequest() {
-        try {
-            for (Map.Entry<SocketChannel, Peer> entry : session.entrySet()) {
-                Peer peer = entry.getValue();
-                if (peer.getAvailablePieces() == null || peer.isChoked()) continue;
-                int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
-                if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-                    System.err.println("[TorrentClient] Request: " + missingPieceIndex + " piece, to " + peer.getSocketChannel().getRemoteAddress());
-                    Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
-                    Sender sender = new Sender(peer, request);
-                    Torrent.executor.submit(sender);
-                } else {
-                    return true;
-                }
+    private void sendRequest() {
+        for (Map.Entry<SocketChannel, Peer> entry : session.entrySet()) {
+            Peer peer = entry.getValue();
+            if (!peer.isInterested()) continue;
+            int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
+            if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
+                Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
+                Sender sender = new Sender(peer, request);
+                Torrent.executor.submit(sender);
+
+                peer.getAvailablePieces().clear(missingPieceIndex);
+            } else {
+                NotInterested notInterested = new NotInterested();
+                Sender sender = new Sender(peer, notInterested);
+                Torrent.executor.submit(sender);
             }
-            return false;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
     public void stop() {

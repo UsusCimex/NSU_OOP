@@ -29,9 +29,6 @@ public class Sender implements Runnable {
                             throw new RuntimeException("[Sender] Error socket write");
                         }
                     }
-                    if (message instanceof Request) {
-                        peer.getAvailablePieces().clear(((Request) message).getIndex());
-                    }
                     printMessage(message, peer);
                 }
             } else {
@@ -53,6 +50,7 @@ public class Sender implements Runnable {
             }
         } catch (IOException e){
             System.err.println("[Sender] Message(Type = " + message.getType() + ") not uploaded...");
+            e.printStackTrace();
         }
     }
 

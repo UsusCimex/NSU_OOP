@@ -113,7 +113,6 @@ public class TorrentServer implements Runnable {
         }
         lengthBuffer.flip();
         int messageLength = lengthBuffer.getInt();
-
         ByteBuffer byteBuffer = ByteBuffer.allocate(messageLength + 4);
         lengthBuffer.flip();
         while(byteBuffer.hasRemaining()) {
@@ -127,7 +126,6 @@ public class TorrentServer implements Runnable {
                 return;
             }
         }
-
         Message message = Message.fromBytes(byteBuffer.flip().array());
         Handler sender = new Handler(peer, message);
         Torrent.executor.submit(sender);
