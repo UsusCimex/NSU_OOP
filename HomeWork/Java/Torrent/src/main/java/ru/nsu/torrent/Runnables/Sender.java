@@ -28,6 +28,9 @@ public class Sender implements Runnable {
                         throw new RuntimeException("[Sender] Error socket write");
                     }
                 }
+                if (message instanceof Request) {
+                    peer.getAvailablePieces().clear(((Request) message).getIndex());
+                }
                 printMessage(message, peer);
             } else {
                 for (Peer pr : Torrent.getTracker().getPeers()) {

@@ -16,9 +16,9 @@ import javafx.scene.control.Alert;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
+import ru.nsu.torrent.net.ParserIP;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class TorrentApp extends Application {
@@ -26,9 +26,19 @@ public class TorrentApp extends Application {
     private static Torrent torrent;
 
     public static void main(String[] args) throws UnknownHostException {
-        InetAddress localAddress = InetAddress.getLocalHost();
-        String localIP = localAddress.getHostAddress();
-        torrent = new Torrent(localIP, 6969);
+        String localIP;
+        int port;
+        if (args.length == 0) {
+            localIP = ParserIP.getIP("w"); //wifi.nsu.ru - local wifi net
+            port = 6969;
+        } else if (args.length == 1){
+            localIP = ParserIP.getIP("w");
+            port = Integer.parseInt(args[0]);
+        } else {
+            localIP = args[0];
+            port = Integer.parseInt(args[1]);
+        }
+        torrent = new Torrent(localIP, port);
         launch(args);
     }
 
