@@ -82,6 +82,13 @@ public class Handler implements Runnable {
                 Have have = (Have) message;
                 int index = have.getIndex();
                 peer.getAvailablePieces().set(index);
+
+                TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+                BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
+                if (!availablePieces.get(index)) {
+                    Sender sender = new Sender(peer, new Interested());
+                    Torrent.executor.submit(sender);
+                }
             }
             case (Bitfield.BITFIELD) -> {
                 Bitfield bitfield = (Bitfield) message;
