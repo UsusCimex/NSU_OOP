@@ -20,30 +20,34 @@ public class Sender implements Runnable {
     public void run() {
         try {
             if (peer != null) {
-                ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
-                while (byteBuffer.hasRemaining()) {
-                    int numWrite = peer.getSocketChannel().write(byteBuffer);
-                    if (numWrite == -1) {
-                        peer.getSocketChannel().close();
-                        throw new RuntimeException("[Sender] Error socket write");
+                if ((!peer.isChoked()) || (message.getType() == Unchoke.UNCHOKE)) {
+                    ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
+                    while (byteBuffer.hasRemaining()) {
+                        int numWrite = peer.getSocketChannel().write(byteBuffer);
+                        if (numWrite == -1) {
+                            peer.getSocketChannel().close();
+                            throw new RuntimeException("[Sender] Error socket write");
+                        }
                     }
+                    if (message instanceof Request) {
+                        peer.getAvailablePieces().clear(((Request) message).getIndex());
+                    }
+                    printMessage(message, peer);
                 }
-                if (message instanceof Request) {
-                    peer.getAvailablePieces().clear(((Request) message).getIndex());
-                }
-                printMessage(message, peer);
             } else {
                 for (Peer pr : Torrent.getTracker().getPeers()) {
                     if (pr.getSocketChannel().isConnected()) {
-                        ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
-                        while (byteBuffer.hasRemaining()) {
-                            int numWrite = pr.getSocketChannel().write(byteBuffer);
-                            if (numWrite == -1) {
-                                pr.getSocketChannel().close();
-                                break;
+                        if (!pr.isInterested() && !pr.isChoked()) {
+                            ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
+                            while (byteBuffer.hasRemaining()) {
+                                int numWrite = pr.getSocketChannel().write(byteBuffer);
+                                if (numWrite == -1) {
+                                    pr.getSocketChannel().close();
+                                    break;
+                                }
                             }
+                            printMessage(message, pr);
                         }
-                        printMessage(message, pr);
                     }
                 }
             }

@@ -11,6 +11,7 @@ import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.BitSet;
 
 public class Handler implements Runnable {
     private final Peer peer;
@@ -85,6 +86,32 @@ public class Handler implements Runnable {
             case (Bitfield.BITFIELD) -> {
                 Bitfield bitfield = (Bitfield) message;
                 peer.setAvailablePieces(bitfield.getBitSet());
+
+                TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+                BitSet availablePieces = tFile.getPieceManager().getAvailablePieces();
+                BitSet peerPieces = peer.getAvailablePieces();
+
+                availablePieces.flip(0, tFile.getPieceManager().getNumberPieces());
+                availablePieces.and(peerPieces);
+                Sender sender;
+                if (availablePieces.cardinality() != 0) {
+                    sender = new Sender(peer, new Interested());
+                } else {
+                    sender = new Sender(peer, new NotInterested());
+                }
+                Torrent.executor.submit(sender);
+            }
+            case (Choke.CHOKE) -> {
+                peer.setChoked(true);
+            }
+            case (Unchoke.UNCHOKE) -> {
+                peer.setChoked(false);
+            }
+            case (Interested.INTERESTED) -> {
+                peer.setInterested(true);
+            }
+            case (NotInterested.NOT_INTERESTED) -> {
+                peer.setInterested(false);
             }
         }
         try {
