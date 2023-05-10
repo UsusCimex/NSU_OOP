@@ -58,9 +58,21 @@ public class Sender implements Runnable {
 
     private void printMessage(Message message, Peer peer) throws IOException {
         if (message.getType() == Request.REQUEST) {
-            System.err.println("[Sender] REQUEST piece: \"" + ((Request) message).getIndex() + "\" to: " + peer.getAddress());
+            System.err.println("[Sender] REQUEST piece: \"" + ((Request) message).getIndex() + "\". Send to: " + peer.getAddress());
         } else if (message.getType() == Piece.PIECE) {
-            System.err.println("[SENDER] PIECE piece: \"" + ((Piece) message).getIndex() + "\" to: " + peer.getAddress());
+            System.err.println("[SENDER] PIECE piece: \"" + ((Piece) message).getIndex() + "\". Send to: " + peer.getAddress());
+        } else if (message.getType() == Bitfield.BITFIELD) {
+            System.err.println("[Sender] BITFIELD send to: " + peer.getAddress());
+        } else if (message.getType() == Interested.INTERESTED) {
+            System.err.println("[Sender] INTERESTED send to: " + peer.getAddress());
+        } else if (message.getType() == NotInterested.NOT_INTERESTED) {
+            System.err.println("[Sender] NOT_INTERESTED send to: " + peer.getAddress());
+        } else if (message.getType() == Have.HAVE) {
+            System.err.println("[Sender] HAVE piece: \"" + ((Have) message).getIndex() + "\". Send to: " + peer.getAddress());
+        } else if (message.getType() == Choke.CHOKE) {
+            System.err.println("[Sender] CHOKE send to: " + peer.getAddress());
+        } else if (message.getType() == Unchoke.UNCHOKE) {
+            System.err.println("[Sender] UNCHOKE send to: " + peer.getAddress());
         }
     }
 }

@@ -8,12 +8,19 @@ import java.util.BitSet;
 public class Peer {
     private final byte[] infoHash;
     private final SocketChannel socketChannel;
+    private final InetSocketAddress address;
     private BitSet availablePieces = null;
     private boolean interested = false;
     private boolean choked = false;
 
-    public Peer(SocketChannel socketChannel, byte[] infoHash) {
+    public Peer(SocketChannel socketChannel, byte[] infoHash) throws IOException {
         this.socketChannel = socketChannel;
+        this.address = (InetSocketAddress) socketChannel.getRemoteAddress();
+        this.infoHash = infoHash;
+    }
+    public Peer(SocketChannel socketChannel, InetSocketAddress address, byte[] infoHash) {
+        this.socketChannel = socketChannel;
+        this.address = address;
         this.infoHash = infoHash;
     }
     public void setAvailablePieces(BitSet availablePieces) {
@@ -28,8 +35,8 @@ public class Peer {
     public byte[] getInfoHash() {
         return infoHash;
     }
-    public InetSocketAddress getAddress() throws IOException {
-        return (InetSocketAddress) socketChannel.getRemoteAddress();
+    public InetSocketAddress getAddress() {
+        return address;
     }
     public boolean isInterested() {
         return interested;

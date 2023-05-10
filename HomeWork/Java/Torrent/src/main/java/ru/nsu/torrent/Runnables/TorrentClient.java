@@ -6,6 +6,7 @@ import ru.nsu.torrent.Messages.Request;
 import ru.nsu.torrent.Torrent;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
@@ -39,6 +40,7 @@ public class TorrentClient implements Runnable {
             for (Peer peer : Torrent.getTracker().getPeers()) {
                 SocketChannel socketChannel = peer.getSocketChannel();
                 socketChannel.configureBlocking(false);
+                System.err.println("[TorrentClient] connecting to: " + peer.getAddress());
                 socketChannel.connect(peer.getAddress());
                 socketChannel.register(this.selector, SelectionKey.OP_CONNECT);
                 session.put(socketChannel, peer);
@@ -130,7 +132,7 @@ public class TorrentClient implements Runnable {
         try {
             for (Map.Entry<SocketChannel, Peer> entry : session.entrySet()) {
                 Peer peer = entry.getValue();
-                if (!peer.getSocketChannel().finishConnect()) continue;
+                if (peer.getAvailablePieces() == null || peer.isChoked()) continue;
                 int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
                 if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
                     System.err.println("[TorrentClient] Request: " + missingPieceIndex + " piece, to " + peer.getSocketChannel().getRemoteAddress());

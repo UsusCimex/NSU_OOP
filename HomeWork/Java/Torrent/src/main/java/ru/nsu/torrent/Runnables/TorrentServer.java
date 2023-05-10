@@ -58,6 +58,7 @@ public class TorrentServer implements Runnable {
     private void accept(SelectionKey key) throws IOException {
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
         SocketChannel socketChannel = serverSocketChannel.accept();
+        System.err.println("[TorrentServer] " + socketChannel.getRemoteAddress() + " try to connect.");
         socketChannel.configureBlocking(false);
 
         byte[] receivedInfoHash = Handshake.receiveHandshake(socketChannel);
