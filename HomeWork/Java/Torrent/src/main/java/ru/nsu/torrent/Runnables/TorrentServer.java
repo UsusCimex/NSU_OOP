@@ -15,14 +15,12 @@ import java.util.*;
 
 public class TorrentServer implements Runnable {
     private final InetSocketAddress address;
-    private final Map<SocketChannel, Peer> session;
     private Selector selector;
     private ServerSocketChannel serverSocketChannel;
     private TorrentManager torrentManager;
     private final Handshake handshake;
     public TorrentServer(String host, int port, TorrentManager torrentManager) throws IOException {
         this.address = new InetSocketAddress(host, port);
-        this.session = new HashMap<>();
         this.torrentManager = torrentManager;
         this.selector = Selector.open();
         this.serverSocketChannel = ServerSocketChannel.open();
@@ -52,20 +50,17 @@ public class TorrentServer implements Runnable {
                             accept(key);
                         } catch (IOException e) {
                             System.err.println("[TorrentServer] Accept failed.");
-                            throw new RuntimeException(e);
                         }
                     } else if (key.isReadable()) {
                         try {
                             read(key);
                         } catch (IOException e) {
                             System.err.println("[TorrentServer] Read failed.");
-                            throw new RuntimeException(e);
                         }
                     }
                 }
             } catch (ClosedSelectorException e) {
-                System.err.println("Selector closed!");
-                throw new RuntimeException(e);
+                System.err.println("[TorrentServer] Selector closed!");
             }
         }
     }
@@ -96,7 +91,7 @@ public class TorrentServer implements Runnable {
             torrentManager.executeMessage(sender);
 
             socketChannel.register(this.selector, SelectionKey.OP_READ);
-            this.session.put(socketChannel, peer);
+            torrentManager.getServerSession().put(socketChannel, peer);
             System.err.println("[TorrentServer] Session opened: " + peer.getAddress());
         } else {
             socketChannel.close();
@@ -105,7 +100,7 @@ public class TorrentServer implements Runnable {
 
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
-        Peer peer = session.get(socketChannel);
+        Peer peer = torrentManager.getServerSession().get(socketChannel);
         if (peer == null) {
             System.err.println("[TorrentServer] Peer not found... Socket exception!");
             socketChannel.close();
@@ -118,7 +113,7 @@ public class TorrentServer implements Runnable {
             int numRead = socketChannel.read(lengthBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentServer] Session closed: " + socketChannel.getRemoteAddress());
-                this.session.remove(socketChannel);
+                torrentManager.getServerSession().remove(socketChannel);
                 socketChannel.close();
                 key.cancel();
                 return;
@@ -133,7 +128,7 @@ public class TorrentServer implements Runnable {
             int numRead = socketChannel.read(byteBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentServer] Session closed: " + socketChannel.getRemoteAddress());
-                this.session.remove(socketChannel);
+                torrentManager.getServerSession().remove(socketChannel);
                 socketChannel.close();
                 key.cancel();
                 return;

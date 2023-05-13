@@ -4,7 +4,6 @@ import ru.nsu.torrent.*;
 import ru.nsu.torrent.Messages.Message;
 import ru.nsu.torrent.Messages.NotInterested;
 import ru.nsu.torrent.Messages.Request;
-import ru.nsu.torrent.Torrent;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -17,6 +16,7 @@ public class TorrentClient implements Runnable {
     private final Selector selector;
     private final TorrentManager torrentManager;
     private final Handshake handshake;
+    private boolean isDownloadProcess;
     public TorrentClient(TorrentManager torrentManager) throws IOException {
         this.torrentManager = torrentManager;
         this.handshake = new Handshake(torrentManager);
@@ -24,9 +24,7 @@ public class TorrentClient implements Runnable {
     }
     public void changeFile(TorrentFile file) {
         torrentFile = file;
-    }
-    public TorrentFile getTorrentFile() {
-        return torrentFile;
+        isDownloadProcess = false;
     }
     @Override
     public void run() {
@@ -46,6 +44,7 @@ public class TorrentClient implements Runnable {
             }
 
             System.err.println("[TorrentClient] Start download file: " + torrentFile.getName());
+            isDownloadProcess = true;
             try {
                 for (InetSocketAddress address : torrentFile.getTracker().getAddresses()) {
                     SocketChannel socketChannel = SocketChannel.open();
@@ -61,14 +60,16 @@ public class TorrentClient implements Runnable {
             }
 
             boolean complete = false;
-            while (!complete) {
+            while (!complete && isDownloadProcess) {
+                Iterator<SelectionKey> keys;
                 try {
                     this.selector.select(100);
-                } catch (IOException e) {
+                    keys = this.selector.selectedKeys().iterator();
+                } catch (IOException | ClosedSelectorException e) {
                     System.err.println("[TorrentClient] Selector destroyed!");
-                    throw new RuntimeException(e);
+                    isDownloadProcess = false;
+                    break;
                 }
-                Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
                     keys.remove();
@@ -79,19 +80,18 @@ public class TorrentClient implements Runnable {
                             }
                         } catch (IOException e) {
                             System.err.println("[TorrentClient] Connection failed!");
-                            throw new RuntimeException(e);
+                            isDownloadProcess = false;
                         }
                     } else if (key.isReadable()) {
                         try {
                             read(key);
                         } catch (IOException e) {
                             System.err.println("[TorrentClient] Read failed!");
-                            throw new RuntimeException(e);
+                            isDownloadProcess = false;
                         }
-                    } else if (key.isWritable()) {
-                        sendRequest(key);
                     }
                 }
+                sendRequest();
                 complete = torrentFile.getPieceManager().getNumberOfAvailablePieces() == torrentFile.getPieceManager().getNumberPieces();
             }
             if (complete) System.err.println("[TorrentClient] File download complete: " + torrentFile.getName());
@@ -152,29 +152,30 @@ public class TorrentClient implements Runnable {
         Handler handler = new Handler(peer, message, torrentManager);
         torrentManager.executeMessage(handler);
     }
-    private void sendRequest(SelectionKey key) {
-        SocketChannel socketChannel = (SocketChannel) key.channel();
-        Peer peer = torrentManager.getClientSession().get(socketChannel);
+    private void sendRequest() {
+        for (Map.Entry<SocketChannel, Peer> iter : torrentManager.getClientSession().entrySet()) {
+            Peer peer = iter.getValue();
+            if (!peer.isInterested()) return;
 
-        if (!peer.isInterested()) return;
+            int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
+            if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
+                Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
+                Sender sender = new Sender(peer, request, torrentManager);
+                torrentManager.executeMessage(sender);
 
-        int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
-        if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-            Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
-            Sender sender = new Sender(peer, request, torrentManager);
-            torrentManager.executeMessage(sender);
+                peer.getAvailablePieces().clear(missingPieceIndex);
+            } else {
+                NotInterested notInterested = new NotInterested();
+                Sender sender = new Sender(peer, notInterested, torrentManager);
+                torrentManager.executeMessage(sender);
 
-            peer.getAvailablePieces().clear(missingPieceIndex);
-        } else {
-            NotInterested notInterested = new NotInterested();
-            Sender sender = new Sender(peer, notInterested, torrentManager);
-            torrentManager.executeMessage(sender);
-
-            peer.setInterested(false);
+                peer.setInterested(false);
+            }
         }
     }
     public void stop() {
         try {
+            isDownloadProcess = false;
             if (selector != null) {
                 selector.close();
             }

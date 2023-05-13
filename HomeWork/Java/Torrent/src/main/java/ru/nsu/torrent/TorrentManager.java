@@ -14,7 +14,7 @@ public class TorrentManager {
     public static final String DOWNLOADS_DIRECTORY = "downloadsDir";
     private final ExecutorService messagesExecutor = Executors.newFixedThreadPool(3);
     private final ExecutorService fileWriterExecutor = Executors.newFixedThreadPool(1);
-    private Map<File, TorrentFile> torrents = new HashMap<>();
+    private final Map<File, TorrentFile> torrents = new HashMap<>();
 
     private final Map<SocketChannel, Peer> ClientSession = new HashMap<>();
     private final Map<SocketChannel, Peer> ServerSession = new HashMap<>();
@@ -24,7 +24,7 @@ public class TorrentManager {
 
         for (File file : Objects.requireNonNull(torrentsDir.listFiles())) {
             TorrentFile tFile = new TorrentFile(file);
-            torrents.put(file, tFile);
+            torrents.put(file.getAbsoluteFile(), tFile);
         }
     }
     public void executeMessage(Runnable runnable) {
@@ -40,7 +40,20 @@ public class TorrentManager {
     public Map<SocketChannel, Peer> getServerSession() {
         return ServerSession;
     }
-
+    public void stopSession(Map<SocketChannel, Peer> session) {
+        Iterator<Map.Entry<SocketChannel, Peer>> iterator = session.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<SocketChannel, Peer> entry = iterator.next();
+            SocketChannel socketChannel = entry.getKey();
+            try {
+                socketChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            iterator.remove();
+        }
+        session.clear();
+    }
     public List<byte[]> getAvailableInfoHashes() {
         List<byte[]> infoHashes = new ArrayList<>();
 
@@ -52,7 +65,8 @@ public class TorrentManager {
         return infoHashes;
     }
     public TorrentFile getTorrentFile(File file) {
-        return torrents.get(file);
+        if (file == null) return null;
+        return torrents.get(file.getAbsoluteFile());
     }
     public TorrentFile getTorrentFile(byte[] infoHash) {
         for (Map.Entry<File, TorrentFile> entry : torrents.entrySet()) {
@@ -85,31 +99,7 @@ public class TorrentManager {
         if (!fileWriterExecutor.isShutdown()) {
             fileWriterExecutor.shutdown();
         }
-
-        Iterator<Map.Entry<SocketChannel, Peer>> iterator = ClientSession.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<SocketChannel, Peer> entry = iterator.next();
-            SocketChannel socketChannel = entry.getKey();
-            try {
-                socketChannel.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            iterator.remove();
-        }
-        ClientSession.clear();
-
-        Iterator<Map.Entry<SocketChannel, Peer>> iterator2 = ServerSession.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<SocketChannel, Peer> entry = iterator2.next();
-            SocketChannel socketChannel = entry.getKey();
-            try {
-                socketChannel.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            iterator2.remove();
-        }
-        ServerSession.clear();
+        stopSession(ClientSession);
+        stopSession(ServerSession);
     }
 }
