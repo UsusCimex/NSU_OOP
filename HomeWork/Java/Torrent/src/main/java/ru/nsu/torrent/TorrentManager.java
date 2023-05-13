@@ -20,6 +20,9 @@ public class TorrentManager {
     private final Map<SocketChannel, Peer> ServerSession = new HashMap<>();
 
     public TorrentManager() {
+        updateTorrents();
+    }
+    public void updateTorrents() {
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
         for (File file : Objects.requireNonNull(torrentsDir.listFiles())) {
