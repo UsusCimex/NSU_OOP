@@ -23,6 +23,7 @@ public class TorrentManager {
         updateTorrents();
     }
     public void updateTorrents() {
+        torrents.clear();
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
         for (File file : Objects.requireNonNull(torrentsDir.listFiles())) {
