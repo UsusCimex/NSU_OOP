@@ -19,19 +19,18 @@ import javafx.scene.control.ListView;
 import ru.nsu.torrent.net.ParserIP;
 
 import java.io.File;
-import java.net.UnknownHostException;
 
 public class TorrentApp extends Application {
     private ListView<String> progressListView;
     private static Torrent torrent;
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) {
         String localIP;
         int port;
         if (args.length == 0) {
-            localIP = ParserIP.getIP("w"); //wifi.nsu.ru - local wifi net
+            localIP = ParserIP.getIP("w");
             port = 6969;
-        } else if (args.length == 1){
+        } else if (args.length == 1) {
             localIP = ParserIP.getIP("w");
             port = Integer.parseInt(args[0]);
         } else {
@@ -50,19 +49,10 @@ public class TorrentApp extends Application {
         loadTorrentButton.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Torrent files (*.torrent)", "*.torrent"));
-            fileChooser.setInitialDirectory(new File(Torrent.TORRENTS_DIRECTORY));
+            fileChooser.setInitialDirectory(new File(TorrentManager.TORRENTS_DIRECTORY));
             File torrentFile = fileChooser.showOpenDialog(primaryStage);
             if (torrentFile != null) {
-                torrent.selectFile(new TorrentFile(torrentFile));
-                if (Torrent.getTracker().getPeers().size() == 0) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Внимание");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Пиры не найдены!");
-                    alert.showAndWait();
-                }
-
-                torrent.startDownload();
+                torrent.selectFile(torrentFile);
             }
         });
 
@@ -86,15 +76,16 @@ public class TorrentApp extends Application {
     }
 
     private void updateProgress() {
-        if (Torrent.getFile() != null) {
-            String fileName = Torrent.getFile().getName();
-            long totalLength = Torrent.getFile().getLength();
-            int totalPieces = Torrent.getFile().getPieceHashes().size();
-            int downloadedPieces = Torrent.getFile().getDownloadedPieces();
+        TorrentFile torrentFile = torrent.getTorrentFile();
+        if (torrentFile != null) {
+            String fileName = torrentFile.getName();
+            long totalLength = torrentFile.getLength();
+            int totalPieces = torrentFile.getPieceHashes().size();
+            int downloadedPieces = torrentFile.getDownloadedPieces();
             int remainingPieces = totalPieces - downloadedPieces;
             double percentComplete = (double) downloadedPieces / totalPieces * 100;
-            int countPeers = Torrent.getTracker().getPeers().size();
-            long pieceLength = Torrent.getFile().getPieceLength();
+            int countPeers = torrentFile.getTracker().getAddresses().size();
+            long pieceLength = torrentFile.getPieceLength();
 
             ObservableList<String> progressInfo = FXCollections.observableArrayList(
                     String.format("Загружается торрент: \"%s\"", fileName),

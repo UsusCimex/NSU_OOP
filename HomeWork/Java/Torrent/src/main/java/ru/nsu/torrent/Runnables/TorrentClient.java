@@ -7,88 +7,113 @@ import ru.nsu.torrent.Messages.Request;
 import ru.nsu.torrent.Torrent;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
 
 public class TorrentClient implements Runnable {
-    private final TorrentFile torrentFile;
-    private Selector selector;
-    private final Map<SocketChannel, Peer> session = new HashMap<>();
-
-    public TorrentClient(TorrentFile torrentFile) {
-        this.torrentFile = torrentFile;
+    private TorrentFile torrentFile = null;
+    private final Selector selector;
+    private final TorrentManager torrentManager;
+    private final Handshake handshake;
+    public TorrentClient(TorrentManager torrentManager) throws IOException {
+        this.torrentManager = torrentManager;
+        this.handshake = new Handshake(torrentManager);
+        this.selector = Selector.open();
+    }
+    public void changeFile(TorrentFile file) {
+        torrentFile = file;
+    }
+    public TorrentFile getTorrentFile() {
+        return torrentFile;
     }
     @Override
     public void run() {
-        if (torrentFile == null) {
-            System.err.println("[TorrentClient] Select file!");
-            return;
-        }
-        if (Torrent.getTracker().getPeers().isEmpty()) {
-            System.err.println("[TorrentClient] Peers not found!");
-            return;
-        }
-        if (Torrent.getFile().getPieceHashes().size() == Torrent.getFile().getDownloadedPieces()) {
-            System.err.println("[TorrentClient] File was download!");
-            return;
-        }
+        while (!Thread.currentThread().isInterrupted()) {
+            if (torrentFile == null) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                continue;
+            }
+            if (torrentFile.getPieceHashes().size() == torrentFile.getDownloadedPieces()) {
+                System.err.println("[TorrentClient] File was downloaded!");
+                torrentFile = null;
+                continue;
+            }
 
-        System.err.println("[TorrentClient] Start download file: " + torrentFile.getName());
-        try {
-            this.selector = Selector.open();
-            for (Peer peer : Torrent.getTracker().getPeers()) {
-                SocketChannel socketChannel = peer.getSocketChannel();
-                socketChannel.configureBlocking(false);
-                System.err.println("[TorrentClient] connecting to: " + peer.getAddress());
-                socketChannel.connect(peer.getAddress());
-                socketChannel.register(this.selector, SelectionKey.OP_CONNECT);
-                session.put(socketChannel, peer);
+            System.err.println("[TorrentClient] Start download file: " + torrentFile.getName());
+            try {
+                for (InetSocketAddress address : torrentFile.getTracker().getAddresses()) {
+                    SocketChannel socketChannel = SocketChannel.open();
+                    socketChannel.configureBlocking(false);
+                    System.err.println("[TorrentClient] connecting to: " + address);
+                    socketChannel.connect(address);
+                    socketChannel.register(this.selector, SelectionKey.OP_CONNECT);
+                    Peer peer = new Peer(socketChannel, torrentFile.getInfoHash());
+                    torrentManager.getClientSession().put(socketChannel, peer);
+                }
+            } catch (IOException e) {
+                System.err.println("[TorrentClien] Connection failed!");
             }
 
             boolean complete = false;
-            while (!Thread.currentThread().isInterrupted() && !complete) {
-                this.selector.select(50);
+            while (!complete) {
+                try {
+                    this.selector.select(100);
+                } catch (IOException e) {
+                    System.err.println("[TorrentClient] Selector destroyed!");
+                    throw new RuntimeException(e);
+                }
                 Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
                     keys.remove();
                     if (key.isConnectable()) {
-                        if (((SocketChannel)key.channel()).finishConnect()) {
-                            connect(key);
+                        try {
+                            if (((SocketChannel) key.channel()).finishConnect()) {
+                                connect(key);
+                            }
+                        } catch (IOException e) {
+                            System.err.println("[TorrentClient] Connection failed!");
+                            throw new RuntimeException(e);
                         }
                     } else if (key.isReadable()) {
-                        read(key);
+                        try {
+                            read(key);
+                        } catch (IOException e) {
+                            System.err.println("[TorrentClient] Read failed!");
+                            throw new RuntimeException(e);
+                        }
+                    } else if (key.isWritable()) {
+                        sendRequest(key);
                     }
                 }
-                sendRequest();
                 complete = torrentFile.getPieceManager().getNumberOfAvailablePieces() == torrentFile.getPieceManager().getNumberPieces();
             }
             if (complete) System.err.println("[TorrentClient] File download complete: " + torrentFile.getName());
-            stop();
-        } catch (ClosedSelectorException e) {
-            System.err.println("[TorrentClient] Selector closed!");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
     private void connect(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
-        Peer peer = session.get(socketChannel);
+        Peer peer = torrentManager.getClientSession().get(socketChannel);
         if (peer == null) {
             System.err.println("Peer not found!");
             return;
         }
-        Handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
+        handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
         key.interestOps(SelectionKey.OP_READ);
     }
 
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
-        Peer peer = session.get(socketChannel);
+        Peer peer = torrentManager.getClientSession().get(socketChannel);
 
         if (peer == null) {
             System.err.println("[TorrentClient] Peer not found... Socket exception!");
@@ -101,7 +126,7 @@ public class TorrentClient implements Runnable {
         int numRead = socketChannel.read(lengthBuffer);
         if (numRead == -1) {
             System.err.println("[Torrent] Session closed: " + socketChannel.getRemoteAddress());
-            this.session.remove(socketChannel);
+            torrentManager.getClientSession().remove(socketChannel);
             socketChannel.close();
             key.cancel();
             return;
@@ -116,7 +141,7 @@ public class TorrentClient implements Runnable {
             numRead = socketChannel.read(byteBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentClient] Session closed: " + socketChannel.getRemoteAddress());
-                this.session.remove(socketChannel);
+                torrentManager.getClientSession().remove(socketChannel);
                 socketChannel.close();
                 key.cancel();
                 return;
@@ -124,44 +149,33 @@ public class TorrentClient implements Runnable {
         }
 
         Message message = Message.fromBytes(byteBuffer.flip().array());
-        Handler handler = new Handler(peer, message);
-        Torrent.executor.submit(handler);
+        Handler handler = new Handler(peer, message, torrentManager);
+        torrentManager.executeMessage(handler);
     }
-    private void sendRequest() {
-        for (Map.Entry<SocketChannel, Peer> entry : session.entrySet()) {
-            Peer peer = entry.getValue();
-            if (!peer.isInterested()) continue;
-            int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
-            if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
-                Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
-                Sender sender = new Sender(peer, request);
-                Torrent.executor.submit(sender);
+    private void sendRequest(SelectionKey key) {
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+        Peer peer = torrentManager.getClientSession().get(socketChannel);
 
-                peer.getAvailablePieces().clear(missingPieceIndex);
-            } else {
-                NotInterested notInterested = new NotInterested();
-                Sender sender = new Sender(peer, notInterested);
-                Torrent.executor.submit(sender);
+        if (!peer.isInterested()) return;
 
-                peer.setInterested(false);
-            }
+        int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
+        if (missingPieceIndex >= 0 && missingPieceIndex < torrentFile.getPieceHashes().size()) {
+            Request request = new Request(missingPieceIndex, 0, (int) Math.min(torrentFile.getPieceLength(), torrentFile.getLength() - missingPieceIndex * torrentFile.getPieceLength()));
+            Sender sender = new Sender(peer, request, torrentManager);
+            torrentManager.executeMessage(sender);
+
+            peer.getAvailablePieces().clear(missingPieceIndex);
+        } else {
+            NotInterested notInterested = new NotInterested();
+            Sender sender = new Sender(peer, notInterested, torrentManager);
+            torrentManager.executeMessage(sender);
+
+            peer.setInterested(false);
         }
     }
     public void stop() {
         try {
             Thread.currentThread().interrupt();
-
-            Iterator<Map.Entry<SocketChannel, Peer>> iterator = session.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<SocketChannel, Peer> entry = iterator.next();
-                SocketChannel socketChannel = entry.getKey();
-                try {
-                    socketChannel.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                iterator.remove();
-            }
 
             if (selector != null) {
                 selector.close();

@@ -17,6 +17,7 @@ public class TorrentFile {
     private final List<byte[]> pieceHashes;
     private final byte[] infoHash;
     private final PieceManager pieceManager;
+    private final Tracker tracker;
 
     public TorrentFile(File file) {
         try (
@@ -40,9 +41,14 @@ public class TorrentFile {
             } else {
                 throw new RuntimeException("Bencode failed");
             }
+            this.tracker = new Tracker(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Tracker getTracker() {
+        return tracker;
     }
 
     private List<byte[]> extractPieceHashes(byte[] pieces) {
@@ -70,7 +76,7 @@ public class TorrentFile {
 
     private PieceManager generateExistingPieces() {
         PieceManager generatedPieceManager = new PieceManager(pieceHashes.size());
-        File targetFile = new File(Torrent.DOWNLOADS_DIRECTORY + "/" + name);
+        File targetFile = new File(TorrentManager.DOWNLOADS_DIRECTORY + "/" + name);
         if (targetFile.exists() && targetFile.isFile()) {
             try (RandomAccessFile raf = new RandomAccessFile(targetFile, "r")) {
                 MessageDigest md = MessageDigest.getInstance("SHA-1");

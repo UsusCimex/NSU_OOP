@@ -18,11 +18,6 @@ public class Peer {
         this.address = (InetSocketAddress) socketChannel.getRemoteAddress();
         this.infoHash = infoHash;
     }
-    public Peer(SocketChannel socketChannel, InetSocketAddress address, byte[] infoHash) {
-        this.socketChannel = socketChannel;
-        this.address = address;
-        this.infoHash = infoHash;
-    }
     public void setAvailablePieces(BitSet availablePieces) {
         this.availablePieces = availablePieces;
     }

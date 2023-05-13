@@ -1,19 +1,25 @@
 package ru.nsu.torrent;
 
+import ru.nsu.torrent.Runnables.Handler;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 
-public abstract class Handshake {
+public class Handshake {
     private static final String PROTOCOL_STRING = "BitTorrent protocol";
     private static final int RESERVED_BYTES_LENGTH = 8;
     private static final int HANDSHAKE_LENGTH = 1 + PROTOCOL_STRING.length() + RESERVED_BYTES_LENGTH + 20 + 20;
+    private final TorrentManager torrentManager;
+    public Handshake(TorrentManager torrentManager) {
+        this.torrentManager = torrentManager;
+    }
 
-    public static void sendHandshake(SocketChannel socketChannel, byte[] infoHash, byte[] peerId) throws IOException {
+    public void sendHandshake(SocketChannel socketChannel, byte[] infoHash, byte[] peerId) throws IOException {
         ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
 
-        System.err.println("[Handshake] Start sending(" + Torrent.bytesToHex(infoHash) + ") to " + socketChannel.getRemoteAddress());
+        System.err.println("[Handshake] Start sending(" + torrentManager.bytesToHex(infoHash) + ") to " + socketChannel.getRemoteAddress());
 
         handshakeBuffer.put((byte) PROTOCOL_STRING.length());
         handshakeBuffer.put(PROTOCOL_STRING.getBytes(Charset.forName("ISO-8859-15")));
@@ -27,7 +33,7 @@ public abstract class Handshake {
         }
     }
 
-    public static byte[] receiveHandshake(SocketChannel socketChannel) throws IOException {
+    public byte[] receiveHandshake(SocketChannel socketChannel) throws IOException {
         ByteBuffer handshakeBuffer = ByteBuffer.allocate(HANDSHAKE_LENGTH);
         while (handshakeBuffer.hasRemaining()) {
             socketChannel.read(handshakeBuffer);
@@ -45,7 +51,7 @@ public abstract class Handshake {
             handshakeBuffer.get(reserved);
             handshakeBuffer.get(receivedInfoHash);
             handshakeBuffer.get(peerID);
-            System.err.println("[Handshake] Received : " + Torrent.bytesToHex(receivedInfoHash) + ", from " + socketChannel.getRemoteAddress());
+            System.err.println("[Handshake] Received : " + torrentManager.bytesToHex(receivedInfoHash) + ", from " + socketChannel.getRemoteAddress());
             return receivedInfoHash;
         } else {
             return null;

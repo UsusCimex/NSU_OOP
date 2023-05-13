@@ -2,8 +2,8 @@ package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.Messages.*;
 import ru.nsu.torrent.Peer;
-import ru.nsu.torrent.Torrent;
 import ru.nsu.torrent.TorrentFile;
+import ru.nsu.torrent.TorrentManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,10 +16,11 @@ import java.util.BitSet;
 public class Handler implements Runnable {
     private final Peer peer;
     private final Message message;
-
-    public Handler(Peer peer, Message message) {
+    private final TorrentManager torrentManager;
+    public Handler(Peer peer, Message message, TorrentManager torrentManager) {
         this.peer = peer;
         this.message = message;
+        this.torrentManager = torrentManager;
     }
 
     @Override
@@ -35,8 +36,8 @@ public class Handler implements Runnable {
                 byte[] data = readPieceData(index, offset, length);
                 if (data == null) return;
                 Piece piece = new Piece(index, offset, data);
-                Sender sender = new Sender(peer, piece);
-                Torrent.executor.submit(sender);
+                Sender sender = new Sender(peer, piece, torrentManager);
+                torrentManager.executeMessage(sender);
             }
             case (Piece.PIECE) -> {
                 Piece piece = (Piece) message;
@@ -44,7 +45,7 @@ public class Handler implements Runnable {
                 int offset = piece.getOffset();
                 byte[] data = piece.getData();
 
-                TorrentFile torrentFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+                TorrentFile torrentFile = torrentManager.getTorrentFile(peer.getInfoHash());
                 if (torrentFile == null) {
                     throw new IllegalStateException("[Handler] File not found... Hash exception!");
                 }
@@ -63,17 +64,8 @@ public class Handler implements Runnable {
                 byte[] expectedHash = torrentFile.getPieceHashes().get(index);
 
                 if (Arrays.equals(calculatedHash, expectedHash)) {
-                    try (RandomAccessFile raf = new RandomAccessFile(Torrent.getDownloadFileByTorrent(torrentFile), "rw")) {
-                        raf.seek((long) index * torrentFile.getPieceLength() + offset);
-                        raf.write(data);
-                        Torrent.getFile().markPieceAsDownloaded(index);
-                    } catch (IOException e) {
-                        throw new RuntimeException("[Handler] File not found!", e);
-                    }
-
-                    Have have = new Have(index);
-                    Sender sender = new Sender(peer, have);
-                    Torrent.executor.submit(sender);
+                    FileWorker fileWorker = new FileWorker(peer, message, torrentManager);
+                    torrentManager.executeFileWrite(fileWorker);
                 } else {
                     System.err.println("[Handler] Hashes do not match for piece " + index);
                 }
@@ -83,20 +75,20 @@ public class Handler implements Runnable {
                 int index = have.getIndex();
                 peer.getAvailablePieces().set(index);
 
-                TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+                TorrentFile tFile = torrentManager.getTorrentFile(peer.getInfoHash());
                 assert tFile != null;
                 BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
                 availablePieces.or(tFile.getPieceManager().getAvailablePieces());
                 if (!availablePieces.get(index)) {
-                    Sender sender = new Sender(peer, new Interested());
-                    Torrent.executor.submit(sender);
+                    Sender sender = new Sender(peer, new Interested(), torrentManager);
+                    torrentManager.executeMessage(sender);
                 }
             }
             case (Bitfield.BITFIELD) -> {
                 Bitfield bitfield = (Bitfield) message;
                 peer.setAvailablePieces(bitfield.getBitSet());
 
-                TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+                TorrentFile tFile = torrentManager.getTorrentFile(peer.getInfoHash());
                 assert tFile != null;
                 BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
                 availablePieces.or(tFile.getPieceManager().getAvailablePieces());
@@ -107,17 +99,18 @@ public class Handler implements Runnable {
                 Sender sender;
                 if (availablePieces.cardinality() != 0) {
                     peer.setInterested(true);
-                    sender = new Sender(peer, new Interested());
+                    sender = new Sender(peer, new Interested(), torrentManager);
                 } else {
                     peer.setInterested(false);
-                    sender = new Sender(peer, new NotInterested());
+                    sender = new Sender(peer, new NotInterested(), torrentManager);
                 }
-                Torrent.executor.submit(sender);
+                torrentManager.executeMessage(sender);
             }
             case (Choke.CHOKE) -> peer.setChoked(true);
             case (Unchoke.UNCHOKE) -> peer.setChoked(false);
             case (Interested.INTERESTED) -> peer.setInterested(true);
             case (NotInterested.NOT_INTERESTED) -> peer.setInterested(false);
+            default -> System.err.println("[Handler] Message(Type = " + message.getType() + ") not found...");
         }
         try {
             printMessage(message, peer);
@@ -127,12 +120,12 @@ public class Handler implements Runnable {
     }
 
     private byte[] readPieceData(int index, int offset, int length) {
-        TorrentFile tFile = Torrent.getTorrentFileByInfoHash(peer.getInfoHash());
+        TorrentFile tFile = torrentManager.getTorrentFile(peer.getInfoHash());
         assert tFile != null;
         if (!tFile.getPieceManager().getPiece(index)) {
             return null;
         }
-        File fileByInfoHash = Torrent.getDownloadFileByTorrent(tFile);
+        File fileByInfoHash = torrentManager.getDownloadFileByTorrent(tFile);
         try (RandomAccessFile file = new RandomAccessFile(fileByInfoHash, "r")) {
             file.seek((long) index * tFile.getPieceLength() + offset);
 

@@ -3,24 +3,30 @@ package ru.nsu.torrent.Runnables;
 import ru.nsu.torrent.Messages.*;
 import ru.nsu.torrent.Peer;
 import ru.nsu.torrent.Torrent;
+import ru.nsu.torrent.TorrentManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.util.Map;
 
 public class Sender implements Runnable {
     private final Peer peer;
     private final Message message;
+    private final TorrentManager torrentManager;
 
-    public Sender(Peer peer, Message message) {
+    public Sender(Peer peer, Message message, TorrentManager torrentManager) {
         this.peer = peer;
         this.message = message;
+        this.torrentManager = torrentManager;
     }
 
     @Override
     public void run() {
         try {
             if (message instanceof Have) {
-                for (Peer pr : Torrent.getTracker().getPeers()) {
+                for (Map.Entry<SocketChannel, Peer> iterator : torrentManager.getClientSession().entrySet()) {
+                    Peer pr = iterator.getValue();
                     if (pr.getSocketChannel().isConnected()) {
                         if (pr == peer) continue;
                         if (!pr.isInterested() && !pr.isChoked()) {
