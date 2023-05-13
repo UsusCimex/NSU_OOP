@@ -9,16 +9,18 @@ import java.io.IOException;
 public class Torrent {
     private final TorrentServer torrentServer;
     private final TorrentClient torrentClient;
+    private final Thread serverThread;
+    private final Thread clientThread;
     private final TorrentManager torrentManager = new TorrentManager();
     public Torrent(String host, int port) {
         try {
-            torrentServer = new TorrentServer(host, port, torrentManager);
-            Thread listenerThread = new Thread(torrentServer);
-            listenerThread.start();
+            this.torrentServer = new TorrentServer(host, port, torrentManager);
+            this.serverThread = new Thread(torrentServer);
+            this.serverThread.start();
 
-            torrentClient = new TorrentClient(torrentManager);
-            Thread downloader = new Thread(torrentClient);
-            downloader.start();
+            this.torrentClient = new TorrentClient(torrentManager);
+            this.clientThread = new Thread(torrentClient);
+            this.clientThread.start();
         } catch (IOException e) {
             System.err.println("[Torrent] Server/Client destroyed!");
             throw new RuntimeException(e);
@@ -26,9 +28,11 @@ public class Torrent {
     }
     public void stopTorrent() {
         if (torrentServer != null) {
+            serverThread.interrupt();
             torrentServer.stop();
         }
         if (torrentClient != null) {
+            clientThread.interrupt();
             torrentClient.stop();
         }
         torrentManager.stop();

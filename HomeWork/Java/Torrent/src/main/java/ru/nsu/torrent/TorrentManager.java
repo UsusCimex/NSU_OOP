@@ -82,6 +82,9 @@ public class TorrentManager {
         if (!messagesExecutor.isShutdown()) {
             messagesExecutor.shutdown();
         }
+        if (!fileWriterExecutor.isShutdown()) {
+            fileWriterExecutor.shutdown();
+        }
 
         Iterator<Map.Entry<SocketChannel, Peer>> iterator = ClientSession.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -94,6 +97,7 @@ public class TorrentManager {
             }
             iterator.remove();
         }
+        ClientSession.clear();
 
         Iterator<Map.Entry<SocketChannel, Peer>> iterator2 = ServerSession.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -106,5 +110,6 @@ public class TorrentManager {
             }
             iterator2.remove();
         }
+        ServerSession.clear();
     }
 }

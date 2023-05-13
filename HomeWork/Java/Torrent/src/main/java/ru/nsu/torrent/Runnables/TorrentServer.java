@@ -37,30 +37,35 @@ public class TorrentServer implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                this.selector.selectNow();
-            } catch (IOException e) {
-                System.err.println("[TorrentServer] Selector destroyed.");
-                throw new RuntimeException(e);
-            }
-            Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
-            while (keys.hasNext()) {
-                SelectionKey key = keys.next();
-                keys.remove();
-                if (key.isAcceptable()) {
-                    try {
-                        accept(key);
-                    } catch (IOException e) {
-                        System.err.println("[TorrentServer] Accept failed.");
-                        throw new RuntimeException(e);
-                    }
-                } else if (key.isReadable()) {
-                    try {
-                        read(key);
-                    } catch (IOException e) {
-                        System.err.println("[TorrentServer] Read failed.");
-                        throw new RuntimeException(e);
+                try {
+                    this.selector.selectNow();
+                } catch (IOException e) {
+                    System.err.println("[TorrentServer] Selector destroyed.");
+                    throw new RuntimeException(e);
+                }
+                Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
+                while (keys.hasNext()) {
+                    SelectionKey key = keys.next();
+                    keys.remove();
+                    if (key.isAcceptable()) {
+                        try {
+                            accept(key);
+                        } catch (IOException e) {
+                            System.err.println("[TorrentServer] Accept failed.");
+                            throw new RuntimeException(e);
+                        }
+                    } else if (key.isReadable()) {
+                        try {
+                            read(key);
+                        } catch (IOException e) {
+                            System.err.println("[TorrentServer] Read failed.");
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
+            } catch (ClosedSelectorException e) {
+                System.err.println("Selector closed!");
+                throw new RuntimeException(e);
             }
         }
     }
@@ -141,8 +146,6 @@ public class TorrentServer implements Runnable {
 
     public void stop() {
         try {
-            Thread.currentThread().interrupt();
-
             if (serverSocketChannel != null) {
                 serverSocketChannel.close();
             }

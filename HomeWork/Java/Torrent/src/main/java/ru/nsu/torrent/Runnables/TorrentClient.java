@@ -33,9 +33,9 @@ public class TorrentClient implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             if (torrentFile == null) {
                 try {
-                    Thread.sleep(250);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    Thread.currentThread().interrupt();
                 }
                 continue;
             }
@@ -57,7 +57,7 @@ public class TorrentClient implements Runnable {
                     torrentManager.getClientSession().put(socketChannel, peer);
                 }
             } catch (IOException e) {
-                System.err.println("[TorrentClien] Connection failed!");
+                System.err.println("[TorrentClient] Connection failed!");
             }
 
             boolean complete = false;
@@ -175,8 +175,6 @@ public class TorrentClient implements Runnable {
     }
     public void stop() {
         try {
-            Thread.currentThread().interrupt();
-
             if (selector != null) {
                 selector.close();
             }
