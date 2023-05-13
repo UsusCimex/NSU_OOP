@@ -28,8 +28,16 @@ public class Handshake {
         handshakeBuffer.put(peerId);
         handshakeBuffer.flip();
 
-        while (handshakeBuffer.hasRemaining()) {
-            socketChannel.write(handshakeBuffer);
+        try {
+            while (handshakeBuffer.hasRemaining()) {
+                int numWrite = socketChannel.write(handshakeBuffer);
+                if (numWrite == -1) {
+                    socketChannel.close();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("[Handshake] Handshake not sending (" + socketChannel.getRemoteAddress() + ")");
+            throw new IOException();
         }
     }
 

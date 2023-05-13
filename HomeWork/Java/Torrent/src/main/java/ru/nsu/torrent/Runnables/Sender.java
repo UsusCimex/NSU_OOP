@@ -8,6 +8,7 @@ import ru.nsu.torrent.TorrentManager;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 import java.util.Map;
 
 public class Sender implements Runnable {
@@ -24,16 +25,17 @@ public class Sender implements Runnable {
     @Override
     public void run() {
         try {
-            if (message instanceof Have) {
-                for (Map.Entry<SocketChannel, Peer> iterator : torrentManager.getClientSession().entrySet()) {
+            if (message.getType() == Have.HAVE) {
+                for (Map.Entry<SocketChannel, Peer> iterator : torrentManager.getServerSession().entrySet()) {
                     Peer pr = iterator.getValue();
                     if (pr.getSocketChannel().isConnected()) {
-                        if (pr == peer) continue;
+                        if (pr == peer || !Arrays.equals(pr.getInfoHash(), peer.getInfoHash())) continue;
                         if (!pr.isInterested() && !pr.isChoked()) {
                             ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
                             while (byteBuffer.hasRemaining()) {
                                 int numWrite = pr.getSocketChannel().write(byteBuffer);
                                 if (numWrite == -1) {
+                                    torrentManager.getClientSession().remove(pr.getSocketChannel());
                                     pr.getSocketChannel().close();
                                     break;
                                 }
@@ -49,8 +51,9 @@ public class Sender implements Runnable {
                     while (byteBuffer.hasRemaining()) {
                         int numWrite = peer.getSocketChannel().write(byteBuffer);
                         if (numWrite == -1) {
+                            torrentManager.getServerSession().remove(peer.getSocketChannel());
                             peer.getSocketChannel().close();
-                            throw new RuntimeException("[Sender] Error socket write");
+                            throw new IOException();
                         }
                     }
                     printMessage(message, peer);

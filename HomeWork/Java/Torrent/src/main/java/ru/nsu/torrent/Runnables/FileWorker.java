@@ -4,7 +4,6 @@ import ru.nsu.torrent.Messages.Have;
 import ru.nsu.torrent.Messages.Message;
 import ru.nsu.torrent.Messages.Piece;
 import ru.nsu.torrent.Peer;
-import ru.nsu.torrent.Torrent;
 import ru.nsu.torrent.TorrentFile;
 import ru.nsu.torrent.TorrentManager;
 

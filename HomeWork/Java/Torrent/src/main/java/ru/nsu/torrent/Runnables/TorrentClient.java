@@ -80,6 +80,12 @@ public class TorrentClient implements Runnable {
                             }
                         } catch (IOException e) {
                             System.err.println("[TorrentClient] Connection failed!");
+                            torrentManager.getClientSession().remove((SocketChannel) (key.channel()));
+                            try {
+                                key.channel().close();
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
                             isDownloadProcess = false;
                         }
                     } else if (key.isReadable()) {
@@ -87,6 +93,12 @@ public class TorrentClient implements Runnable {
                             read(key);
                         } catch (IOException e) {
                             System.err.println("[TorrentClient] Read failed!");
+                            torrentManager.getClientSession().remove((SocketChannel) (key.channel()));
+                            try {
+                                key.channel().close();
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
                             isDownloadProcess = false;
                         }
                     }
