@@ -7,7 +7,6 @@ import ru.nsu.torrent.Messages.NotInterested;
 import ru.nsu.torrent.Messages.Request;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;

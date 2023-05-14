@@ -45,7 +45,6 @@ public class Handler implements Runnable {
             case (Piece.PIECE) -> {
                 Piece piece = (Piece) message;
                 int index = piece.getIndex();
-                int offset = piece.getOffset();
                 byte[] data = piece.getData();
 
                 TorrentFile torrentFile = torrentManager.getTorrentFile(peer.getInfoHash());

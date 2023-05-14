@@ -72,40 +72,6 @@ public class TorrentApp extends Application {
     @Override
     public void stop() {
         torrent.stopTorrent();
-//        printThreadDebug();
-    }
-
-    private void printThreadDebug() {
-
-        ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-
-        // Создаем массив с достаточной емкостью, чтобы вместить все потоки
-        Thread[] threads = new Thread[threadGroup.activeCount()];
-
-        // Заполняем массив потоками
-        threadGroup.enumerate(threads);
-
-        // Выводим информацию о каждом потоке
-        for (Thread thread : threads) {
-            System.out.println("Name thread: " + thread.getName());
-            System.out.println("ID thread: " + thread.getId());
-            System.out.println("Status: " + thread.getState());
-            System.out.println("Priority: " + thread.getPriority());
-
-            // Получаем стек вызовов потока
-            StackTraceElement[] stackTrace = thread.getStackTrace();
-
-            System.out.println("Stack:");
-            for (StackTraceElement stackTraceElement : stackTrace) {
-                System.out.println("  Class: " + stackTraceElement.getClassName());
-                System.out.println("  Method: " + stackTraceElement.getMethodName());
-                System.out.println("  File: " + stackTraceElement.getFileName());
-                System.out.println("  Line: " + stackTraceElement.getLineNumber());
-                System.out.println("-----------------------");
-            }
-
-            System.out.println("===============================");
-        }
     }
 
     private void updateProgress() {

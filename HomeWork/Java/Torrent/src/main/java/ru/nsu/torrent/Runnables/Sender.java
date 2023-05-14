@@ -2,7 +2,6 @@ package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.Messages.*;
 import ru.nsu.torrent.Peer;
-import ru.nsu.torrent.Torrent;
 import ru.nsu.torrent.TorrentManager;
 
 import java.io.IOException;

@@ -2,9 +2,7 @@ package ru.nsu.torrent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
 import java.util.*;
 
 // По ТЗ не нужен, но пусть возвращает список пиров из файла

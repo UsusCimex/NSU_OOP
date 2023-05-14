@@ -4,7 +4,6 @@ import ru.nsu.torrent.Handshake;
 import ru.nsu.torrent.Messages.Bitfield;
 import ru.nsu.torrent.Messages.Message;
 import ru.nsu.torrent.Peer;
-import ru.nsu.torrent.Torrent;
 import ru.nsu.torrent.TorrentManager;
 
 import java.io.IOException;
@@ -14,13 +13,12 @@ import java.nio.channels.*;
 import java.util.*;
 
 public class TorrentServer implements Runnable {
-    private final InetSocketAddress address;
-    private Selector selector;
-    private ServerSocketChannel serverSocketChannel;
-    private TorrentManager torrentManager;
+    private final Selector selector;
+    private final ServerSocketChannel serverSocketChannel;
+    private final TorrentManager torrentManager;
     private final Handshake handshake;
     public TorrentServer(String host, int port, TorrentManager torrentManager) throws IOException {
-        this.address = new InetSocketAddress(host, port);
+        InetSocketAddress address = new InetSocketAddress(host, port);
         this.torrentManager = torrentManager;
         this.selector = Selector.open();
         this.serverSocketChannel = ServerSocketChannel.open();
