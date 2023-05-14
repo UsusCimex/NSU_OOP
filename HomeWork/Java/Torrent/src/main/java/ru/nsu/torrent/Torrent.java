@@ -41,7 +41,6 @@ public class Torrent {
     public void selectFile(File file) {
         this.selectedFile = file;
         torrentManager.stopSession(torrentManager.getClientSession());
-        torrentManager.updateTorrents();
         TorrentFile torrentFile = torrentManager.getTorrentFile(selectedFile);
         torrentClient.changeFile(torrentFile);
     }

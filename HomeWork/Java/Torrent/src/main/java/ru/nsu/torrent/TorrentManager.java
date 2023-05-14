@@ -51,7 +51,7 @@ public class TorrentManager {
             }
         }
     }
-    public void updateTorrents() {
+    private void updateTorrents() {
         torrents.clear();
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
@@ -100,13 +100,18 @@ public class TorrentManager {
     }
     public TorrentFile getTorrentFile(File file) {
         if (file == null) return null;
-        return torrents.get(file.getAbsoluteFile());
+        TorrentFile torrentFile = torrents.get(file.getAbsoluteFile());
+        if (torrentFile == null) {
+            torrents.put(file.getAbsoluteFile(), new TorrentFile(file));
+            torrentFile = torrents.get(file.getAbsoluteFile());
+        }
+        return torrentFile;
     }
     public TorrentFile getTorrentFile(byte[] infoHash) {
         for (Map.Entry<File, TorrentFile> entry : torrents.entrySet()) {
             TorrentFile tFile = entry.getValue();
             if (Arrays.equals(tFile.getInfoHash(), infoHash)) {
-                return tFile;
+                return tFile.updated();
             }
         }
         return null;

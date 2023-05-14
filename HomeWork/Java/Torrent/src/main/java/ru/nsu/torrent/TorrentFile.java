@@ -16,8 +16,8 @@ public class TorrentFile {
     private final long pieceLength;
     private final List<byte[]> pieceHashes;
     private final byte[] infoHash;
-    private final PieceManager pieceManager;
-    private final Tracker tracker;
+    private PieceManager pieceManager;
+    private Tracker tracker;
 
     public TorrentFile(File file) {
         try (
@@ -49,6 +49,11 @@ public class TorrentFile {
 
     public Tracker getTracker() {
         return tracker;
+    }
+    public TorrentFile updated() {
+        this.pieceManager = generateExistingPieces();
+        this.tracker = new Tracker(this);
+        return this;
     }
 
     private List<byte[]> extractPieceHashes(byte[] pieces) {
