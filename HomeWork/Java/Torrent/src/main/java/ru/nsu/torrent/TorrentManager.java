@@ -4,6 +4,9 @@ import ru.nsu.torrent.Messages.Message;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +24,34 @@ public class TorrentManager {
 
     public TorrentManager() {
         updateTorrents();
+    }
+    public void updateClientSession(TorrentFile torrentFile, Selector selector) {
+        List<InetSocketAddress> addresses = torrentFile.getTracker().getAddresses();
+        Map<SocketChannel, Peer> clientSession = getClientSession();
+
+        for (InetSocketAddress address : addresses) {
+            try {
+                boolean sessionExists = false;
+                for (SocketChannel channel : clientSession.keySet()) {
+                    if (channel.getRemoteAddress().equals(address)) {
+                        sessionExists = true;
+                        break;
+                    }
+                }
+
+                if (!sessionExists) {
+                    SocketChannel socketChannel = SocketChannel.open();
+                    socketChannel.configureBlocking(false);
+                    System.err.println("[TorrentManager] connecting to: " + address);
+                    socketChannel.connect(address);
+                    socketChannel.register(selector, SelectionKey.OP_CONNECT);
+                    Peer peer = new Peer(socketChannel, torrentFile.getInfoHash());
+                    clientSession.put(socketChannel, peer);
+                }
+            } catch (IOException e) {
+                System.err.println("[TorrentManager] ClientSession update exception...");
+            }
+        }
     }
     public void updateTorrents() {
         torrents.clear();
@@ -50,9 +81,10 @@ public class TorrentManager {
             Map.Entry<SocketChannel, Peer> entry = iterator.next();
             SocketChannel socketChannel = entry.getKey();
             try {
+                System.err.println("[TorrentManager] Session: " + socketChannel.getRemoteAddress() + " closed.");
                 socketChannel.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("[TorrentManager] Close socket exception!");
             }
             iterator.remove();
         }

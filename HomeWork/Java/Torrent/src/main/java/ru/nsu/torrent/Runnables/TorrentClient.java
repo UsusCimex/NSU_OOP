@@ -1,6 +1,7 @@
 package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.*;
+import ru.nsu.torrent.Messages.Bitfield;
 import ru.nsu.torrent.Messages.Message;
 import ru.nsu.torrent.Messages.NotInterested;
 import ru.nsu.torrent.Messages.Request;
@@ -42,25 +43,17 @@ public class TorrentClient implements Runnable {
                 torrentFile = null;
                 continue;
             }
+            if (torrentFile.getTracker().getAddresses().isEmpty()) {
+                System.err.println("[TorrentClient] Peers not found!");
+                torrentFile = null;
+                continue;
+            }
 
             System.err.println("[TorrentClient] Start download file: " + torrentFile.getName());
             isDownloadProcess = true;
-            try {
-                for (InetSocketAddress address : torrentFile.getTracker().getAddresses()) {
-                    SocketChannel socketChannel = SocketChannel.open();
-                    socketChannel.configureBlocking(false);
-                    System.err.println("[TorrentClient] connecting to: " + address);
-                    socketChannel.connect(address);
-                    socketChannel.register(this.selector, SelectionKey.OP_CONNECT);
-                    Peer peer = new Peer(socketChannel, torrentFile.getInfoHash());
-                    torrentManager.getClientSession().put(socketChannel, peer);
-                }
-            } catch (IOException e) {
-                System.err.println("[TorrentClient] Connection failed!");
-            }
-
             boolean complete = false;
             while (!complete && isDownloadProcess) {
+                torrentManager.updateClientSession(torrentFile, selector);
                 Iterator<SelectionKey> keys;
                 try {
                     this.selector.select(100);
@@ -86,7 +79,6 @@ public class TorrentClient implements Runnable {
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
                             }
-                            isDownloadProcess = false;
                         }
                     } else if (key.isReadable()) {
                         try {
@@ -99,14 +91,25 @@ public class TorrentClient implements Runnable {
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
                             }
-                            isDownloadProcess = false;
                         }
                     }
                 }
                 sendRequest();
                 complete = torrentFile.getPieceManager().getNumberOfAvailablePieces() == torrentFile.getPieceManager().getNumberPieces();
             }
-            if (complete) System.err.println("[TorrentClient] File download complete: " + torrentFile.getName());
+            if (complete) {
+                System.err.println("[TorrentClient] File download complete: " + torrentFile.getName());
+                for (Peer pr : torrentManager.getServerSession().values()) {
+                    if (pr.getSocketChannel().isConnected()) {
+                        if (pr.getAvailablePieces().cardinality() != torrentFile.getDownloadedPieces()) {
+                            Sender sender = new Sender(pr, new Bitfield(torrentFile.getPieceManager().getAvailablePieces()), torrentManager);
+                            torrentManager.executeMessage(sender);
+                        }
+                    }
+                }
+            }
+            torrentFile = null;
+            torrentManager.stopSession(torrentManager.getClientSession());
         }
     }
 
@@ -115,7 +118,7 @@ public class TorrentClient implements Runnable {
 
         Peer peer = torrentManager.getClientSession().get(socketChannel);
         if (peer == null) {
-            System.err.println("Peer not found!");
+            System.err.println("[TorrentClient] Peer not found!");
             return;
         }
         handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
@@ -137,7 +140,7 @@ public class TorrentClient implements Runnable {
         ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
         int numRead = socketChannel.read(lengthBuffer);
         if (numRead == -1) {
-            System.err.println("[Torrent] Session closed: " + socketChannel.getRemoteAddress());
+            System.err.println("[TorrentClient] Session closed: " + socketChannel.getRemoteAddress());
             torrentManager.getClientSession().remove(socketChannel);
             socketChannel.close();
             key.cancel();

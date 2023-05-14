@@ -6,6 +6,9 @@ public abstract class Message {
     protected int length;
     protected byte type;
 
+    public int getLength() {
+        return length;
+    }
     public byte getType() {
         return type;
     }
@@ -14,6 +17,7 @@ public abstract class Message {
     public static Message fromBytes(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         int length = buffer.getInt();
+        if (length == 0) return new KeepAlive();
         byte type = buffer.get();
 
         return switch (type) {

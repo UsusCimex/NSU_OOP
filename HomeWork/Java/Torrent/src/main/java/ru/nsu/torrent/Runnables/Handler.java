@@ -25,6 +25,9 @@ public class Handler implements Runnable {
 
     @Override
     public void run() {
+        if (message.getLength() == 0) {
+            return;
+        }
         byte type = message.getType();
         switch (type) {
             case (Request.REQUEST) -> {
@@ -76,12 +79,12 @@ public class Handler implements Runnable {
                 peer.getAvailablePieces().set(index);
 
                 TorrentFile tFile = torrentManager.getTorrentFile(peer.getInfoHash());
-                assert tFile != null;
                 BitSet availablePieces = new BitSet(tFile.getPieceManager().getNumberPieces());
                 availablePieces.or(tFile.getPieceManager().getAvailablePieces());
                 if (!availablePieces.get(index)) {
                     Sender sender = new Sender(peer, new Interested(), torrentManager);
                     torrentManager.executeMessage(sender);
+                    peer.setInterested(true);
                 }
             }
             case (Bitfield.BITFIELD) -> {
