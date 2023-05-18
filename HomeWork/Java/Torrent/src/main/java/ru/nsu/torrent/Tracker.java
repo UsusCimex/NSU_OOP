@@ -3,17 +3,18 @@ package ru.nsu.torrent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.*;
 
 // По ТЗ не нужен, но пусть возвращает список пиров из файла
 public class Tracker {
-    private final List<InetSocketAddress> addresses = new ArrayList<>();;
+    private final List<SocketAddress> addresses = new ArrayList<>();
     private final TorrentFile torrentFile;
     public final String TRACKERS_DIRECTORY = "trackersDir";
     public Tracker(TorrentFile torrentFile) {
         this.torrentFile = torrentFile;
     }
-    public List<InetSocketAddress> getAddresses() {
+    public List<SocketAddress> getAddresses() {
         updateAddresses();
         return addresses;
     }
@@ -25,7 +26,7 @@ public class Tracker {
                 String[] peerData = scanner.nextLine().split(":");
                 String ipAddress = peerData[0].trim();
                 int port = Integer.parseInt(peerData[1].trim());
-                InetSocketAddress address = new InetSocketAddress(ipAddress, port);
+                SocketAddress address = new InetSocketAddress(ipAddress, port);
                 addresses.add(address);
             }
         } catch (FileNotFoundException ex) {

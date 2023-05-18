@@ -17,7 +17,7 @@ public class TorrentFile {
     private final List<byte[]> pieceHashes;
     private final byte[] infoHash;
     private PieceManager pieceManager;
-    private Tracker tracker;
+    private final Tracker tracker;
 
     public TorrentFile(File file) {
         try (

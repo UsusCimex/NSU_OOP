@@ -5,8 +5,8 @@ import ru.nsu.torrent.Peer;
 import ru.nsu.torrent.TorrentManager;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class Sender implements Runnable {
     public void run() {
         try {
             if (message.getType() == Have.HAVE) {
-                for (Map.Entry<SocketChannel, Peer> iterator : torrentManager.getServerSession().entrySet()) {
+                for (Map.Entry<SocketAddress, Peer> iterator : torrentManager.getServerSession().entrySet()) {
                     Peer pr = iterator.getValue();
                     if (pr.getSocketChannel().isConnected()) {
                         if (pr == peer || !Arrays.equals(pr.getInfoHash(), peer.getInfoHash())) continue;
@@ -34,7 +34,7 @@ public class Sender implements Runnable {
                             while (byteBuffer.hasRemaining()) {
                                 int numWrite = pr.getSocketChannel().write(byteBuffer);
                                 if (numWrite == -1) {
-                                    torrentManager.getClientSession().remove(pr.getSocketChannel());
+                                    torrentManager.getClientSession().remove(iterator.getKey());
                                     pr.getSocketChannel().close();
                                     break;
                                 }
@@ -50,7 +50,7 @@ public class Sender implements Runnable {
                     while (byteBuffer.hasRemaining()) {
                         int numWrite = peer.getSocketChannel().write(byteBuffer);
                         if (numWrite == -1) {
-                            torrentManager.getServerSession().remove(peer.getSocketChannel());
+                            torrentManager.getServerSession().remove(peer.getSocketChannel().getRemoteAddress());
                             peer.getSocketChannel().close();
                             throw new IOException();
                         }

@@ -8,6 +8,7 @@ import ru.nsu.torrent.Messages.Request;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
@@ -76,7 +77,7 @@ public class TorrentClient implements Runnable {
                                 SocketChannel socketChannel = (SocketChannel) (key.channel());
                                 Socket socket = socketChannel.socket();
                                 System.err.println("[TorrentClient] Connection failed: " + socket.getRemoteSocketAddress());
-                                torrentManager.getClientSession().remove(socketChannel);
+                                torrentManager.getClientSession().remove(socket.getRemoteSocketAddress());
                                 socketChannel.close();
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
@@ -90,7 +91,7 @@ public class TorrentClient implements Runnable {
                                 SocketChannel socketChannel = (SocketChannel) (key.channel());
                                 Socket socket = socketChannel.socket();
                                 System.err.println("[TorrentClient] Read failed: " + socket.getRemoteSocketAddress());
-                                torrentManager.getClientSession().remove(socketChannel);
+                                torrentManager.getClientSession().remove(socket.getRemoteSocketAddress());
                                 socketChannel.close();
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
@@ -120,7 +121,7 @@ public class TorrentClient implements Runnable {
     private void connect(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
-        Peer peer = torrentManager.getClientSession().get(socketChannel);
+        Peer peer = torrentManager.getClientSession().get(socketChannel.getRemoteAddress());
         if (peer == null) {
             System.err.println("[TorrentClient] Peer not found!");
             return;
@@ -132,7 +133,7 @@ public class TorrentClient implements Runnable {
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
-        Peer peer = torrentManager.getClientSession().get(socketChannel);
+        Peer peer = torrentManager.getClientSession().get(socketChannel.getRemoteAddress());
 
         if (peer == null) {
             System.err.println("[TorrentClient] Peer not found... Socket exception!");
@@ -145,7 +146,7 @@ public class TorrentClient implements Runnable {
         int numRead = socketChannel.read(lengthBuffer);
         if (numRead == -1) {
             System.err.println("[TorrentClient] Session closed: " + socketChannel.getRemoteAddress());
-            torrentManager.getClientSession().remove(socketChannel);
+            torrentManager.getClientSession().remove(socketChannel.getRemoteAddress());
             socketChannel.close();
             key.cancel();
             return;
@@ -160,7 +161,7 @@ public class TorrentClient implements Runnable {
             numRead = socketChannel.read(byteBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentClient] Session closed: " + socketChannel.getRemoteAddress());
-                torrentManager.getClientSession().remove(socketChannel);
+                torrentManager.getClientSession().remove(socketChannel.getRemoteAddress());
                 socketChannel.close();
                 key.cancel();
                 return;
@@ -172,7 +173,7 @@ public class TorrentClient implements Runnable {
         torrentManager.executeMessage(handler);
     }
     private void sendRequest() {
-        for (Map.Entry<SocketChannel, Peer> iter : torrentManager.getClientSession().entrySet()) {
+        for (Map.Entry<SocketAddress, Peer> iter : torrentManager.getClientSession().entrySet()) {
             Peer peer = iter.getValue();
             if (!peer.isInterested()) return;
 

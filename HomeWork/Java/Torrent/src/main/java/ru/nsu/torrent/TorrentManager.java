@@ -2,7 +2,7 @@ package ru.nsu.torrent;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -17,21 +17,21 @@ public class TorrentManager {
     private final ExecutorService fileWriterExecutor = Executors.newFixedThreadPool(1);
     private final Map<File, TorrentFile> torrents = new HashMap<>();
 
-    private final Map<SocketChannel, Peer> ClientSession = new HashMap<>();
-    private final Map<SocketChannel, Peer> ServerSession = new HashMap<>();
+    private final Map<SocketAddress, Peer> ClientSession = new HashMap<>();
+    private final Map<SocketAddress, Peer> ServerSession = new HashMap<>();
 
     public TorrentManager() {
         updateTorrents();
     }
     public void updateClientSession(TorrentFile torrentFile, Selector selector) {
-        List<InetSocketAddress> addresses = torrentFile.getTracker().getAddresses();
-        Map<SocketChannel, Peer> clientSession = getClientSession();
+        List<SocketAddress> addresses = torrentFile.getTracker().getAddresses();
+        Map<SocketAddress, Peer> clientSession = getClientSession();
 
-        for (InetSocketAddress address : addresses) {
+        for (SocketAddress address : addresses) {
             try {
                 boolean sessionExists = false;
-                for (SocketChannel channel : clientSession.keySet()) {
-                    if (channel.getRemoteAddress().equals(address)) {
+                for (Peer peer : clientSession.values()) {
+                    if (peer.getSocketChannel().getRemoteAddress().equals(address)) {
                         sessionExists = true;
                         break;
                     }
@@ -44,7 +44,7 @@ public class TorrentManager {
                     socketChannel.connect(address);
                     socketChannel.register(selector, SelectionKey.OP_CONNECT);
                     Peer peer = new Peer(socketChannel, torrentFile.getInfoHash());
-                    clientSession.put(socketChannel, peer);
+                    clientSession.put(address, peer);
                 }
             } catch (IOException e) {
                 System.err.println("[TorrentManager] ClientSession update exception...");
@@ -67,22 +67,24 @@ public class TorrentManager {
         fileWriterExecutor.submit(runnable);
     }
 
-    public Map<SocketChannel, Peer> getClientSession() {
+    public Map<SocketAddress, Peer> getClientSession() {
         return ClientSession;
     }
-    public Map<SocketChannel, Peer> getServerSession() {
+    public Map<SocketAddress, Peer> getServerSession() {
         return ServerSession;
     }
-    public void stopSession(Map<SocketChannel, Peer> session) {
-        Iterator<Map.Entry<SocketChannel, Peer>> iterator = session.entrySet().iterator();
+    public void stopSession(Map<SocketAddress, Peer> session) {
+        Iterator<Map.Entry<SocketAddress, Peer>> iterator = session.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<SocketChannel, Peer> entry = iterator.next();
-            SocketChannel socketChannel = entry.getKey();
-            try {
-                System.err.println("[TorrentManager] Session: " + socketChannel.getRemoteAddress() + " closed.");
-                socketChannel.close();
-            } catch (IOException e) {
-                System.err.println("[TorrentManager] Close socket exception!");
+            Map.Entry<SocketAddress, Peer> entry = iterator.next();
+            SocketChannel socketChannel = entry.getValue().getSocketChannel();
+            if (socketChannel.isConnected()) {
+                try {
+                    System.err.println("[TorrentManager] Session: " + socketChannel.getRemoteAddress() + " closed.");
+                    socketChannel.close();
+                } catch (IOException e) {
+                    System.err.println("[TorrentManager] Close socket exception!");
+                }
             }
             iterator.remove();
         }

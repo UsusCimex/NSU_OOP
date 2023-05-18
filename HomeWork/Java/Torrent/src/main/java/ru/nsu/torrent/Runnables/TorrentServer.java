@@ -91,7 +91,7 @@ public class TorrentServer implements Runnable {
             torrentManager.executeMessage(sender);
 
             socketChannel.register(this.selector, SelectionKey.OP_READ);
-            torrentManager.getServerSession().put(socketChannel, peer);
+            torrentManager.getServerSession().put(socketChannel.getRemoteAddress(), peer);
             System.err.println("[TorrentServer] Session opened: " + peer.getAddress());
         } else {
             socketChannel.close();
@@ -100,7 +100,7 @@ public class TorrentServer implements Runnable {
 
     private void read(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
-        Peer peer = torrentManager.getServerSession().get(socketChannel);
+        Peer peer = torrentManager.getServerSession().get(socketChannel.getRemoteAddress());
         if (peer == null) {
             System.err.println("[TorrentServer] Peer not found... Socket exception!");
             socketChannel.close();
@@ -113,7 +113,7 @@ public class TorrentServer implements Runnable {
             int numRead = socketChannel.read(lengthBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentServer] Session closed: " + socketChannel.getRemoteAddress());
-                torrentManager.getServerSession().remove(socketChannel);
+                torrentManager.getServerSession().remove(socketChannel.getRemoteAddress());
                 socketChannel.close();
                 key.cancel();
                 return;
@@ -128,7 +128,7 @@ public class TorrentServer implements Runnable {
             int numRead = socketChannel.read(byteBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentServer] Session closed: " + socketChannel.getRemoteAddress());
-                torrentManager.getServerSession().remove(socketChannel);
+                torrentManager.getServerSession().remove(socketChannel.getRemoteAddress());
                 socketChannel.close();
                 key.cancel();
                 return;
