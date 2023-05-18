@@ -48,6 +48,7 @@ public class TorrentServer implements Runnable {
                             accept(key);
                         } catch (IOException e) {
                             System.err.println("[TorrentServer] Accept failed.");
+                            key.channel().close();
                         }
                     } else if (key.isReadable()) {
                         try {

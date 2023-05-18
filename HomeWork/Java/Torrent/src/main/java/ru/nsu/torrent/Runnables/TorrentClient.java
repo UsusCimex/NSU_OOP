@@ -7,6 +7,7 @@ import ru.nsu.torrent.Messages.NotInterested;
 import ru.nsu.torrent.Messages.Request;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
@@ -71,10 +72,12 @@ public class TorrentClient implements Runnable {
                                 connect(key);
                             }
                         } catch (IOException e) {
-                            System.err.println("[TorrentClient] Connection failed!");
-                            torrentManager.getClientSession().remove((SocketChannel) (key.channel()));
                             try {
-                                key.channel().close();
+                                SocketChannel socketChannel = (SocketChannel) (key.channel());
+                                Socket socket = socketChannel.socket();
+                                System.err.println("[TorrentClient] Connection failed: " + socket.getRemoteSocketAddress());
+                                torrentManager.getClientSession().remove(socketChannel);
+                                socketChannel.close();
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -83,10 +86,12 @@ public class TorrentClient implements Runnable {
                         try {
                             read(key);
                         } catch (IOException e) {
-                            System.err.println("[TorrentClient] Read failed!");
-                            torrentManager.getClientSession().remove((SocketChannel) (key.channel()));
                             try {
-                                key.channel().close();
+                                SocketChannel socketChannel = (SocketChannel) (key.channel());
+                                Socket socket = socketChannel.socket();
+                                System.err.println("[TorrentClient] Read failed: " + socket.getRemoteSocketAddress());
+                                torrentManager.getClientSession().remove(socketChannel);
+                                socketChannel.close();
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
                             }
