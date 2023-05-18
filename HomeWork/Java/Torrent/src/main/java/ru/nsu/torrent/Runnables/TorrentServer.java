@@ -54,6 +54,7 @@ public class TorrentServer implements Runnable {
                             read(key);
                         } catch (IOException e) {
                             System.err.println("[TorrentServer] Read failed.");
+                            e.printStackTrace();
                             key.channel().close();
                         }
                     }

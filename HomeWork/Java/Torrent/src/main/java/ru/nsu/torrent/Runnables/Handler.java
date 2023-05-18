@@ -123,7 +123,6 @@ public class Handler implements Runnable {
 
     private byte[] readPieceData(int index, int offset, int length) {
         TorrentFile tFile = torrentManager.getTorrentFile(peer.getInfoHash());
-        assert tFile != null;
         if (!tFile.getPieceManager().getPiece(index)) {
             return null;
         }

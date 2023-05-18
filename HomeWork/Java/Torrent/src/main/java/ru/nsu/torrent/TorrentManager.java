@@ -105,7 +105,7 @@ public class TorrentManager {
             torrents.put(file.getAbsoluteFile(), new TorrentFile(file));
             torrentFile = torrents.get(file.getAbsoluteFile());
         }
-        return torrentFile;
+        return torrentFile.updated();
     }
     public TorrentFile getTorrentFile(byte[] infoHash) {
         for (Map.Entry<File, TorrentFile> entry : torrents.entrySet()) {

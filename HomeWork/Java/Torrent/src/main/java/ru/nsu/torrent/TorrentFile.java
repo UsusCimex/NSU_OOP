@@ -52,7 +52,6 @@ public class TorrentFile {
     }
     public TorrentFile updated() {
         this.pieceManager = generateExistingPieces();
-        this.tracker = new Tracker(this);
         return this;
     }
 
@@ -83,12 +82,11 @@ public class TorrentFile {
         PieceManager generatedPieceManager = new PieceManager(pieceHashes.size());
         File targetFile = new File(TorrentManager.DOWNLOADS_DIRECTORY + "/" + name);
         if (targetFile.exists() && targetFile.isFile()) {
-            try (RandomAccessFile raf = new RandomAccessFile(targetFile, "r")) {
+            try (FileInputStream raf = new FileInputStream(targetFile)) {
                 MessageDigest md = MessageDigest.getInstance("SHA-1");
                 byte[] buffer = new byte[(int) pieceLength];
 
                 for (int i = 0; i < pieceHashes.size(); i++) {
-                    raf.seek((long) i * pieceLength);
                     int bytesRead = raf.read(buffer);
                     if (bytesRead > 0) {
                         byte[] pieceData = Arrays.copyOf(buffer, bytesRead);
