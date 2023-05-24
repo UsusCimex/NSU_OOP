@@ -15,7 +15,7 @@ public class TorrentManager {
     public static final String DOWNLOADS_DIRECTORY = "downloadsDir";
     private final ExecutorService messagesExecutor = Executors.newFixedThreadPool(3);
     private final ExecutorService fileWriterExecutor = Executors.newFixedThreadPool(1);
-    private final Map<File, TorrentFile> torrents = new HashMap<>();
+    private final Map<String, TorrentFile> torrents = new HashMap<>();
 
     private final Map<SocketAddress, Peer> ClientSession = new HashMap<>();
     private final Map<SocketAddress, Peer> ServerSession = new HashMap<>();
@@ -57,7 +57,7 @@ public class TorrentManager {
 
         for (File file : Objects.requireNonNull(torrentsDir.listFiles())) {
             TorrentFile tFile = new TorrentFile(file);
-            torrents.put(file.getAbsoluteFile(), tFile);
+            torrents.put(TorrentManager.bytesToHex(tFile.getInfoHash()), tFile);
         }
     }
     public void executeMessage(Runnable runnable) {
@@ -90,47 +90,20 @@ public class TorrentManager {
         }
         session.clear();
     }
-    public List<byte[]> getAvailableInfoHashes() {
-        List<byte[]> infoHashes = new ArrayList<>();
-
-        for (Map.Entry<File, TorrentFile> entry : torrents.entrySet()) {
-            TorrentFile tFile = entry.getValue();
-            infoHashes.add(tFile.getInfoHash());
-        }
-
-        return infoHashes;
-    }
-    public TorrentFile getTorrentFile(File file) {
-        if (file == null) return null;
-        TorrentFile torrentFile = torrents.get(file.getAbsoluteFile());
-        if (torrentFile == null) {
-            torrents.put(file.getAbsoluteFile(), new TorrentFile(file));
-            torrentFile = torrents.get(file.getAbsoluteFile());
-        }
-        return torrentFile.updated();
+    public List<String> getAvailableInfoHashes() {
+        return new ArrayList<>(torrents.keySet());
     }
     public TorrentFile getTorrentFile(byte[] infoHash) {
-        for (Map.Entry<File, TorrentFile> entry : torrents.entrySet()) {
-            TorrentFile tFile = entry.getValue();
-            if (Arrays.equals(tFile.getInfoHash(), infoHash)) {
-                return tFile.updated();
-            }
+        if (infoHash == null) {
+            return null;
         }
-        return null;
+        return torrents.get(TorrentManager.bytesToHex(infoHash));
     }
     public File getDownloadFileByTorrent(TorrentFile torrentFile) {
         return new File(DOWNLOADS_DIRECTORY, torrentFile.getName());
     }
-    public String bytesToHex(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
+    public static String bytesToHex(byte[] bytes) {
+        return HexFormat.of().formatHex(bytes);
     }
 
     public void stop() {

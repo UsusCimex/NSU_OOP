@@ -12,7 +12,7 @@ public class Torrent {
     private final Thread serverThread;
     private final Thread clientThread;
     private final TorrentManager torrentManager = new TorrentManager();
-    private File selectedFile;
+    private byte[] selectedFileHash;
     public Torrent(String host, int port) {
         try {
             this.torrentServer = new TorrentServer(host, port, torrentManager);
@@ -39,13 +39,13 @@ public class Torrent {
         torrentManager.stop();
     }
     public void selectFile(File file) {
-        this.selectedFile = file;
+        this.selectedFileHash = TorrentFile.calculateInfoHash(file);
         torrentManager.stopSession(torrentManager.getClientSession());
-        TorrentFile torrentFile = torrentManager.getTorrentFile(selectedFile);
+        TorrentFile torrentFile = torrentManager.getTorrentFile(selectedFileHash);
         torrentClient.changeFile(torrentFile);
     }
 
     public TorrentFile getTorrentFile() {
-        return torrentManager.getTorrentFile(selectedFile);
+        return torrentManager.getTorrentFile(selectedFileHash);
     }
 }

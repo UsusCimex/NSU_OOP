@@ -16,8 +16,8 @@ public class TorrentFile {
     private final long pieceLength;
     private final List<byte[]> pieceHashes;
     private final byte[] infoHash;
-    private PieceManager pieceManager;
-    private final Tracker tracker;
+    private PieceManager pieceManager = null;
+    private Tracker tracker = null;
 
     public TorrentFile(File file) {
         try (
@@ -36,23 +36,20 @@ public class TorrentFile {
                 this.name = (String) infoDict.get("name");
                 this.pieceLength = (Long) infoDict.get("piece length");
                 this.pieceHashes = extractPieceHashes(((String) infoDict.get("pieces")).getBytes("ISO-8859-15"));
-                this.infoHash = calculateInfoHash(infoDict);
-                this.pieceManager = generateExistingPieces();
+                this.infoHash = calculateInfoHash(file);
             } else {
                 throw new RuntimeException("Bencode failed");
             }
-            this.tracker = new Tracker(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public Tracker getTracker() {
+        if (tracker == null) {
+            this.tracker = new Tracker(this);
+        }
         return tracker;
-    }
-    public TorrentFile updated() {
-        this.pieceManager = generateExistingPieces();
-        return this;
     }
 
     private List<byte[]> extractPieceHashes(byte[] pieces) {
@@ -68,50 +65,48 @@ public class TorrentFile {
         return pieceHashes;
     }
 
-    private byte[] calculateInfoHash(Map<String, Object> infoDict) {
-        Bencode bencode = new Bencode(Charset.forName("ISO-8859-15"));
-        try {
-            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-            return sha1.digest(bencode.encode(infoDict));
+    public static byte[] calculateInfoHash(File file) {
+        try (
+                FileInputStream fis = new FileInputStream(file);
+                BencodeInputStream bin = new BencodeInputStream(fis, Charset.forName("ISO-8859-15"))
+        ) {
+            Type<?> type = bin.nextType();
+            if (type != Type.DICTIONARY) {
+                throw new RuntimeException("Type != DICTIONARY");
+            }
+            Map<String, Object> dict = bin.readDictionary();
+            if (dict.get("info") instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> infoDict = (Map<String, Object>) dict.get("info");
+                Bencode bencode = new Bencode( Charset.forName("ISO-8859-15"));
+
+                MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+                return sha1.digest(bencode.encode(infoDict));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Algorithm SHA-1 not found...");
         }
-    }
-
-    private PieceManager generateExistingPieces() {
-        PieceManager generatedPieceManager = new PieceManager(pieceHashes.size());
-        File targetFile = new File(TorrentManager.DOWNLOADS_DIRECTORY + "/" + name);
-        if (targetFile.exists() && targetFile.isFile()) {
-            try (FileInputStream raf = new FileInputStream(targetFile)) {
-                MessageDigest md = MessageDigest.getInstance("SHA-1");
-                byte[] buffer = new byte[(int) pieceLength];
-
-                for (int i = 0; i < pieceHashes.size(); i++) {
-                    int bytesRead = raf.read(buffer);
-                    if (bytesRead > 0) {
-                        byte[] pieceData = Arrays.copyOf(buffer, bytesRead);
-                        byte[] pieceHash = md.digest(pieceData);
-
-                        if (Arrays.equals(pieceHash, pieceHashes.get(i))) {
-                            generatedPieceManager.markPieceAsAvailable(i);
-                        }
-                    }
-                }
-            } catch (IOException | NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                System.err.println("[TorrentFile] Failed to update existing pieces");
-            }
-        }
-        return generatedPieceManager;
+        return null;
     }
 
     public int getDownloadedPieces() {
+        if (pieceManager == null) {
+            this.pieceManager = new PieceManager(this);
+        }
         return pieceManager.getNumberOfAvailablePieces();
     }
     public synchronized void markPieceAsDownloaded(int index) {
+        if (pieceManager == null) {
+            this.pieceManager = new PieceManager(this);
+        }
         pieceManager.markPieceAsAvailable(index);
     }
     public PieceManager getPieceManager() {
+        if (pieceManager == null) {
+            this.pieceManager = new PieceManager(this);
+        }
         return pieceManager;
     }
     public String getName() {

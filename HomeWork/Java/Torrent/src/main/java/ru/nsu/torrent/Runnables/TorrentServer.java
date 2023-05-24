@@ -71,13 +71,13 @@ public class TorrentServer implements Runnable {
         System.err.println("[TorrentServer] " + socketChannel.getRemoteAddress() + " try to connect.");
         socketChannel.configureBlocking(false);
 
-        byte[] receivedInfoHash = handshake.receiveHandshake(socketChannel);
-        List<byte[]> availableInfoHashes = torrentManager.getAvailableInfoHashes();
+        String receivedInfoHash = TorrentManager.bytesToHex(handshake.receiveHandshake(socketChannel));
+        List<String> availableInfoHashes = torrentManager.getAvailableInfoHashes();
 
         byte[] validInfoHash = null;
-        for (byte[] infoHash : availableInfoHashes) {
-            if (receivedInfoHash != null && Arrays.equals(infoHash, receivedInfoHash)) {
-                validInfoHash = infoHash;
+        for (String infoHash : availableInfoHashes) {
+            if (infoHash.equals(receivedInfoHash)) {
+                validInfoHash = HexFormat.of().parseHex(infoHash);
                 break;
             }
         }
