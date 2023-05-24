@@ -51,14 +51,21 @@ public class TorrentApp extends Application {
             fileChooser.setInitialDirectory(new File(TorrentManager.TORRENTS_DIRECTORY));
             File torrentFile = fileChooser.showOpenDialog(primaryStage);
             if (torrentFile != null) {
+                System.err.println("[TorrentApp] Selected file: " + torrentFile.getName());
                 torrent.selectFile(torrentFile);
             }
+        });
+        Button stopTorrentButton = new Button("Остановить загрузку/Обновить информацию о файлах");
+        stopTorrentButton.setOnAction(event -> {
+            torrent.selectFile(null);
+            torrent.uploadTorrents();
+            System.err.println("[TorrentApp] Torrent stopped");
         });
 
         Label progressLabel = new Label("Прогресс загрузки:");
         progressListView = new ListView<>();
 
-        VBox vBox = new VBox(10, loadTorrentButton, progressLabel, progressListView);
+        VBox vBox = new VBox(10, loadTorrentButton, stopTorrentButton, progressLabel, progressListView);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(15));
 

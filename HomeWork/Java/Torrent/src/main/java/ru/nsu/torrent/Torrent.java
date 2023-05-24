@@ -39,10 +39,18 @@ public class Torrent {
         torrentManager.stop();
     }
     public void selectFile(File file) {
-        this.selectedFileHash = TorrentFile.calculateInfoHash(file);
         torrentManager.stopSession(torrentManager.getClientSession());
-        TorrentFile torrentFile = torrentManager.getTorrentFile(selectedFileHash);
-        torrentClient.changeFile(torrentFile);
+        if (file == null) {
+            this.selectedFileHash = null;
+            torrentClient.changeFile(null);
+        } else {
+            this.selectedFileHash = TorrentFile.calculateInfoHash(file);
+            TorrentFile torrentFile = torrentManager.getTorrentFile(selectedFileHash);
+            torrentClient.changeFile(torrentFile);
+        }
+    }
+    public void uploadTorrents() {
+        torrentManager.updateTorrents();
     }
 
     public TorrentFile getTorrentFile() {

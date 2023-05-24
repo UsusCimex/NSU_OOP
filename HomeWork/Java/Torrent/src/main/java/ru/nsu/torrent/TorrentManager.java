@@ -52,7 +52,7 @@ public class TorrentManager {
             }
         }
     }
-    private void updateTorrents() {
+    public void updateTorrents() {
         torrents.clear();
         File torrentsDir = new File(TORRENTS_DIRECTORY);
 
@@ -78,6 +78,7 @@ public class TorrentManager {
         Iterator<Map.Entry<SocketAddress, Peer>> iterator = session.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<SocketAddress, Peer> entry = iterator.next();
+            iterator.remove();
             SocketChannel socketChannel = entry.getValue().getSocketChannel();
             if (socketChannel.isConnected()) {
                 try {
@@ -87,7 +88,6 @@ public class TorrentManager {
                     System.err.println("[TorrentManager] Close socket exception!");
                 }
             }
-            iterator.remove();
         }
         session.clear();
     }
