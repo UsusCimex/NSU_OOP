@@ -26,29 +26,30 @@ public class TorrentManager {
     public void updateClientSession(TorrentFile torrentFile, Selector selector) {
         List<SocketAddress> addresses = torrentFile.getTracker().getAddresses();
         Map<SocketAddress, Peer> clientSession = getClientSession();
-
-        for (SocketAddress address : addresses) {
-            try {
-                if (address == null) continue;
-                boolean sessionExists = false;
-                for (Peer peer : clientSession.values()) {
-                    if (peer.getSocketChannel().getRemoteAddress().equals(address)) {
-                        sessionExists = true;
-                        break;
+        synchronized (addresses) {
+            for (SocketAddress address : addresses) {
+                try {
+                    if (address == null) continue;
+                    boolean sessionExists = false;
+                    for (Peer peer : clientSession.values()) {
+                        if (peer.getSocketChannel().getRemoteAddress().equals(address)) {
+                            sessionExists = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!sessionExists) {
-                    SocketChannel socketChannel = SocketChannel.open();
-                    socketChannel.configureBlocking(false);
-                    System.err.println("[TorrentManager] connecting to: " + address);
-                    socketChannel.connect(address);
-                    socketChannel.register(selector, SelectionKey.OP_CONNECT);
-                    Peer peer = new Peer(socketChannel, torrentFile.getInfoHash());
-                    clientSession.put(address, peer);
+                    if (!sessionExists) {
+                        SocketChannel socketChannel = SocketChannel.open();
+                        socketChannel.configureBlocking(false);
+                        System.err.println("[TorrentManager] connecting to: " + address);
+                        socketChannel.connect(address);
+                        socketChannel.register(selector, SelectionKey.OP_CONNECT);
+                        Peer peer = new Peer(socketChannel, torrentFile.getInfoHash());
+                        clientSession.put(address, peer);
+                    }
+                } catch (IOException e) {
+                    System.err.println("[TorrentManager] ClientSession update exception...");
                 }
-            } catch (IOException e) {
-                System.err.println("[TorrentManager] ClientSession update exception...");
             }
         }
     }
@@ -75,15 +76,12 @@ public class TorrentManager {
         return ServerSession;
     }
     public void stopSession(Map<SocketAddress, Peer> session) {
-        Iterator<Map.Entry<SocketAddress, Peer>> iterator = session.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<SocketAddress, Peer> entry = iterator.next();
-            iterator.remove();
-            SocketChannel socketChannel = entry.getValue().getSocketChannel();
+        for (Peer peer : session.values()) {
+            SocketChannel socketChannel = peer.getSocketChannel();
             if (socketChannel.isConnected()) {
                 try {
-                    System.err.println("[TorrentManager] Session: " + socketChannel.getRemoteAddress() + " closed.");
                     socketChannel.close();
+                    System.err.println("[TorrentManager] Session: " + socketChannel.getRemoteAddress() + " closed.");
                 } catch (IOException e) {
                     System.err.println("[TorrentManager] Close socket exception!");
                 }

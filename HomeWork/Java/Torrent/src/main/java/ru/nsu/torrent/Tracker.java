@@ -8,7 +8,7 @@ import java.util.*;
 
 // По ТЗ не нужен, но пусть возвращает список пиров из файла
 public class Tracker {
-    private final List<SocketAddress> addresses = new ArrayList<>();
+    private final List<SocketAddress> addresses = Collections.synchronizedList(new ArrayList<SocketAddress>());
     private final TorrentFile torrentFile;
     public final String TRACKERS_DIRECTORY = "trackersDir";
     public Tracker(TorrentFile torrentFile) {
@@ -19,20 +19,22 @@ public class Tracker {
         return addresses;
     }
     private void updateAddresses() {
-        addresses.clear();
-        String trackerFile = getPathToTrackerFile();
-        try (Scanner scanner = new Scanner(new File(TRACKERS_DIRECTORY + "/" + trackerFile))) {
-            while (scanner.hasNextLine()) {
-                String[] peerData = scanner.nextLine().split(":");
-                String ipAddress = peerData[0].trim();
-                int port = Integer.parseInt(peerData[1].trim());
-                SocketAddress address = new InetSocketAddress(ipAddress, port);
-                addresses.add(address);
+        synchronized (addresses) {
+            addresses.clear();
+            String trackerFile = getPathToTrackerFile();
+            try (Scanner scanner = new Scanner(new File(TRACKERS_DIRECTORY + "/" + trackerFile))) {
+                while (scanner.hasNextLine()) {
+                    String[] peerData = scanner.nextLine().split(":");
+                    String ipAddress = peerData[0].trim();
+                    int port = Integer.parseInt(peerData[1].trim());
+                    SocketAddress address = new InetSocketAddress(ipAddress, port);
+                    addresses.add(address);
+                }
+            } catch (FileNotFoundException ex) {
+                System.err.println("Tracker not found. Path: " + TRACKERS_DIRECTORY + "/" + trackerFile);
+            } catch (NullPointerException ex) {
+                ex.printStackTrace();
             }
-        } catch (FileNotFoundException ex) {
-            System.err.println("Tracker not found. Path: " + TRACKERS_DIRECTORY + "/" + trackerFile);
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
         }
     }
     private String getPathToTrackerFile() {

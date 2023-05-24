@@ -127,7 +127,7 @@ public class TorrentClient implements Runnable {
             return;
         }
         handshake.sendHandshake(socketChannel, torrentFile.getInfoHash(), new byte[20]);
-        key.interestOps(SelectionKey.OP_READ);
+        key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     }
 
     private void read(SelectionKey key) throws IOException {
@@ -175,8 +175,8 @@ public class TorrentClient implements Runnable {
     private void sendRequest(SelectionKey key) {
         SocketChannel socketChannel = (SocketChannel) key.channel();
         Socket socket = socketChannel.socket();
-        if (!socketChannel.isConnected()) { return; }
         Peer peer = torrentManager.getClientSession().get(socket.getRemoteSocketAddress());
+        if (peer == null) return;
         if (!peer.isInterested()) return;
 
         int missingPieceIndex = torrentFile.getPieceManager().getIndexOfSearchedPiece(peer.getAvailablePieces());
