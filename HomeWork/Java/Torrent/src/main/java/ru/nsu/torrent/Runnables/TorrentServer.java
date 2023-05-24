@@ -123,8 +123,8 @@ public class TorrentServer implements Runnable {
         int messageLength = lengthBuffer.getInt();
         ByteBuffer byteBuffer = ByteBuffer.allocate(messageLength + 4);
         lengthBuffer.flip();
+        byteBuffer.put(lengthBuffer);
         while(byteBuffer.hasRemaining()) {
-            byteBuffer.put(lengthBuffer);
             int numRead = socketChannel.read(byteBuffer);
             if (numRead == -1) {
                 System.err.println("[TorrentServer] Session closed: " + socketChannel.getRemoteAddress());
