@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 public class TorrentManager {
     public static final String TORRENTS_DIRECTORY = "torrentsDir";
     public static final String DOWNLOADS_DIRECTORY = "downloadsDir";
-    private final ExecutorService messagesExecutor = Executors.newFixedThreadPool(3);
+    private final ExecutorService messagesExecutor = Executors.newFixedThreadPool(2);
     private final ExecutorService fileWriterExecutor = Executors.newFixedThreadPool(1);
     private final Map<String, TorrentFile> torrents = new HashMap<>();
 
@@ -29,6 +29,7 @@ public class TorrentManager {
 
         for (SocketAddress address : addresses) {
             try {
+                if (address == null) continue;
                 boolean sessionExists = false;
                 for (Peer peer : clientSession.values()) {
                     if (peer.getSocketChannel().getRemoteAddress().equals(address)) {

@@ -14,7 +14,7 @@ public class Tracker {
     public Tracker(TorrentFile torrentFile) {
         this.torrentFile = torrentFile;
     }
-    public List<SocketAddress> getAddresses() {
+    public synchronized List<SocketAddress> getAddresses() {
         updateAddresses();
         return addresses;
     }
