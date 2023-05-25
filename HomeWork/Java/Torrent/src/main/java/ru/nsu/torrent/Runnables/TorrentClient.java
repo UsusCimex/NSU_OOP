@@ -110,7 +110,6 @@ public class TorrentClient implements Runnable {
                 }
             }
             torrentFile = null;
-            torrentManager.stopSession(torrentManager.getClientSession());
         }
         try {
             selector.close();

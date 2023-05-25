@@ -112,7 +112,6 @@ public class TorrentManager {
         if (!fileWriterExecutor.isShutdown()) {
             fileWriterExecutor.shutdown();
         }
-        stopSession(ClientSession);
         stopSession(ServerSession);
     }
 }

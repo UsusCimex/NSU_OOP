@@ -65,12 +65,12 @@ public class TorrentServer implements Runnable {
             }
         }
         try {
-            serverSocketChannel.close();
+            selector.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                selector.close();
+                serverSocketChannel.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
