@@ -13,12 +13,13 @@ public class Torrent {
     private final TorrentClient torrentClient;
     private final Thread serverThread;
     private final Thread clientThread;
-    private final TorrentManager torrentManager = new TorrentManager();
-    private final SocketAddress myIP;
+    private final TorrentManager torrentManager;
+    private final SocketAddress myAddress;
     private byte[] selectedFileHash;
     public Torrent(String host, int port) {
         try {
-            this.myIP = new InetSocketAddress(host, port);
+            this.myAddress = new InetSocketAddress(host, port);
+            this.torrentManager = new TorrentManager(myAddress);
 
             this.torrentServer = new TorrentServer(host, port, torrentManager);
             this.serverThread = new Thread(torrentServer);
@@ -61,6 +62,6 @@ public class Torrent {
     }
 
     public SocketAddress getMyIP() {
-        return myIP;
+        return myAddress;
     }
 }

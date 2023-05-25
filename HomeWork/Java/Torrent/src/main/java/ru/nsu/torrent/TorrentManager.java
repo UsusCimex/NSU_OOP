@@ -16,12 +16,14 @@ public class TorrentManager {
     private final ExecutorService messagesExecutor = Executors.newFixedThreadPool(2);
     private final ExecutorService fileWriterExecutor = Executors.newFixedThreadPool(1);
     private final Map<String, TorrentFile> torrents = new HashMap<>();
+    private final SocketAddress myAddress;
 
     private final Map<SocketAddress, Peer> ClientSession = new HashMap<>();
     private final Map<SocketAddress, Peer> ServerSession = new HashMap<>();
 
-    public TorrentManager() {
+    public TorrentManager(SocketAddress address) {
         updateTorrents();
+        myAddress = address;
     }
     public void updateClientSession(TorrentFile torrentFile, Selector selector) {
         List<SocketAddress> addresses = torrentFile.getTracker().getAddresses();
@@ -29,7 +31,7 @@ public class TorrentManager {
         synchronized (addresses) {
             for (SocketAddress address : addresses) {
                 try {
-                    if (address == null) continue;
+                    if (address == null || address.equals(myAddress)) continue;
                     boolean sessionExists = false;
                     for (Peer peer : clientSession.values()) {
                         if (peer.getSocketChannel().getRemoteAddress().equals(address)) {
@@ -112,6 +114,5 @@ public class TorrentManager {
         if (!fileWriterExecutor.isShutdown()) {
             fileWriterExecutor.shutdown();
         }
-        stopSession(ServerSession);
     }
 }
