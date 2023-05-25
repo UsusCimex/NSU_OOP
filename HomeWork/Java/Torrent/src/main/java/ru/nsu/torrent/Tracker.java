@@ -8,7 +8,7 @@ import java.util.*;
 
 // По ТЗ не нужен, но пусть возвращает список пиров из файла
 public class Tracker {
-    private final List<SocketAddress> addresses = Collections.synchronizedList(new ArrayList<SocketAddress>());
+    private final List<SocketAddress> addresses = Collections.synchronizedList(new ArrayList<>());
     private final TorrentFile torrentFile;
     public final String TRACKERS_DIRECTORY = "trackersDir";
     public Tracker(TorrentFile torrentFile) {
