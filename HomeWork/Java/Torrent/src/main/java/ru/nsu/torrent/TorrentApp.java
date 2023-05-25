@@ -18,10 +18,13 @@ import javafx.scene.control.ListView;
 import ru.nsu.torrent.net.ParserIP;
 
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 public class TorrentApp extends Application {
     private ListView<String> progressListView;
     private static Torrent torrent;
+    private static SocketAddress myIP;
 
     public static void main(String[] args) {
         String localIP;
@@ -36,6 +39,7 @@ public class TorrentApp extends Application {
             localIP = args[0];
             port = Integer.parseInt(args[1]);
         }
+        myIP = new InetSocketAddress(localIP, port);
         torrent = new Torrent(localIP, port);
         launch(args);
     }
@@ -61,11 +65,11 @@ public class TorrentApp extends Application {
             torrent.uploadTorrents();
             System.err.println("[TorrentApp] Torrent stopped");
         });
-
+        Label addressLabel = new Label("Your ip:\t" + myIP);
         Label progressLabel = new Label("Прогресс загрузки:");
         progressListView = new ListView<>();
 
-        VBox vBox = new VBox(10, loadTorrentButton, stopTorrentButton, progressLabel, progressListView);
+        VBox vBox = new VBox(10, loadTorrentButton, stopTorrentButton, addressLabel, progressLabel, progressListView);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(15));
 
