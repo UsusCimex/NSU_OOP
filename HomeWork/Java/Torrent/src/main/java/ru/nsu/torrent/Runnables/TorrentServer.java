@@ -33,13 +33,14 @@ public class TorrentServer implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
+                Iterator<SelectionKey> keys;
                 try {
-                    this.selector.selectNow();
-                } catch (IOException e) {
-                    System.err.println("[TorrentServer] Selector destroyed.");
-                    throw new RuntimeException(e);
+                    this.selector.select(100);
+                    keys = this.selector.selectedKeys().iterator();
+                } catch (IOException | ClosedSelectorException e) {
+                    System.err.println("[TorrentServer] Selector destroyed!");
+                    break;
                 }
-                Iterator<SelectionKey> keys = this.selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     SelectionKey key = keys.next();
                     keys.remove();
@@ -61,6 +62,17 @@ public class TorrentServer implements Runnable {
                 }
             } catch (ClosedSelectorException | IOException e) {
                 System.err.println("[TorrentServer] Selector closed!");
+            }
+        }
+        try {
+            serverSocketChannel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                selector.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -137,18 +149,5 @@ public class TorrentServer implements Runnable {
         Message message = Message.fromBytes(byteBuffer.flip().array());
         Handler sender = new Handler(peer, message, torrentManager);
         torrentManager.executeMessage(sender);
-    }
-
-    public void stop() {
-        try {
-            if (serverSocketChannel != null) {
-                serverSocketChannel.close();
-            }
-            if (selector != null) {
-                selector.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

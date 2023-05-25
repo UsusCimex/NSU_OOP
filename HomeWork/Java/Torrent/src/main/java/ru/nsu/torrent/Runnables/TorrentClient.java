@@ -17,7 +17,6 @@ public class TorrentClient implements Runnable {
     private final Selector selector;
     private final TorrentManager torrentManager;
     private final Handshake handshake;
-    private boolean isDownloadProcess;
     public TorrentClient(TorrentManager torrentManager) throws IOException {
         this.torrentManager = torrentManager;
         this.handshake = new Handshake(torrentManager);
@@ -25,7 +24,6 @@ public class TorrentClient implements Runnable {
     }
     public void changeFile(TorrentFile file) {
         torrentFile = file;
-        isDownloadProcess = false;
     }
     @Override
     public void run() {
@@ -50,9 +48,8 @@ public class TorrentClient implements Runnable {
             }
 
             System.err.println("[TorrentClient] Start download file: " + torrentFile.getName());
-            isDownloadProcess = true;
             boolean complete = false;
-            while (!complete && isDownloadProcess) {
+            while (!complete && !Thread.currentThread().isInterrupted()) {
                 torrentManager.updateClientSession(torrentFile, selector);
                 Iterator<SelectionKey> keys;
                 try {
@@ -60,7 +57,6 @@ public class TorrentClient implements Runnable {
                     keys = this.selector.selectedKeys().iterator();
                 } catch (IOException | ClosedSelectorException e) {
                     System.err.println("[TorrentClient] Selector destroyed!");
-                    isDownloadProcess = false;
                     break;
                 }
                 while (keys.hasNext()) {
@@ -115,6 +111,11 @@ public class TorrentClient implements Runnable {
             }
             torrentFile = null;
             torrentManager.stopSession(torrentManager.getClientSession());
+        }
+        try {
+            selector.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -192,16 +193,6 @@ public class TorrentClient implements Runnable {
             torrentManager.executeMessage(sender);
 
             peer.setInterested(false);
-        }
-    }
-    public void stop() {
-        try {
-            isDownloadProcess = false;
-            if (selector != null) {
-                selector.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

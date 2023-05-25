@@ -5,6 +5,8 @@ import ru.nsu.torrent.Runnables.TorrentServer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 public class Torrent {
     private final TorrentServer torrentServer;
@@ -12,9 +14,12 @@ public class Torrent {
     private final Thread serverThread;
     private final Thread clientThread;
     private final TorrentManager torrentManager = new TorrentManager();
+    private final SocketAddress myIP;
     private byte[] selectedFileHash;
     public Torrent(String host, int port) {
         try {
+            this.myIP = new InetSocketAddress(host, port);
+
             this.torrentServer = new TorrentServer(host, port, torrentManager);
             this.serverThread = new Thread(torrentServer);
             this.serverThread.start();
@@ -28,13 +33,11 @@ public class Torrent {
         }
     }
     public void stopTorrent() {
-        if (torrentServer != null) {
+        if (!serverThread.isInterrupted()) {
             serverThread.interrupt();
-            torrentServer.stop();
         }
-        if (torrentClient != null) {
+        if (!clientThread.isInterrupted()) {
             clientThread.interrupt();
-            torrentClient.stop();
         }
         torrentManager.stop();
     }
@@ -55,5 +58,9 @@ public class Torrent {
 
     public TorrentFile getTorrentFile() {
         return torrentManager.getTorrentFile(selectedFileHash);
+    }
+
+    public SocketAddress getMyIP() {
+        return myIP;
     }
 }
