@@ -60,60 +60,43 @@ public class TorrentClient implements Runnable {
                     break;
                 }
                 while (keys.hasNext()) {
-                    SelectionKey key = keys.next();
-                    keys.remove();
-                    if (key.isConnectable()) {
+                    try {
+                        SelectionKey key = keys.next();
+                        keys.remove();
                         try {
-                            if (((SocketChannel) key.channel()).finishConnect()) {
-                                connect(key);
+                            if (key.isConnectable()) {
+                                if (((SocketChannel) key.channel()).finishConnect()) {
+                                    connect(key);
+                                }
+                            } else if (key.isReadable()) {
+                                read(key);
                             }
                         } catch (IOException e) {
-                            try {
-                                SocketChannel socketChannel = (SocketChannel) (key.channel());
-                                Socket socket = socketChannel.socket();
-                                System.err.println("[TorrentClient] Connection failed: " + socket.getRemoteSocketAddress());
-                                torrentManager.getClientSession().remove(socket.getRemoteSocketAddress());
-                                socketChannel.close();
-                            } catch (IOException ex) {
-                                throw new RuntimeException(ex);
-                            }
+                            SocketChannel socketChannel = (SocketChannel) key.channel();
+                            Socket socket = socketChannel.socket();
+                            System.err.println("[TorrentClient] Session: " + socket.getRemoteSocketAddress() + " closed");
+                            torrentManager.getServerSession().remove(socket.getRemoteSocketAddress());
+                            socketChannel.close();
                         }
-                    } else if (key.isReadable()) {
-                        try {
-                            read(key);
-                        } catch (IOException e) {
-                            try {
-                                SocketChannel socketChannel = (SocketChannel) (key.channel());
-                                Socket socket = socketChannel.socket();
-                                System.err.println("[TorrentClient] Read failed: " + socket.getRemoteSocketAddress());
-                                torrentManager.getClientSession().remove(socket.getRemoteSocketAddress());
-                                socketChannel.close();
-                            } catch (IOException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        }
+
+                        sendRequest(key);
+                    } catch (IOException e) {
+                        System.err.println("[TorrentClient] Socket close exception!");
                     }
-                    sendRequest(key);
                 }
                 if (torrentFile == null) break;
                 complete = torrentFile.getPieceManager().getNumberOfAvailablePieces() == torrentFile.getPieceManager().getNumberPieces();
             }
             if (complete) {
                 System.err.println("[TorrentClient] File download complete: " + torrentFile.getName());
-                for (Peer pr : torrentManager.getServerSession().values()) {
-                    if (pr.getSocketChannel().isConnected()) {
-                        if (pr.getAvailablePieces().cardinality() != torrentFile.getDownloadedPieces()) {
-                            Sender sender = new Sender(pr, new Bitfield(torrentFile.getPieceManager().getAvailablePieces()), torrentManager);
-                            torrentManager.executeMessage(sender);
-                        }
-                    }
-                }
             }
             torrentFile = null;
+            torrentManager.stopSession(torrentManager.getClientSession());
         }
         try {
             selector.close();
         } catch (IOException e) {
+            System.err.println("[TorrentClient] Selector close exception!");
             throw new RuntimeException(e);
         }
     }

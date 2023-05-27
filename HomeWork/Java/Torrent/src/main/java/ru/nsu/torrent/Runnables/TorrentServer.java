@@ -8,6 +8,7 @@ import ru.nsu.torrent.TorrentManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
@@ -32,46 +33,47 @@ public class TorrentServer implements Runnable {
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
+            Iterator<SelectionKey> keys;
             try {
-                Iterator<SelectionKey> keys;
+                this.selector.select(100);
+                keys = this.selector.selectedKeys().iterator();
+            } catch (IOException | ClosedSelectorException e) {
+                System.err.println("[TorrentServer] Selector destroyed!");
+                break;
+            }
+            while (keys.hasNext()) {
                 try {
-                    this.selector.select(100);
-                    keys = this.selector.selectedKeys().iterator();
-                } catch (IOException | ClosedSelectorException e) {
-                    System.err.println("[TorrentServer] Selector destroyed!");
-                    break;
-                }
-                while (keys.hasNext()) {
                     SelectionKey key = keys.next();
                     keys.remove();
-                    if (key.isAcceptable()) {
-                        try {
+                    try {
+                        if (key.isAcceptable()) {
                             accept(key);
-                        } catch (IOException e) {
-                            System.err.println("[TorrentServer] Accept failed.");
-                            key.channel().close();
-                        }
-                    } else if (key.isReadable()) {
-                        try {
+                        } else if (key.isReadable()) {
                             read(key);
-                        } catch (IOException e) {
-                            System.err.println("[TorrentServer] Read failed.");
-                            key.channel().close();
                         }
+                    } catch (IOException e) {
+                        SocketChannel socketChannel = (SocketChannel) key.channel();
+                        Socket socket = socketChannel.socket();
+                        System.err.println("[TorrentServer] Session: " + socket.getRemoteSocketAddress() + " closed");
+                        torrentManager.getServerSession().remove(socket.getRemoteSocketAddress());
+                        socketChannel.close();
                     }
+                } catch (IOException e) {
+                    System.err.println("[TorrentServer] Socket close exception!");
                 }
-            } catch (ClosedSelectorException | IOException e) {
-                System.err.println("[TorrentServer] Selector closed!");
             }
         }
         try {
+            torrentManager.stopSession(torrentManager.getServerSession());
             selector.close();
         } catch (IOException e) {
+            System.err.println("[TorrentServer] Selector close exception!");
             throw new RuntimeException(e);
         } finally {
             try {
                 serverSocketChannel.close();
             } catch (IOException e) {
+                System.err.println("[TorrentServer] ServerSocket channel closed exception!");
                 throw new RuntimeException(e);
             }
         }
