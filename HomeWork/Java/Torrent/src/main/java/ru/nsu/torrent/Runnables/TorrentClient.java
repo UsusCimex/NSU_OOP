@@ -1,7 +1,6 @@
 package ru.nsu.torrent.Runnables;
 
 import ru.nsu.torrent.*;
-import ru.nsu.torrent.Messages.Bitfield;
 import ru.nsu.torrent.Messages.Message;
 import ru.nsu.torrent.Messages.NotInterested;
 import ru.nsu.torrent.Messages.Request;

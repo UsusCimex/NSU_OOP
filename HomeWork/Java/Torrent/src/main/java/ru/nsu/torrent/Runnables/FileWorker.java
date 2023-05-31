@@ -37,8 +37,10 @@ public class FileWorker implements Runnable {
             }
 
             Have have = new Have(index);
-            Sender sender = new Sender(peer, have, torrentManager);
-            torrentManager.executeMessage(sender);
+            for (var pr : torrentManager.getServerSession().values()) {
+                Sender sender = new Sender(pr, have, torrentManager);
+                torrentManager.executeMessage(sender);
+            }
         } else {
             System.err.println("[FileWorker] Please use this class only by Piece message");
             throw new RuntimeException("Use only Piece message!");

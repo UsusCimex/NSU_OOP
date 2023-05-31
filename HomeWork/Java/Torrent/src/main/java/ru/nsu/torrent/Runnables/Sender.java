@@ -5,10 +5,7 @@ import ru.nsu.torrent.Peer;
 import ru.nsu.torrent.TorrentManager;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Map;
 
 public class Sender implements Runnable {
     private final Peer peer;
@@ -24,39 +21,17 @@ public class Sender implements Runnable {
     @Override
     public void run() {
         try {
-            if (message.getType() == Have.HAVE) {
-                for (Map.Entry<SocketAddress, Peer> iterator : torrentManager.getServerSession().entrySet()) {
-                    Peer pr = iterator.getValue();
-                    if (pr.getSocketChannel().isConnected()) {
-                        if (pr == peer || !Arrays.equals(pr.getInfoHash(), peer.getInfoHash())) continue;
-                        if (!pr.isInterested() && !pr.isChoked()) {
-                            ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
-                            while (byteBuffer.hasRemaining()) {
-                                int numWrite = pr.getSocketChannel().write(byteBuffer);
-                                if (numWrite == -1) {
-                                    torrentManager.getClientSession().remove(iterator.getKey());
-                                    pr.getSocketChannel().close();
-                                    break;
-                                }
-                            }
-                            printMessage(message, pr);
-                        }
+            if ((!peer.isChoked()) || (message.getType() == Unchoke.UNCHOKE)) {
+                ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
+                while (byteBuffer.hasRemaining()) {
+                    int numWrite = peer.getSocketChannel().write(byteBuffer);
+                    if (numWrite == -1) {
+                        torrentManager.getServerSession().remove(peer.getSocketChannel().getRemoteAddress());
+                        peer.getSocketChannel().close();
+                        throw new IOException();
                     }
                 }
-            }
-            else {
-                if ((!peer.isChoked()) || (message.getType() == Unchoke.UNCHOKE)) {
-                    ByteBuffer byteBuffer = ByteBuffer.wrap(message.toBytes());
-                    while (byteBuffer.hasRemaining()) {
-                        int numWrite = peer.getSocketChannel().write(byteBuffer);
-                        if (numWrite == -1) {
-                            torrentManager.getServerSession().remove(peer.getSocketChannel().getRemoteAddress());
-                            peer.getSocketChannel().close();
-                            throw new IOException();
-                        }
-                    }
-                    printMessage(message, peer);
-                }
+                printMessage(message, peer);
             }
         } catch (IOException e){
             System.err.println("[Sender] Message(Type = " + message.getType() + ") not uploaded...");
