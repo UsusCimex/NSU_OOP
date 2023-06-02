@@ -34,7 +34,7 @@ public class TorrentManager {
                     if (address == null || address.equals(myAddress)) continue;
                     boolean sessionExists = false;
                     for (Peer peer : clientSession.values()) {
-                        if (peer.getSocketChannel().getRemoteAddress().equals(address)) {
+                        if (peer.getAddress().equals(address)) {
                             sessionExists = true;
                             break;
                         }
@@ -50,6 +50,7 @@ public class TorrentManager {
                         clientSession.put(address, peer);
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
                     System.err.println("[TorrentManager] ClientSession update exception...");
                 }
             }

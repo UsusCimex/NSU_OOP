@@ -74,7 +74,7 @@ public class TorrentClient implements Runnable {
                             SocketChannel socketChannel = (SocketChannel) key.channel();
                             Socket socket = socketChannel.socket();
                             System.err.println("[TorrentClient] Session: " + socket.getRemoteSocketAddress() + " closed");
-                            torrentManager.getServerSession().remove(socket.getRemoteSocketAddress());
+                            torrentManager.getClientSession().remove(socket.getRemoteSocketAddress());
                             socketChannel.close();
                         }
 
